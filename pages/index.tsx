@@ -6,6 +6,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isSample, setIsSample] = useState(false);
 
   const sampleContract = `This Agreement shall automatically renew for successive 12-month terms unless either party provides written notice at least 90 days prior to the end of the current term. The Vendor may modify pricing and terms upon renewal with 30 days notice. Liability is capped at fees paid in the last three (3) months. The Vendor may terminate this Agreement for convenience upon 30 days written notice.`;
 
@@ -32,8 +33,8 @@ export default function Home() {
     setError(null);
     setAnalysis("");
 
-    if (!accessToken) {
-      setError("You need to pay before analyzing a contract.");
+    if (!accessToken && !isSample) {
+      setError("You need to pay before analyzing your own contract.");
       setLoading(false);
       return;
     }
@@ -42,7 +43,7 @@ export default function Home() {
       const res = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contractText, accessToken }),
+        body: JSON.stringify({ contractText, accessToken, isSample }),
       });
 
       const data = await res.json();
@@ -73,7 +74,10 @@ export default function Home() {
         </p>
 
         <button
-          onClick={() => setContractText(sampleContract)}
+          onClick={() => {
+            setContractText(sampleContract);
+            setIsSample(true);
+          }}
           style={{
             marginBottom: 12,
             fontSize: 14,
@@ -83,13 +87,16 @@ export default function Home() {
             cursor: "pointer",
           }}
         >
-          Try with a sample SaaS agreement
+          Try with a sample SaaS agreement (free)
         </button>
 
         <textarea
           placeholder="Paste your agreement here..."
           value={contractText}
-          onChange={(e) => setContractText(e.target.value)}
+          onChange={(e) => {
+            setContractText(e.target.value);
+            setIsSample(false);
+          }}
           style={{
             width: "100%",
             height: 220,
@@ -102,7 +109,7 @@ export default function Home() {
           }}
         />
 
-        {!accessToken ? (
+        {!accessToken && !isSample ? (
           <button
             onClick={pay}
             style={{
@@ -117,7 +124,7 @@ export default function Home() {
               cursor: "pointer",
             }}
           >
-            Pay 99 kr to analyze one contract
+            Pay 99 kr to analyze your own contract
           </button>
         ) : (
           <button
@@ -158,6 +165,18 @@ export default function Home() {
               fontSize: 15,
             }}
           >
+            {isSample && (
+              <div
+                style={{
+                  marginBottom: 12,
+                  fontSize: 12,
+                  color: "#facc15",
+                  fontWeight: 700,
+                }}
+              >
+                SAMPLE ANALYSIS – example output
+              </div>
+            )}
             {analysis}
           </div>
         )}

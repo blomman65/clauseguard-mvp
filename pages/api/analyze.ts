@@ -10,14 +10,17 @@ export default async function handler(
 ) {
   if (req.method !== "POST") return res.status(405).end();
 
-  const { contractText, accessToken } = req.body;
-
-  if (!accessToken || !consumeAccessToken(accessToken)) {
-    return res.status(403).json({ error: "Invalid or already used token" });
-  }
+  const { contractText, accessToken, isSample } = req.body;
 
   if (!contractText || contractText.length < 50) {
     return res.status(400).json({ error: "Contract text too short" });
+  }
+
+  // Require valid token ONLY for non-sample analysis
+  if (!isSample) {
+    if (!accessToken || !consumeAccessToken(accessToken)) {
+      return res.status(403).json({ error: "Invalid or already used token" });
+    }
   }
 
   try {
