@@ -1,85 +1,45 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import OpenAI from "openai";
-import { consumeAccessToken } from "../../lib/accessTokens";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") return res.status(405).end();
 
   const { contractText, accessToken, isSample } = req.body;
 
-  if (!contractText || contractText.length < 50) {
-    return res.status(400).json({ error: "Contract text too short" });
+  if (!isSample && !accessToken) {
+    return res.status(403).json({ error: "No valid token provided" });
   }
 
-  // 🔒 Require valid token ONLY for non-sample analysis
-  if (!isSample) {
-    if (!accessToken || !consumeAccessToken(accessToken)) {
-      return res
-        .status(403)
-        .json({ error: "Invalid or already used token" });
-    }
-  }
+  if (!contractText || contractText.length < 20)
+    return res.status(400).json({ error: "Contract text too short" });
 
   try {
     const completion = await openai.chat.completions.create({
       model: "gpt-4o",
-      max_tokens: 800,
+      max_tokens: 700,
       messages: [
         {
           role: "system",
           content: `
-You are a senior commercial SaaS lawyer advising a CFO at a 10–50 person startup.
-
-CRITICAL:
-Start your response with exactly one line in this format:
-Overall risk level: LOW | MEDIUM | HIGH
-
-Then leave one blank line and continue.
-
-Focus especially on:
-- Financial exposure
-- Termination and auto-renewal
-- Liability caps
-- Unilateral changes
-- Vendor lock-in
-
-Be conservative. If something is unclear, flag it as a risk.
-
-Return strictly in this format:
-
-Overall risk level: <LOW | MEDIUM | HIGH>
-
-1. Overall assessment (1 short paragraph)
-2. Top 5 risks (each with:
-   - Risk level
-   - Why it matters
-   - What to negotiate)
-3. Financial red flags
-4. Clauses that are non-standard for SaaS agreements
-5. Recommended negotiation priorities (max 5 bullets)
-
-Use clear business language. This is not legal advice.
+You are a senior commercial lawyer advising a CFO.
+Return the analysis in this structure:
+1. Executive summary (max 6 bullets)
+2. Key risks (High / Medium / Low)
+3. Financial implications
+4. Non-standard clauses
+5. Recommended next steps
+Use clear, non-legal language. This is not legal advice.
           `,
         },
-        {
-          role: "user",
-          content: contractText,
-        },
+        { role: "user", content: contractText },
       ],
     });
 
-    res.status(200).json({
-      analysis: completion.choices[0].message.content,
-    });
+    res.status(200).json({ analysis: completion.choices[0].message.content });
   } catch (err) {
-    console.error("OpenAI analysis error:", err);
+    console.error(err);
     res.status(500).json({ error: "Analysis failed" });
   }
 }
