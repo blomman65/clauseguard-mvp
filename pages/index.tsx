@@ -320,6 +320,71 @@ export default function Home() {
           </div>
         )}
 
+        {/* FAQ + Trust Section */}
+        <div style={{ marginTop: 60 }}>
+          <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16 }}>
+            Frequently Asked Questions
+          </h3>
+
+          <div style={{ marginBottom: 12 }}>
+            <strong>Q: Are my contracts safe?</strong>
+            <p style={{ fontSize: 14, color: "#cbd5f5", margin: "4px 0 8px" }}>
+              ClauseGuard processes contracts securely in memory only. Your documents
+              are not stored or used for training AI models.
+            </p>
+          </div>
+
+          <div style={{ marginBottom: 12 }}>
+            <strong>Q: Can AI really understand legal contracts?</strong>
+            <p style={{ fontSize: 14, color: "#cbd5f5", margin: "4px 0 8px" }}>
+              ClauseGuard uses advanced AI trained to spot common commercial and SaaS
+              contract risks. It highlights potential financial exposure and non-standard clauses.
+            </p>
+          </div>
+
+          <div style={{ marginBottom: 12 }}>
+            <strong>Q: Is this legal advice?</strong>
+            <p style={{ fontSize: 14, color: "#cbd5f5", margin: "4px 0 8px" }}>
+              No. This is general information to support decision-making. Always consult
+              a qualified lawyer for binding advice.
+            </p>
+          </div>
+
+          <div style={{ marginBottom: 12 }}>
+            <strong>Q: When is this analysis enough?</strong>
+            <p style={{ fontSize: 14, color: "#cbd5f5", margin: "4px 0 8px" }}>
+              It's perfect for spotting high-risk clauses quickly before contract review.
+              Use it as a sanity check to avoid surprises and negotiate smarter.
+            </p>
+          </div>
+
+          <div
+            style={{
+              marginTop: 32,
+              padding: 24,
+              borderRadius: 12,
+              background: "#020617",
+            }}
+          >
+            <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 12 }}>
+              Why CFOs and Founders Trust ClauseGuard
+            </h3>
+            <ul
+              style={{
+                fontSize: 14,
+                color: "#cbd5f5",
+                lineHeight: 1.6,
+                paddingLeft: 20,
+              }}
+            >
+              <li>Instant contract analysis without waiting for a lawyer</li>
+              <li>Clear, non-legal language for decision-making</li>
+              <li>Secure: contracts are not stored or shared</li>
+              <li>Supports smart negotiation — saves time and money</li>
+            </ul>
+          </div>
+        </div>
+
         <p style={{ marginTop: 40, fontSize: 12, color: "#94a3b8" }}>
           Contracts are processed securely and not stored after analysis. This
           tool provides general information only and does not constitute legal
