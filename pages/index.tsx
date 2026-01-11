@@ -7,10 +7,13 @@ export default function Home() {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSample, setIsSample] = useState(false);
-  const [riskLevel, setRiskLevel] = useState<"LOW" | "MEDIUM" | "HIGH" | null>(null);
+  const [riskLevel, setRiskLevel] = useState<
+    "LOW" | "MEDIUM" | "HIGH" | null
+  >(null);
 
   const sampleContract = `This Agreement shall automatically renew for successive 12-month terms unless either party provides written notice at least 90 days prior to the end of the current term. The Vendor may modify pricing and terms upon renewal with 30 days notice. Liability is capped at fees paid in the last three (3) months. The Vendor may terminate this Agreement for convenience upon 30 days written notice.`;
 
+  // Read token from URL after Stripe success
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const token = params.get("token");
@@ -77,7 +80,10 @@ export default function Home() {
     const res = await fetch("/api/export-pdf", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ analysis, riskLevel }),
+      body: JSON.stringify({
+        analysis,
+        riskLevel,
+      }),
     });
 
     const blob = await res.blob();
@@ -89,13 +95,17 @@ export default function Home() {
     document.body.appendChild(a);
     a.click();
     a.remove();
+
     window.URL.revokeObjectURL(url);
   };
 
   return (
     <main style={{ background: "#0f172a", minHeight: "100vh", color: "white" }}>
       <div style={{ maxWidth: 720, margin: "auto", padding: "60px 20px" }}>
-        <h1 style={{ fontSize: 42, fontWeight: 800, marginBottom: 12 }}>ClauseGuard</h1>
+        <h1 style={{ fontSize: 42, fontWeight: 800, marginBottom: 12 }}>
+          ClauseGuard
+        </h1>
+
         <p style={{ fontSize: 18, color: "#cbd5f5", marginBottom: 24 }}>
           ClauseGuard analyzes SaaS and commercial contracts using AI and highlights
           financial risk, hidden clauses, and what you should renegotiate.
@@ -103,6 +113,11 @@ export default function Home() {
         </p>
 
         <div style={{ marginBottom: 48 }}>
+          <p style={{ fontSize: 14, color: "#a5b4fc", marginBottom: 12 }}>
+            Used by early-stage founders and operators to sanity-check contracts
+            before legal review.
+          </p>
+
           <div
             style={{
               background: "#020617",
@@ -114,7 +129,14 @@ export default function Home() {
               Most contract risk is invisible until it’s too late
             </h2>
 
-            <ul style={{ fontSize: 15, lineHeight: 1.7, color: "#cbd5f5", paddingLeft: 20 }}>
+            <ul
+              style={{
+                fontSize: 15,
+                lineHeight: 1.7,
+                color: "#cbd5f5",
+                paddingLeft: 20,
+              }}
+            >
               <li>Auto-renewals that quietly lock you in</li>
               <li>Liability caps that don’t match your exposure</li>
               <li>Termination clauses favoring the vendor</li>
@@ -129,19 +151,33 @@ export default function Home() {
         </div>
 
         <div style={{ marginBottom: 24 }}>
-          <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>How it works</h3>
-          <ol style={{ fontSize: 14, color: "#cbd5f5", paddingLeft: 20, lineHeight: 1.6 }}>
+          <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>
+            How it works
+          </h3>
+
+          <ol
+            style={{
+              fontSize: 14,
+              color: "#cbd5f5",
+              paddingLeft: 20,
+              lineHeight: 1.6,
+            }}
+          >
             <li>Paste your contract</li>
             <li>Get an instant risk analysis</li>
             <li>See what to renegotiate before signing</li>
           </ol>
+
           <p style={{ fontSize: 12, color: "#94a3b8", marginTop: 8 }}>
             No account required. One-time analysis. Takes under 60 seconds.
           </p>
         </div>
 
         <button
-          onClick={() => { setContractText(sampleContract); setIsSample(true); }}
+          onClick={() => {
+            setContractText(sampleContract);
+            setIsSample(true);
+          }}
           style={{
             marginBottom: 12,
             fontSize: 14,
@@ -157,7 +193,10 @@ export default function Home() {
         <textarea
           placeholder="Paste your agreement here..."
           value={contractText}
-          onChange={(e) => { setContractText(e.target.value); setIsSample(false); }}
+          onChange={(e) => {
+            setContractText(e.target.value);
+            setIsSample(false);
+          }}
           style={{
             width: "100%",
             height: 220,
@@ -209,7 +248,9 @@ export default function Home() {
         )}
 
         {error && (
-          <p style={{ marginTop: 24, color: "#f87171", fontSize: 14 }}>{error}</p>
+          <p style={{ marginTop: 24, color: "#f87171", fontSize: 14 }}>
+            {error}
+          </p>
         )}
 
         {analysis && (
@@ -246,7 +287,14 @@ export default function Home() {
             )}
 
             {isSample && (
-              <div style={{ marginBottom: 12, fontSize: 12, color: "#facc15", fontWeight: 700 }}>
+              <div
+                style={{
+                  marginBottom: 12,
+                  fontSize: 12,
+                  color: "#facc15",
+                  fontWeight: 700,
+                }}
+              >
                 SAMPLE ANALYSIS – example output
               </div>
             )}
@@ -270,6 +318,7 @@ export default function Home() {
               Download PDF
             </button>
 
+            {/* CTA för att uppgradera från sample */}
             {isSample && (
               <button
                 onClick={pay}
@@ -300,36 +349,54 @@ export default function Home() {
           <div style={{ marginBottom: 12 }}>
             <strong>Q: Are my contracts safe?</strong>
             <p style={{ fontSize: 14, color: "#cbd5f5", margin: "4px 0 8px" }}>
-              ClauseGuard processes contracts securely in memory only. Your documents are not stored or used for training AI models.
+              ClauseGuard processes contracts securely in memory only. Your documents
+              are not stored or used for training AI models.
             </p>
           </div>
 
           <div style={{ marginBottom: 12 }}>
             <strong>Q: Can AI really understand legal contracts?</strong>
             <p style={{ fontSize: 14, color: "#cbd5f5", margin: "4px 0 8px" }}>
-              ClauseGuard uses advanced AI trained to spot common commercial and SaaS contract risks. It highlights potential financial exposure and non-standard clauses.
+              ClauseGuard uses advanced AI trained to spot common commercial and SaaS
+              contract risks. It highlights potential financial exposure and non-standard clauses.
             </p>
           </div>
 
           <div style={{ marginBottom: 12 }}>
             <strong>Q: Is this legal advice?</strong>
             <p style={{ fontSize: 14, color: "#cbd5f5", margin: "4px 0 8px" }}>
-              No. This is general information to support decision-making. Always consult a qualified lawyer for binding advice.
+              No. This is general information to support decision-making. Always consult
+              a qualified lawyer for binding advice.
             </p>
           </div>
 
           <div style={{ marginBottom: 12 }}>
             <strong>Q: When is this analysis enough?</strong>
             <p style={{ fontSize: 14, color: "#cbd5f5", margin: "4px 0 8px" }}>
-              It's perfect for spotting high-risk clauses quickly before contract review. Use it as a sanity check to avoid surprises and negotiate smarter.
+              It's perfect for spotting high-risk clauses quickly before contract review.
+              Use it as a sanity check to avoid surprises and negotiate smarter.
             </p>
           </div>
 
-          <div style={{ marginTop: 32, padding: 24, borderRadius: 12, background: "#020617" }}>
+          <div
+            style={{
+              marginTop: 32,
+              padding: 24,
+              borderRadius: 12,
+              background: "#020617",
+            }}
+          >
             <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 12 }}>
               Why CFOs and Founders Trust ClauseGuard
             </h3>
-            <ul style={{ fontSize: 14, color: "#cbd5f5", lineHeight: 1.6, paddingLeft: 20 }}>
+            <ul
+              style={{
+                fontSize: 14,
+                color: "#cbd5f5",
+                lineHeight: 1.6,
+                paddingLeft: 20,
+              }}
+            >
               <li>Instant contract analysis without waiting for a lawyer</li>
               <li>Clear, non-legal language for decision-making</li>
               <li>Secure: contracts are not stored or shared</li>
@@ -339,7 +406,9 @@ export default function Home() {
         </div>
 
         <p style={{ marginTop: 40, fontSize: 12, color: "#94a3b8" }}>
-          Contracts are processed securely and not stored after analysis. This tool provides general information only and does not constitute legal advice.
+          Contracts are processed securely and not stored after analysis. This
+          tool provides general information only and does not constitute legal
+          advice.
         </p>
       </div>
     </main>
