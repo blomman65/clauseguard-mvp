@@ -76,6 +76,29 @@ export default function Home() {
     setLoading(false);
   };
 
+  const downloadPdf = async () => {
+    const res = await fetch("/api/export-pdf", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        analysis,
+        riskLevel,
+      }),
+    });
+
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "ClauseGuard_Contract_Analysis.pdf";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    window.URL.revokeObjectURL(url);
+  };
+
   return (
     <main style={{ background: "#0f172a", minHeight: "100vh", color: "white" }}>
       <div style={{ maxWidth: 720, margin: "auto", padding: "60px 20px" }}>
@@ -277,6 +300,23 @@ export default function Home() {
             )}
 
             {analysis}
+
+            <button
+              onClick={downloadPdf}
+              style={{
+                marginTop: 24,
+                padding: "10px 16px",
+                fontSize: 14,
+                fontWeight: 700,
+                borderRadius: 10,
+                background: "#334155",
+                color: "white",
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
+              Download PDF
+            </button>
           </div>
         )}
 
