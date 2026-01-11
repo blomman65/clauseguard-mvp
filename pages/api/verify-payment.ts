@@ -12,13 +12,17 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const { session_id } = req.query;
-  if (!session_id || typeof session_id !== "string")
+
+  if (!session_id || typeof session_id !== "string") {
     return res.status(400).json({ error: "Missing session_id" });
+  }
 
   try {
     const session = await stripe.checkout.sessions.retrieve(session_id);
-    if (session.payment_status !== "paid")
+
+    if (session.payment_status !== "paid") {
       return res.status(403).json({ error: "Payment not completed" });
+    }
 
     const token = randomUUID();
     createAccessToken(token);

@@ -1,12 +1,11 @@
-const tokens = new Map<string, { used: boolean }>();
+const validTokens = new Set<string>();
 
 export function createAccessToken(token: string) {
-  tokens.set(token, { used: false });
+  validTokens.add(token);
 }
 
 export function consumeAccessToken(token: string): boolean {
-  const entry = tokens.get(token);
-  if (!entry || entry.used) return false;
-  entry.used = true;
+  if (!validTokens.has(token)) return false;
+  validTokens.delete(token); // one-time use
   return true;
 }
