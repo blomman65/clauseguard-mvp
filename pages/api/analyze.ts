@@ -2,7 +2,9 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import OpenAI from "openai";
 import { consumeAccessToken } from "../../lib/accessTokens";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 export default async function handler(
   req: NextApiRequest,
@@ -16,10 +18,12 @@ export default async function handler(
     return res.status(400).json({ error: "Contract text too short" });
   }
 
-  // Require valid token ONLY for non-sample analysis
+  // 🔒 Require valid token ONLY for non-sample analysis
   if (!isSample) {
     if (!accessToken || !consumeAccessToken(accessToken)) {
-      return res.status(403).json({ error: "Invalid or already used token" });
+      return res
+        .status(403)
+        .json({ error: "Invalid or already used token" });
     }
   }
 
@@ -33,6 +37,12 @@ export default async function handler(
           content: `
 You are a senior commercial SaaS lawyer advising a CFO at a 10–50 person startup.
 
+CRITICAL:
+Start your response with exactly one line in this format:
+Overall risk level: LOW | MEDIUM | HIGH
+
+Then leave one blank line and continue.
+
 Focus especially on:
 - Financial exposure
 - Termination and auto-renewal
@@ -44,7 +54,9 @@ Be conservative. If something is unclear, flag it as a risk.
 
 Return strictly in this format:
 
-1. Overall risk level (Low / Medium / High) with 1-sentence justification
+Overall risk level: <LOW | MEDIUM | HIGH>
+
+1. Overall assessment (1 short paragraph)
 2. Top 5 risks (each with:
    - Risk level
    - Why it matters
@@ -56,7 +68,10 @@ Return strictly in this format:
 Use clear business language. This is not legal advice.
           `,
         },
-        { role: "user", content: contractText },
+        {
+          role: "user",
+          content: contractText,
+        },
       ],
     });
 
@@ -64,7 +79,7 @@ Use clear business language. This is not legal advice.
       analysis: completion.choices[0].message.content,
     });
   } catch (err) {
-    console.error(err);
+    console.error("OpenAI analysis error:", err);
     res.status(500).json({ error: "Analysis failed" });
   }
 }

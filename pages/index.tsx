@@ -7,6 +7,9 @@ export default function Home() {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSample, setIsSample] = useState(false);
+  const [riskLevel, setRiskLevel] = useState<
+    "LOW" | "MEDIUM" | "HIGH" | null
+  >(null);
 
   const sampleContract = `This Agreement shall automatically renew for successive 12-month terms unless either party provides written notice at least 90 days prior to the end of the current term. The Vendor may modify pricing and terms upon renewal with 30 days notice. Liability is capped at fees paid in the last three (3) months. The Vendor may terminate this Agreement for convenience upon 30 days written notice.`;
 
@@ -28,10 +31,19 @@ export default function Home() {
     window.location.href = data.url;
   };
 
+  const extractRiskLevel = (text: string) => {
+    const firstLine = text.split("\n")[0];
+    if (firstLine.includes("HIGH")) return "HIGH";
+    if (firstLine.includes("MEDIUM")) return "MEDIUM";
+    if (firstLine.includes("LOW")) return "LOW";
+    return null;
+  };
+
   const analyze = async () => {
     setLoading(true);
     setError(null);
     setAnalysis("");
+    setRiskLevel(null);
 
     if (!accessToken && !isSample) {
       setError("You need to pay before analyzing your own contract.");
@@ -54,6 +66,8 @@ export default function Home() {
         return;
       }
 
+      const risk = extractRiskLevel(data.analysis);
+      setRiskLevel(risk);
       setAnalysis(data.analysis);
     } catch {
       setError("Something went wrong. Please try again.");
@@ -61,6 +75,13 @@ export default function Home() {
 
     setLoading(false);
   };
+
+  const riskColor =
+    riskLevel === "HIGH"
+      ? "#ef4444"
+      : riskLevel === "MEDIUM"
+      ? "#f59e0b"
+      : "#22c55e";
 
   return (
     <main style={{ background: "#0f172a", minHeight: "100vh", color: "white" }}>
@@ -165,6 +186,23 @@ export default function Home() {
               fontSize: 15,
             }}
           >
+            {riskLevel && (
+              <div
+                style={{
+                  display: "inline-block",
+                  marginBottom: 16,
+                  padding: "6px 12px",
+                  borderRadius: 999,
+                  background: riskColor,
+                  fontSize: 12,
+                  fontWeight: 800,
+                  color: "white",
+                }}
+              >
+                Overall risk: {riskLevel}
+              </div>
+            )}
+
             {isSample && (
               <div
                 style={{
@@ -177,6 +215,7 @@ export default function Home() {
                 SAMPLE ANALYSIS – example output
               </div>
             )}
+
             {analysis}
           </div>
         )}
