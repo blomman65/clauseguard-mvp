@@ -13,7 +13,7 @@ export default function Home() {
 
   const sampleContract = `This Agreement shall automatically renew for successive 12-month terms unless either party provides written notice at least 90 days prior to the end of the current term. The Vendor may modify pricing and terms upon renewal with 30 days notice. Liability is capped at fees paid in the last three (3) months. The Vendor may terminate this Agreement for convenience upon 30 days written notice.`;
 
-  // Läs token från URL efter Stripe success
+  // Read token from URL after Stripe success
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const token = params.get("token");
@@ -32,10 +32,10 @@ export default function Home() {
   };
 
   const extractRiskLevel = (text: string) => {
-    const firstLine = text.split("\n")[0];
-    if (firstLine.includes("HIGH")) return "HIGH";
-    if (firstLine.includes("MEDIUM")) return "MEDIUM";
-    if (firstLine.includes("LOW")) return "LOW";
+    const firstLines = text.slice(0, 200).toUpperCase();
+    if (firstLines.includes("HIGH")) return "HIGH";
+    if (firstLines.includes("MEDIUM")) return "MEDIUM";
+    if (firstLines.includes("LOW")) return "LOW";
     return null;
   };
 
@@ -76,36 +76,6 @@ export default function Home() {
     setLoading(false);
   };
 
-  const downloadPdf = async () => {
-    const res = await fetch("/api/export-pdf", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        analysis,
-        riskLevel,
-      }),
-    });
-
-    const blob = await res.blob();
-    const url = window.URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "ClauseGuard_Contract_Analysis.pdf";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-
-    window.URL.revokeObjectURL(url);
-  };
-
-  const riskColor =
-    riskLevel === "HIGH"
-      ? "#ef4444"
-      : riskLevel === "MEDIUM"
-      ? "#f59e0b"
-      : "#22c55e";
-
   return (
     <main style={{ background: "#0f172a", minHeight: "100vh", color: "white" }}>
       <div style={{ maxWidth: 720, margin: "auto", padding: "60px 20px" }}>
@@ -113,9 +83,72 @@ export default function Home() {
           ClauseGuard
         </h1>
 
-        <p style={{ fontSize: 18, color: "#cbd5f5", marginBottom: 32 }}>
-          Instantly spot risky clauses before your startup signs a contract.
+        <p style={{ fontSize: 18, color: "#cbd5f5", marginBottom: 24 }}>
+          ClauseGuard analyzes SaaS and commercial contracts using AI and highlights
+          financial risk, hidden clauses, and what you should renegotiate.
+          Built for founders, CFOs, and operators.
         </p>
+
+        <div style={{ marginBottom: 48 }}>
+          <p style={{ fontSize: 14, color: "#a5b4fc", marginBottom: 12 }}>
+            Used by early-stage founders and operators to sanity-check contracts
+            before legal review.
+          </p>
+
+          <div
+            style={{
+              background: "#020617",
+              borderRadius: 16,
+              padding: 24,
+            }}
+          >
+            <h2 style={{ fontSize: 22, fontWeight: 800, marginBottom: 12 }}>
+              Most contract risk is invisible until it’s too late
+            </h2>
+
+            <ul
+              style={{
+                fontSize: 15,
+                lineHeight: 1.7,
+                color: "#cbd5f5",
+                paddingLeft: 20,
+              }}
+            >
+              <li>Auto-renewals that quietly lock you in</li>
+              <li>Liability caps that don’t match your exposure</li>
+              <li>Termination clauses favoring the vendor</li>
+              <li>Pricing terms that increase costs over time</li>
+            </ul>
+
+            <p style={{ marginTop: 16, fontSize: 14, color: "#e5e7eb" }}>
+              ClauseGuard scans your agreement and explains the real risk in plain
+              language — so you know what to negotiate before signing.
+            </p>
+          </div>
+        </div>
+
+        <div style={{ marginBottom: 24 }}>
+          <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>
+            How it works
+          </h3>
+
+          <ol
+            style={{
+              fontSize: 14,
+              color: "#cbd5f5",
+              paddingLeft: 20,
+              lineHeight: 1.6,
+            }}
+          >
+            <li>Paste your contract</li>
+            <li>Get an instant risk analysis</li>
+            <li>See what to renegotiate before signing</li>
+          </ol>
+
+          <p style={{ fontSize: 12, color: "#94a3b8", marginTop: 8 }}>
+            No account required. One-time analysis. Takes under 60 seconds.
+          </p>
+        </div>
 
         <button
           onClick={() => {
@@ -131,7 +164,7 @@ export default function Home() {
             cursor: "pointer",
           }}
         >
-          Try with a sample SaaS agreement (free)
+          Try a sample SaaS agreement (free)
         </button>
 
         <textarea
@@ -216,10 +249,14 @@ export default function Home() {
                   marginBottom: 16,
                   padding: "6px 12px",
                   borderRadius: 999,
-                  background: riskColor,
+                  background:
+                    riskLevel === "HIGH"
+                      ? "#ef4444"
+                      : riskLevel === "MEDIUM"
+                      ? "#f59e0b"
+                      : "#22c55e",
                   fontSize: 12,
                   fontWeight: 800,
-                  color: "white",
                 }}
               >
                 Overall risk: {riskLevel}
@@ -240,23 +277,6 @@ export default function Home() {
             )}
 
             {analysis}
-
-            <button
-              onClick={downloadPdf}
-              style={{
-                marginTop: 20,
-                padding: "10px 16px",
-                fontSize: 14,
-                fontWeight: 700,
-                borderRadius: 10,
-                background: "#334155",
-                color: "white",
-                border: "none",
-                cursor: "pointer",
-              }}
-            >
-              Download PDF
-            </button>
           </div>
         )}
 
