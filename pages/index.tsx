@@ -317,6 +317,26 @@ export default function Home() {
             >
               Download PDF
             </button>
+
+            {/* CTA för att uppgradera från sample */}
+            {isSample && (
+              <button
+                onClick={pay}
+                style={{
+                  marginTop: 16,
+                  padding: "12px 20px",
+                  fontSize: 14,
+                  fontWeight: 700,
+                  borderRadius: 12,
+                  background: "#6366f1",
+                  color: "white",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                Analyze your own contract for 99 kr
+              </button>
+            )}
           </div>
         )}
 
