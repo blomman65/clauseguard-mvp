@@ -1,16 +1,18 @@
 {
   "name": "clauseguard-mvp",
   "version": "1.0.0",
-  "description": "",
+  "description": "AI-powered SaaS contract risk analysis",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "lint": "next lint"
   },
-  "keywords": [],
+  "keywords": ["contract", "saas", "legal", "ai"],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@vercel/kv": "^3.0.0",
     "dotenv": "^17.2.3",
     "micro": "^10.0.1",
     "next": "14.2.5",
@@ -24,6 +26,7 @@
     "@types/micro": "^7.3.7",
     "@types/next": "^8.0.7",
     "@types/node": "^25.0.3",
+    "@types/pdfkit": "^0.13.5",
     "@types/stripe": "^8.0.416",
     "typescript": "5.9.3"
   }
