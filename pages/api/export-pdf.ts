@@ -21,7 +21,7 @@ export default async function handler(
   res.setHeader("Content-Type", "application/pdf");
   res.setHeader(
     "Content-Disposition",
-    'attachment; filename="ClauseGuard_Contract_Analysis.pdf"'
+    'attachment; filename="TrustTerms_Contract_Analysis.pdf"'
   );
 
   doc.pipe(res);
@@ -30,7 +30,7 @@ export default async function handler(
   doc
     .fontSize(22)
     .font("Helvetica-Bold")
-    .text("ClauseGuard – Contract Risk Analysis");
+    .text("TrustTerms – Contract Risk Analysis");
 
   doc.moveDown();
 

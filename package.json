@@ -1,5 +1,5 @@
 {
-  "name": "clauseguard-mvp",
+  "name": "trustterms",
   "version": "1.0.0",
   "description": "AI-powered SaaS contract risk analysis",
   "scripts": {
@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint"
   },
-  "keywords": ["contract", "saas", "legal", "ai"],
+  "keywords": ["contract", "saas", "legal", "ai", "risk-analysis"],
   "author": "",
   "license": "ISC",
   "dependencies": {

@@ -91,7 +91,7 @@ export default function Home() {
 
     const a = document.createElement("a");
     a.href = url;
-    a.download = "ClauseGuard_Contract_Analysis.pdf";
+    a.download = "TrustTerms_Contract_Analysis.pdf";
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -103,11 +103,11 @@ export default function Home() {
     <main style={{ background: "#0f172a", minHeight: "100vh", color: "white" }}>
       <div style={{ maxWidth: 720, margin: "auto", padding: "60px 20px" }}>
         <h1 style={{ fontSize: 42, fontWeight: 800, marginBottom: 12 }}>
-          ClauseGuard
+          TrustTerms
         </h1>
 
         <p style={{ fontSize: 18, color: "#cbd5f5", marginBottom: 24 }}>
-          ClauseGuard analyzes SaaS and commercial contracts using AI and highlights
+          TrustTerms analyzes SaaS and commercial contracts using AI and highlights
           financial risk, hidden clauses, and what you should renegotiate.
           Built for founders, CFOs, and operators.
         </p>
@@ -126,7 +126,7 @@ export default function Home() {
             }}
           >
             <h2 style={{ fontSize: 22, fontWeight: 800, marginBottom: 12 }}>
-              Most contract risk is invisible until it’s too late
+              Most contract risk is invisible until it's too late
             </h2>
 
             <ul
@@ -138,13 +138,13 @@ export default function Home() {
               }}
             >
               <li>Auto-renewals that quietly lock you in</li>
-              <li>Liability caps that don’t match your exposure</li>
+              <li>Liability caps that don't match your exposure</li>
               <li>Termination clauses favoring the vendor</li>
               <li>Pricing terms that increase costs over time</li>
             </ul>
 
             <p style={{ marginTop: 16, fontSize: 14, color: "#e5e7eb" }}>
-              ClauseGuard scans your agreement and explains the real risk in plain
+              TrustTerms scans your agreement and explains the real risk in plain
               language — so you know what to negotiate before signing.
             </p>
           </div>
@@ -224,7 +224,7 @@ export default function Home() {
               cursor: "pointer",
             }}
           >
-            Pay 99 kr to analyze your own contract
+            Pay 149 kr to analyze your own contract
           </button>
         ) : (
           <button
@@ -334,7 +334,7 @@ export default function Home() {
                   cursor: "pointer",
                 }}
               >
-                Analyze your own contract for 99 kr
+                Analyze your own contract for 149 kr
               </button>
             )}
           </div>
@@ -349,7 +349,7 @@ export default function Home() {
           <div style={{ marginBottom: 12 }}>
             <strong>Q: Are my contracts safe?</strong>
             <p style={{ fontSize: 14, color: "#cbd5f5", margin: "4px 0 8px" }}>
-              ClauseGuard processes contracts securely in memory only. Your documents
+              TrustTerms processes contracts securely in memory only. Your documents
               are not stored or used for training AI models.
             </p>
           </div>
@@ -357,7 +357,7 @@ export default function Home() {
           <div style={{ marginBottom: 12 }}>
             <strong>Q: Can AI really understand legal contracts?</strong>
             <p style={{ fontSize: 14, color: "#cbd5f5", margin: "4px 0 8px" }}>
-              ClauseGuard uses advanced AI trained to spot common commercial and SaaS
+              TrustTerms uses advanced AI trained to spot common commercial and SaaS
               contract risks. It highlights potential financial exposure and non-standard clauses.
             </p>
           </div>
@@ -387,7 +387,7 @@ export default function Home() {
             }}
           >
             <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 12 }}>
-              Why CFOs and Founders Trust ClauseGuard
+              Why CFOs and Founders Trust TrustTerms
             </h3>
             <ul
               style={{
