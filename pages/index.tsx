@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { analytics } from "../lib/analytics";
 
 export default function Home() {
   const [contractText, setContractText] = useState("");
@@ -19,6 +20,7 @@ export default function Home() {
     const token = params.get("token");
     if (token) {
       setAccessToken(token);
+      analytics.paymentCompleted();
       const newUrl = window.location.origin + window.location.pathname;
       window.history.replaceState({}, "", newUrl);
     }
@@ -26,6 +28,7 @@ export default function Home() {
 
   const pay = async () => {
     setError(null);
+    analytics.checkoutStarted();
     const res = await fetch("/api/create-checkout-session", { method: "POST" });
     const data = await res.json();
     window.location.href = data.url;
@@ -40,6 +43,8 @@ export default function Home() {
   };
 
   const analyze = async () => {
+    const startTime = Date.now();
+    
     setLoading(true);
     setError(null);
     setAnalysis("");
@@ -50,6 +55,8 @@ export default function Home() {
       setLoading(false);
       return;
     }
+
+    analytics.analysisStarted(isSample, contractText.length);
 
     try {
       const res = await fetch("/api/analyze", {
@@ -62,6 +69,7 @@ export default function Home() {
 
       if (!res.ok) {
         setError(data.error || "Analysis failed");
+        analytics.analysisFailed(data.error || "Unknown error", isSample);
         setLoading(false);
         return;
       }
@@ -69,14 +77,24 @@ export default function Home() {
       const risk = extractRiskLevel(data.analysis);
       setRiskLevel(risk);
       setAnalysis(data.analysis);
+
+      const timeElapsed = Date.now() - startTime;
+      analytics.analysisCompleted(isSample, risk || "UNKNOWN", timeElapsed);
+
+      if (isSample) {
+        analytics.sampleAnalyzed(risk || "UNKNOWN");
+      }
     } catch {
       setError("Something went wrong. Please try again.");
+      analytics.analysisFailed("Network error", isSample);
     }
 
     setLoading(false);
   };
 
   const downloadPdf = async () => {
+    analytics.pdfDownloaded(riskLevel || "UNKNOWN");
+    
     const res = await fetch("/api/export-pdf", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -97,6 +115,12 @@ export default function Home() {
     a.remove();
 
     window.URL.revokeObjectURL(url);
+  };
+
+  const handleSampleClick = () => {
+    analytics.sampleClicked();
+    setContractText(sampleContract);
+    setIsSample(true);
   };
 
   return (
@@ -174,10 +198,7 @@ export default function Home() {
         </div>
 
         <button
-          onClick={() => {
-            setContractText(sampleContract);
-            setIsSample(true);
-          }}
+          onClick={handleSampleClick}
           style={{
             marginBottom: 12,
             fontSize: 14,
