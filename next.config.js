@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  
+
   async headers() {
     return [
       {
@@ -11,12 +11,19 @@ const nextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline' eu.posthog.com js.stripe.com",
+              // Script-src: egna scripts + PostHog + Stripe
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' eu.posthog.com eu-assets.i.posthog.com js.stripe.com",
+              // Styles
               "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' data: https:",
+              // Bilder
+              "img-src 'self' data: https: eu.posthog.com eu-assets.i.posthog.com",
+              // Fonts
               "font-src 'self' data:",
-              "connect-src 'self' api.stripe.com eu.posthog.com api.openai.com",
+              // Connect: API-anrop, websockets
+              "connect-src 'self' api.stripe.com eu.posthog.com eu-assets.i.posthog.com api.openai.com",
+              // Iframes (Stripe checkout)
               "frame-src js.stripe.com",
+              // Övrigt säkerhet
               "object-src 'none'",
               "base-uri 'self'",
               "form-action 'self'",
