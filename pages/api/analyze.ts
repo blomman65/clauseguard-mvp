@@ -7,13 +7,20 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Max contract length (ungefär 15 sidor text)
 const MAX_CONTRACT_LENGTH = 50000;
 
-// Cached sample analysis för att spara OpenAI-kostnader
 const SAMPLE_CONTRACT_TEXT = `This Agreement shall automatically renew for successive 12-month terms unless either party provides written notice at least 90 days prior to the end of the current term. The Vendor may modify pricing and terms upon renewal with 30 days notice. Liability is capped at fees paid in the last three (3) months. The Vendor may terminate this Agreement for convenience upon 30 days written notice.`;
 
 let cachedSampleAnalysis: string | null = null;
+
+// Input sanitization för att förhindra prompt injection
+function sanitizeInput(text: string): string {
+  return text
+    .replace(/<script>/gi, '')
+    .replace(/javascript:/gi, '')
+    .replace(/on\w+\s*=/gi, '')
+    .slice(0, MAX_CONTRACT_LENGTH);
+}
 
 export default async function handler(
   req: NextApiRequest,
@@ -36,20 +43,22 @@ export default async function handler(
   }
 
   if (contractText.length > MAX_CONTRACT_LENGTH) {
-    return res.status(400).json({ 
-      error: `Contract too long (maximum ${MAX_CONTRACT_LENGTH} characters)` 
+    return res.status(400).json({
+      error: `Contract too long (maximum ${MAX_CONTRACT_LENGTH} characters)`
     });
   }
+
+  // Sanitize input
+  const sanitizedContract = sanitizeInput(contractText);
 
   // ===== RATE LIMITING =====
   
   const clientIp = getClientIp(req);
   console.log('🔍 Client IP:', clientIp);
   
-  // Olika rate limits för sample vs betald analys
-  const rateLimitConfig = isSample 
-    ? { limit: 3, window: 3600 }  // 3 sample per timme
-    : { limit: 10, window: 3600 }; // 10 betalda per timme
+  const rateLimitConfig = isSample
+    ? { limit: 3, window: 3600 }
+    : { limit: 10, window: 3600 };
   
   const rateLimitResult = await rateLimit(
     `analyze:${clientIp}`,
@@ -61,7 +70,7 @@ export default async function handler(
 
   if (!rateLimitResult.success) {
     const resetDate = new Date(rateLimitResult.reset);
-    return res.status(429).json({ 
+    return res.status(429).json({
       error: "Too many requests. Please try again later.",
       reset: resetDate.toISOString(),
       remaining: 0
@@ -70,27 +79,25 @@ export default async function handler(
 
   // ===== AUTHORIZATION =====
   
-  // Kräv giltig token för icke-sample analyser
   if (!isSample) {
     if (!accessToken || typeof accessToken !== 'string') {
-      return res.status(403).json({ 
-        error: "Access token required for paid analysis" 
+      return res.status(403).json({
+        error: "Access token required for paid analysis"
       });
     }
 
     const isValidToken = await consumeAccessToken(accessToken);
     
     if (!isValidToken) {
-      return res.status(403).json({ 
-        error: "Invalid or already used access token" 
+      return res.status(403).json({
+        error: "Invalid or already used access token"
       });
     }
   }
 
   // ===== SAMPLE ANALYSIS OPTIMIZATION =====
   
-  // Om det är exakt samma sample contract, returnera cached version
-  if (isSample && contractText.trim() === SAMPLE_CONTRACT_TEXT.trim()) {
+  if (isSample && sanitizedContract.trim() === SAMPLE_CONTRACT_TEXT.trim()) {
     if (cachedSampleAnalysis) {
       console.log('✅ Returning cached sample analysis');
       return res.status(200).json({
@@ -107,48 +114,64 @@ export default async function handler(
     
     const completion = await openai.chat.completions.create({
       model: "gpt-4o",
-      max_tokens: 800,
-      temperature: 0.3, // Lägre temperatur för mer konsistenta resultat
+      max_tokens: 1200,
+      temperature: 0.3,
       messages: [
         {
           role: "system",
-          content: `
-You are a senior commercial SaaS lawyer advising a CFO at a 10–50 person startup.
+          content: `You are a senior commercial SaaS lawyer with 15+ years experience advising venture-backed startups (10-50 employees) on contract risk.
 
-CRITICAL:
-Start your response with exactly one line in this format:
-Overall risk level: LOW | MEDIUM | HIGH
+CRITICAL OUTPUT FORMAT:
+Line 1: "Overall risk level: LOW | MEDIUM | HIGH"
+Line 2: Empty line
 
-Then leave one blank line and continue.
+Then follow this exact structure:
 
-Focus especially on:
-- Financial exposure
-- Termination and auto-renewal
-- Liability caps
-- Unilateral changes
-- Vendor lock-in
+## Executive Summary
+[2-3 sentences: What's the biggest risk? Should they sign as-is?]
 
-Be conservative. If something is unclear, flag it as a risk.
+## Top 5 Risks
 
-Return strictly in this format:
+### 1. [Risk Name] — Risk Level: HIGH/MEDIUM/LOW
+**What it means:** [Business impact in plain language]
+**Why it matters:** [Financial/operational exposure with specific $ amounts if possible]
+**Negotiate this:** [Specific clause to change + suggested alternative language]
 
-Overall risk level: <LOW | MEDIUM | HIGH>
+[Repeat for risks 2-5]
 
-1. Overall assessment (1 short paragraph)
-2. Top 5 risks (each with:
-   - Risk level
-   - Why it matters
-   - What to negotiate)
-3. Financial red flags
-4. Clauses that are non-standard for SaaS agreements
-5. Recommended negotiation priorities (max 5 bullets)
+## Financial Red Flags
+- [Specific $ exposure or pricing concerns]
+- [Auto-renewal financial implications]
+- [Liability cap vs. realistic potential damages]
+- [Payment terms and penalties]
 
-Use clear business language. This is not legal advice.
-          `,
+## Non-Standard Clauses
+[List clauses that are unusually vendor-favorable compared to market-standard SaaS agreements. Be specific about what's unusual and what's standard.]
+
+## Recommended Negotiation Strategy
+1. [Highest priority item with specific ask]
+2. [Second priority with fallback position]
+3. [Third priority]
+[Max 5 items total, prioritized by financial impact]
+
+CRITICAL RULES:
+- Be brutally honest about risk levels - don't sugarcoat
+- Focus on financial exposure over legal theory
+- Use specific examples and numbers from THIS contract
+- Compare explicitly to market-standard SaaS terms (e.g., "Market standard is 12 months liability cap, this contract only caps at 3 months")
+- If a critical clause is MISSING (e.g., no liability cap stated at all), flag as HIGH risk
+- Avoid legal jargon - write for a CFO, not a lawyer
+- For each risk, answer: "What could this cost us in real money?"
+- If you see red flags like unilateral pricing changes, unlimited liability, or auto-renewal >12 months, explicitly call them out
+
+RISK LEVEL GUIDELINES:
+- HIGH: Could cost >$50k or create existential operational risk
+- MEDIUM: Could cost $10-50k or create significant hassle
+- LOW: Minor financial exposure (<$10k) or standard market terms`,
         },
         {
           role: "user",
-          content: contractText,
+          content: sanitizedContract,
         },
       ],
     });
@@ -157,12 +180,12 @@ Use clear business language. This is not legal advice.
 
     console.log('✅ OpenAI analysis complete');
 
-    // Cacha sample analysis
-    if (isSample && contractText.trim() === SAMPLE_CONTRACT_TEXT.trim()) {
+    // Cache sample analysis
+    if (isSample && sanitizedContract.trim() === SAMPLE_CONTRACT_TEXT.trim()) {
       cachedSampleAnalysis = analysis;
     }
 
-    // Lägg till rate limit headers
+    // Rate limit headers
     res.setHeader('X-RateLimit-Limit', rateLimitConfig.limit.toString());
     res.setHeader('X-RateLimit-Remaining', rateLimitResult.remaining.toString());
     res.setHeader('X-RateLimit-Reset', new Date(rateLimitResult.reset).toISOString());
@@ -175,21 +198,20 @@ Use clear business language. This is not legal advice.
   } catch (err: any) {
     console.error("❌ OpenAI analysis error:", err);
     
-    // Specifika felmeddelanden baserat på OpenAI error
     if (err.status === 429) {
-      return res.status(503).json({ 
-        error: "Service temporarily unavailable. Please try again in a moment." 
+      return res.status(503).json({
+        error: "Service temporarily unavailable. Please try again in a moment."
       });
     }
     
     if (err.status === 401) {
-      return res.status(500).json({ 
-        error: "Configuration error. Please contact support." 
+      return res.status(500).json({
+        error: "Configuration error. Please contact support."
       });
     }
 
-    return res.status(500).json({ 
-      error: "Analysis failed. Please try again." 
+    return res.status(500).json({
+      error: "Analysis failed. Please try again."
     });
   }
 }
