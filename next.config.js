@@ -19,8 +19,8 @@ const nextConfig = {
               "img-src 'self' data: https: eu.posthog.com eu-assets.i.posthog.com",
               // Fonts
               "font-src 'self' data:",
-              // Connect: API-anrop, websockets
-              "connect-src 'self' api.stripe.com eu.posthog.com eu-assets.i.posthog.com api.openai.com",
+              // Connect: API-anrop, websockets - FIXAD MED eu.i.posthog.com
+              "connect-src 'self' api.stripe.com eu.posthog.com eu-assets.i.posthog.com eu.i.posthog.com api.openai.com https://vercel.live",
               // Iframes (Stripe checkout)
               "frame-src js.stripe.com",
               // Övrigt säkerhet
