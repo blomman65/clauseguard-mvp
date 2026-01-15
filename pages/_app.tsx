@@ -1,43 +1,54 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import type { AppProps } from 'next/app';
 import { useRouter } from 'next/router';
 import { initAnalytics, analytics } from '../lib/analytics';
-import CookieBanner from '../components/CookieBanner';
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
-  const analyticsInitialized = useRef(false);
+  const [analyticsReady, setAnalyticsReady] = useState(false);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    const consent = localStorage.getItem('cookie-consent');
+    // Lyssna på cookie consent events
+    const handleConsentChange = () => {
+      const consent = localStorage.getItem('cookie-consent');
+      
+      if (consent === 'accepted' && !analyticsReady) {
+        console.log('✅ Cookie consent accepted - initializing analytics');
+        initAnalytics();
+        setAnalyticsReady(true);
+        
+        // Tracka initial pageview
+        analytics.pageView(router.pathname);
+      }
+    };
 
-    // Initiera analytics EN gång och endast med consent
-    if (consent === 'accepted' && !analyticsInitialized.current) {
-      initAnalytics();
-      analyticsInitialized.current = true;
+    // Kolla om consent redan finns
+    handleConsentChange();
 
-      // Initial pageview
-      analytics.pageView(router.pathname);
+    // Lyssna på custom event från CookieBanner
+    window.addEventListener('cookieConsentChanged', handleConsentChange);
 
-      // Route changes
-      const handleRouteChange = (url: string) => {
-        analytics.pageView(url);
-      };
+    return () => {
+      window.removeEventListener('cookieConsentChanged', handleConsentChange);
+    };
+  }, [router.pathname, analyticsReady]);
 
-      router.events.on('routeChangeComplete', handleRouteChange);
+  // Tracka route changes (endast om analytics är aktivt)
+  useEffect(() => {
+    if (!analyticsReady) return;
 
-      return () => {
-        router.events.off('routeChangeComplete', handleRouteChange);
-      };
-    }
-  }, [router.pathname]); // 👈 stabil dependency
+    const handleRouteChange = (url: string) => {
+      analytics.pageView(url);
+    };
 
-  return (
-    <>
-      <Component {...pageProps} />
-      <CookieBanner />
-    </>
-  );
+    router.events.on('routeChangeComplete', handleRouteChange);
+
+    return () => {
+      router.events.off('routeChangeComplete', handleRouteChange);
+    };
+  }, [router, analyticsReady]);
+
+  return <Component {...pageProps} />;
 }

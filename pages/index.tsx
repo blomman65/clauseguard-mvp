@@ -150,334 +150,548 @@ export default function Home() {
 
   const charCount = contractText.length;
   const isOverLimit = charCount > MAX_CONTRACT_LENGTH;
+  const canAnalyze = contractText.length >= 50 && !isOverLimit;
 
   return (
     <>
       <Meta />
-      <main style={{ background: "#0f172a", minHeight: "100vh", color: "white" }}>
-        <div style={{ maxWidth: 720, margin: "auto", padding: "60px 20px" }}>
-          <h1 style={{ fontSize: 42, fontWeight: 800, marginBottom: 12 }}>
-            TrustTerms
-          </h1>
+      <main style={{ 
+        background: "linear-gradient(to bottom, #0f172a 0%, #1e293b 100%)",
+        minHeight: "100vh", 
+        color: "white",
+        position: "relative",
+        overflow: "hidden"
+      }}>
+        {/* Subtle animated background */}
+        <div style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: "radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%)",
+          pointerEvents: "none"
+        }} />
 
-          <p style={{ fontSize: 18, color: "#cbd5f5", marginBottom: 24 }}>
-            TrustTerms analyzes SaaS and commercial contracts using AI and highlights
-            financial risk, hidden clauses, and what you should renegotiate.
-            Built for founders, CFOs, and operators.
-          </p>
+        <div style={{ maxWidth: 880, margin: "auto", padding: "80px 24px", position: "relative", zIndex: 1 }}>
+          
+          {/* Header */}
+          <div style={{ textAlign: "center", marginBottom: 60 }}>
+            <div style={{
+              display: "inline-block",
+              padding: "6px 16px",
+              background: "rgba(99, 102, 241, 0.1)",
+              border: "1px solid rgba(99, 102, 241, 0.3)",
+              borderRadius: 20,
+              fontSize: 13,
+              fontWeight: 600,
+              color: "#a5b4fc",
+              marginBottom: 20,
+              letterSpacing: "0.5px"
+            }}>
+              ⚡ AI-POWERED CONTRACT ANALYSIS
+            </div>
 
-          <div style={{ marginBottom: 48 }}>
-            <p style={{ fontSize: 14, color: "#a5b4fc", marginBottom: 12 }}>
-              Used by early-stage founders and operators to sanity-check contracts
-              before legal review.
+            <h1 style={{ 
+              fontSize: 56, 
+              fontWeight: 900, 
+              marginBottom: 20,
+              background: "linear-gradient(to right, #ffffff, #a5b4fc)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              letterSpacing: "-0.02em",
+              lineHeight: 1.1
+            }}>
+              TrustTerms
+            </h1>
+
+            <p style={{ 
+              fontSize: 20, 
+              color: "#cbd5e1", 
+              marginBottom: 32,
+              lineHeight: 1.6,
+              maxWidth: 600,
+              margin: "0 auto 32px"
+            }}>
+              Spot hidden risks in SaaS contracts before you sign. 
+              Built for founders and CFOs who need answers in minutes, not days.
             </p>
 
-            <div style={{ background: "#020617", borderRadius: 16, padding: 24 }}>
-              <h2 style={{ fontSize: 22, fontWeight: 800, marginBottom: 12 }}>
-                Most contract risk is invisible until it's too late
-              </h2>
-
-              <ul style={{ fontSize: 15, lineHeight: 1.7, color: "#cbd5f5", paddingLeft: 20 }}>
-                <li>Auto-renewals that quietly lock you in</li>
-                <li>Liability caps that don't match your exposure</li>
-                <li>Termination clauses favoring the vendor</li>
-                <li>Pricing terms that increase costs over time</li>
-              </ul>
-
-              <p style={{ marginTop: 16, fontSize: 14, color: "#e5e7eb" }}>
-                TrustTerms scans your agreement and explains the real risk in plain
-                language — so you know what to negotiate before signing.
-              </p>
+            <div style={{ 
+              display: "flex", 
+              gap: 16, 
+              justifyContent: "center",
+              flexWrap: "wrap",
+              fontSize: 14,
+              color: "#94a3b8"
+            }}>
+              <span>✓ 60-second analysis</span>
+              <span>✓ No account needed</span>
+              <span>✓ Privacy-first</span>
             </div>
           </div>
 
-          <div style={{ marginBottom: 24 }}>
-            <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>
-              How it works
-            </h3>
-
-            <ol style={{ fontSize: 14, color: "#cbd5f5", paddingLeft: 20, lineHeight: 1.6 }}>
-              <li>Paste your contract</li>
-              <li>Get an instant risk analysis</li>
-              <li>See what to renegotiate before signing</li>
-            </ol>
-
-            <p style={{ fontSize: 12, color: "#94a3b8", marginTop: 8 }}>
-              No account required. One-time analysis. Takes under 60 seconds.
-            </p>
-          </div>
-
-          <button
-            onClick={handleSampleClick}
-            style={{
-              marginBottom: 12,
-              fontSize: 14,
-              color: "#a5b4fc",
-              background: "transparent",
-              border: "none",
-              cursor: "pointer",
-              textDecoration: "underline",
-            }}
-          >
-            Try a sample SaaS agreement (free)
-          </button>
-
-          <textarea
-            placeholder="Paste your agreement here..."
-            value={contractText}
-            onChange={(e) => {
-              setContractText(e.target.value);
-              setIsSample(false);
-            }}
-            style={{
-              width: "100%",
-              height: 220,
-              padding: 16,
-              borderRadius: 12,
-              border: isOverLimit ? "2px solid #ef4444" : "none",
-              fontSize: 15,
-              color: "#0f172a",
-              marginBottom: 8,
-            }}
-          />
-
-          <div style={{
-            fontSize: 12,
-            color: isOverLimit ? "#ef4444" : "#94a3b8",
-            marginBottom: 20,
-            textAlign: "right",
+          {/* Value Props Cards */}
+          <div style={{ 
+            display: "grid", 
+            gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+            gap: 20,
+            marginBottom: 60
           }}>
-            {charCount.toLocaleString()} / {MAX_CONTRACT_LENGTH.toLocaleString()} characters
-            {isOverLimit && " - Contract too long"}
+            {[
+              { emoji: "🔍", title: "Hidden Risks", desc: "Auto-renewals, liability caps, termination traps" },
+              { emoji: "💰", title: "Financial Impact", desc: "See what risky clauses could actually cost you" },
+              { emoji: "🎯", title: "Negotiation Tips", desc: "Know exactly what to push back on before signing" }
+            ].map((item, i) => (
+              <div key={i} style={{
+                background: "rgba(15, 23, 42, 0.6)",
+                backdropFilter: "blur(10px)",
+                border: "1px solid rgba(100, 116, 139, 0.2)",
+                borderRadius: 16,
+                padding: 24,
+                transition: "all 0.3s ease",
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.transform = "translateY(-4px)";
+                e.currentTarget.style.borderColor = "rgba(99, 102, 241, 0.4)";
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.borderColor = "rgba(100, 116, 139, 0.2)";
+              }}>
+                <div style={{ fontSize: 32, marginBottom: 12 }}>{item.emoji}</div>
+                <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>{item.title}</h3>
+                <p style={{ fontSize: 14, color: "#94a3b8", lineHeight: 1.5, margin: 0 }}>{item.desc}</p>
+              </div>
+            ))}
           </div>
 
-          {!accessToken && !isSample ? (
-            <button
-              onClick={pay}
-              disabled={isOverLimit || charCount < 50}
-              style={{
-                width: "100%",
-                padding: 16,
-                fontSize: 18,
-                fontWeight: 700,
-                borderRadius: 12,
-                background: (isOverLimit || charCount < 50) ? "#334155" : "#6366f1",
-                color: "white",
-                border: "none",
-                cursor: (isOverLimit || charCount < 50) ? "not-allowed" : "pointer",
-                opacity: (isOverLimit || charCount < 50) ? 0.5 : 1,
-              }}
-            >
-              Pay 349 kr to analyze your own contract
-            </button>
-          ) : (
-            <button
-              onClick={analyze}
-              disabled={loading || isOverLimit || charCount < 50}
-              style={{
-                width: "100%",
-                padding: 16,
-                fontSize: 18,
-                fontWeight: 700,
-                borderRadius: 12,
-                background: (loading || isOverLimit || charCount < 50) ? "#334155" : "#22c55e",
-                color: "white",
-                border: "none",
-                cursor: (loading || isOverLimit || charCount < 50) ? "not-allowed" : "pointer",
-                opacity: (loading || isOverLimit || charCount < 50) ? 0.7 : 1,
-              }}
-            >
-              {loading ? "Analyzing…" : "Analyze agreement"}
-            </button>
-          )}
+          {/* Main Analysis Card */}
+          <div style={{
+            background: "rgba(15, 23, 42, 0.8)",
+            backdropFilter: "blur(20px)",
+            border: "1px solid rgba(100, 116, 139, 0.3)",
+            borderRadius: 20,
+            padding: 40,
+            boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3)"
+          }}>
+            
+            {/* Try Sample Button */}
+            <div style={{ marginBottom: 20 }}>
+              <button
+                onClick={handleSampleClick}
+                style={{
+                  fontSize: 14,
+                  color: "#a5b4fc",
+                  background: "transparent",
+                  border: "none",
+                  cursor: "pointer",
+                  textDecoration: "underline",
+                  fontWeight: 600,
+                  transition: "color 0.2s"
+                }}
+                onMouseEnter={e => e.currentTarget.style.color = "#6366f1"}
+                onMouseLeave={e => e.currentTarget.style.color = "#a5b4fc"}
+              >
+                ← Try a sample SaaS contract (free)
+              </button>
+            </div>
 
+            {/* Textarea */}
+            <textarea
+              placeholder="Paste your SaaS agreement here...
+
+Or click above to try a sample contract first (completely free, no payment needed)."
+              value={contractText}
+              onChange={(e) => {
+                setContractText(e.target.value);
+                setIsSample(false);
+              }}
+              style={{
+                width: "100%",
+                height: 280,
+                padding: 20,
+                borderRadius: 12,
+                border: isOverLimit ? "2px solid #ef4444" : "2px solid rgba(100, 116, 139, 0.3)",
+                fontSize: 15,
+                fontFamily: "ui-monospace, monospace",
+                color: "#0f172a",
+                background: "#f8fafc",
+                marginBottom: 12,
+                resize: "vertical",
+                transition: "border-color 0.3s",
+                outline: "none"
+              }}
+              onFocus={e => {
+                if (!isOverLimit) e.currentTarget.style.borderColor = "#6366f1";
+              }}
+              onBlur={e => {
+                if (!isOverLimit) e.currentTarget.style.borderColor = "rgba(100, 116, 139, 0.3)";
+              }}
+            />
+
+            {/* Character Count */}
+            <div style={{
+              fontSize: 13,
+              color: isOverLimit ? "#ef4444" : "#64748b",
+              marginBottom: 24,
+              textAlign: "right",
+              fontWeight: 500
+            }}>
+              {charCount.toLocaleString()} / {MAX_CONTRACT_LENGTH.toLocaleString()} characters
+              {isOverLimit && " - Contract too long"}
+            </div>
+
+            {/* Action Buttons */}
+            <div style={{ display: "flex", gap: 12, flexDirection: "column" }}>
+              
+              {/* Analyze Button (if already paid or sample) */}
+              {(accessToken || isSample) && (
+                <button
+                  onClick={analyze}
+                  disabled={loading || !canAnalyze}
+                  style={{
+                    width: "100%",
+                    padding: "18px 32px",
+                    fontSize: 18,
+                    fontWeight: 700,
+                    borderRadius: 12,
+                    background: (!canAnalyze || loading) 
+                      ? "rgba(100, 116, 139, 0.3)" 
+                      : "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)",
+                    color: "white",
+                    border: "none",
+                    cursor: (!canAnalyze || loading) ? "not-allowed" : "pointer",
+                    transition: "all 0.3s",
+                    boxShadow: canAnalyze && !loading ? "0 4px 20px rgba(34, 197, 94, 0.3)" : "none",
+                  }}
+                  onMouseEnter={e => {
+                    if (canAnalyze && !loading) {
+                      e.currentTarget.style.transform = "translateY(-2px)";
+                      e.currentTarget.style.boxShadow = "0 6px 30px rgba(34, 197, 94, 0.4)";
+                    }
+                  }}
+                  onMouseLeave={e => {
+                    if (canAnalyze && !loading) {
+                      e.currentTarget.style.transform = "translateY(0)";
+                      e.currentTarget.style.boxShadow = "0 4px 20px rgba(34, 197, 94, 0.3)";
+                    }
+                  }}
+                >
+                  {loading ? "⚡ Analyzing..." : "🔍 Analyze Contract"}
+                </button>
+              )}
+
+              {/* Pay Button (if not paid and not sample) */}
+              {!accessToken && !isSample && (
+                <button
+                  onClick={pay}
+                  style={{
+                    width: "100%",
+                    padding: "18px 32px",
+                    fontSize: 18,
+                    fontWeight: 700,
+                    borderRadius: 12,
+                    background: "linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)",
+                    color: "white",
+                    border: "none",
+                    cursor: "pointer",
+                    transition: "all 0.3s",
+                    boxShadow: "0 4px 20px rgba(99, 102, 241, 0.3)",
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.transform = "translateY(-2px)";
+                    e.currentTarget.style.boxShadow = "0 6px 30px rgba(99, 102, 241, 0.5)";
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow = "0 4px 20px rgba(99, 102, 241, 0.3)";
+                  }}
+                >
+                  💳 Pay 349 kr to Analyze Your Contract
+                </button>
+              )}
+
+              {/* Info text under button */}
+              {!accessToken && !isSample && (
+                <p style={{ 
+                  fontSize: 13, 
+                  color: "#94a3b8", 
+                  textAlign: "center", 
+                  margin: 0,
+                  lineHeight: 1.5 
+                }}>
+                  One-time payment • No subscription • Instant access
+                  <br />
+                  After payment, come back here and click "Analyze"
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Loading State */}
           {loading && (
             <div style={{
-              marginTop: 20,
-              padding: 24,
-              background: "#1e293b",
-              borderRadius: 12,
+              marginTop: 32,
+              padding: 40,
+              background: "rgba(30, 41, 59, 0.8)",
+              backdropFilter: "blur(20px)",
+              border: "1px solid rgba(100, 116, 139, 0.3)",
+              borderRadius: 20,
               textAlign: "center",
             }}>
               <div style={{
-                display: "inline-block",
-                width: 40,
-                height: 40,
-                border: "4px solid #334155",
+                width: 50,
+                height: 50,
+                border: "4px solid rgba(99, 102, 241, 0.2)",
                 borderTopColor: "#6366f1",
                 borderRadius: "50%",
+                margin: "0 auto 20px",
                 animation: "spin 1s linear infinite",
               }} />
-              <p style={{ marginTop: 12, fontSize: 14, color: "#cbd5e1" }}>
+              <p style={{ fontSize: 16, color: "#e2e8f0", fontWeight: 600, marginBottom: 8 }}>
                 Analyzing {isSample ? "sample" : "your"} contract...
               </p>
-              <p style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}>
+              <p style={{ fontSize: 14, color: "#94a3b8" }}>
                 {loadingMessage}
               </p>
             </div>
           )}
 
+          {/* Error State */}
           {error && (
-            <p style={{ marginTop: 24, color: "#f87171", fontSize: 14 }}>
-              {error}
-            </p>
+            <div style={{
+              marginTop: 32,
+              padding: 24,
+              background: "rgba(239, 68, 68, 0.1)",
+              border: "1px solid rgba(239, 68, 68, 0.3)",
+              borderRadius: 12,
+              color: "#fca5a5",
+              fontSize: 15
+            }}>
+              ⚠️ {error}
+            </div>
           )}
 
+          {/* Analysis Results */}
           {analysis && (
             <div style={{
               marginTop: 40,
-              background: "#020617",
-              padding: 24,
-              borderRadius: 12,
-              whiteSpace: "pre-wrap",
-              lineHeight: 1.6,
-              fontSize: 15,
+              background: "rgba(15, 23, 42, 0.8)",
+              backdropFilter: "blur(20px)",
+              border: "1px solid rgba(100, 116, 139, 0.3)",
+              padding: 40,
+              borderRadius: 20,
+              boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3)"
             }}>
+              {/* Risk Badge */}
               {riskLevel && (
                 <div style={{
-                  display: "inline-block",
-                  marginBottom: 16,
-                  padding: "6px 12px",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                  marginBottom: 24,
+                  padding: "10px 20px",
                   borderRadius: 999,
                   background:
+                    riskLevel === "HIGH" ? "rgba(239, 68, 68, 0.15)" :
+                    riskLevel === "MEDIUM" ? "rgba(245, 158, 11, 0.15)" : "rgba(34, 197, 94, 0.15)",
+                  border: `2px solid ${
                     riskLevel === "HIGH" ? "#ef4444" :
-                    riskLevel === "MEDIUM" ? "#f59e0b" : "#22c55e",
-                  fontSize: 12,
-                  fontWeight: 800,
-                }}>
-                  Overall risk: {riskLevel}
-                </div>
-              )}
-
-              {isSample && (
-                <div style={{
-                  marginBottom: 12,
-                  fontSize: 12,
-                  color: "#facc15",
-                  fontWeight: 700,
-                }}>
-                  SAMPLE ANALYSIS – example output
-                </div>
-              )}
-
-              {analysis}
-
-              <button
-                onClick={downloadPdf}
-                style={{
-                  marginTop: 24,
-                  padding: "10px 16px",
+                    riskLevel === "MEDIUM" ? "#f59e0b" : "#22c55e"
+                  }`,
                   fontSize: 14,
-                  fontWeight: 700,
-                  borderRadius: 10,
-                  background: "#334155",
-                  color: "white",
-                  border: "none",
-                  cursor: "pointer",
-                }}
-              >
-                📄 Download PDF
-              </button>
+                  fontWeight: 800,
+                  color:
+                    riskLevel === "HIGH" ? "#fca5a5" :
+                    riskLevel === "MEDIUM" ? "#fcd34d" : "#86efac",
+                }}>
+                  <div style={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: "50%",
+                    background: "currentColor"
+                  }} />
+                  OVERALL RISK: {riskLevel}
+                </div>
+              )}
 
+              {/* Sample badge */}
               {isSample && (
                 <div style={{
-                  marginTop: 24,
-                  padding: 24,
-                  background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                  borderRadius: 12,
+                  display: "inline-block",
+                  marginLeft: 12,
+                  marginBottom: 24,
+                  padding: "10px 16px",
+                  background: "rgba(250, 204, 21, 0.15)",
+                  border: "1px solid rgba(250, 204, 21, 0.3)",
+                  borderRadius: 8,
+                  fontSize: 12,
+                  color: "#fde047",
+                  fontWeight: 700,
+                }}>
+                  📋 SAMPLE ANALYSIS
+                </div>
+              )}
+
+              {/* Analysis content */}
+              <div style={{
+                whiteSpace: "pre-wrap",
+                lineHeight: 1.8,
+                fontSize: 15,
+                color: "#e2e8f0"
+              }}>
+                {analysis}
+              </div>
+
+              {/* Action buttons */}
+              <div style={{ marginTop: 32, display: "flex", gap: 12, flexWrap: "wrap" }}>
+                <button
+                  onClick={downloadPdf}
+                  style={{
+                    padding: "12px 24px",
+                    fontSize: 15,
+                    fontWeight: 700,
+                    borderRadius: 10,
+                    background: "rgba(100, 116, 139, 0.2)",
+                    color: "#e2e8f0",
+                    border: "1px solid rgba(100, 116, 139, 0.3)",
+                    cursor: "pointer",
+                    transition: "all 0.3s"
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.background = "rgba(100, 116, 139, 0.3)";
+                    e.currentTarget.style.borderColor = "rgba(100, 116, 139, 0.5)";
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.background = "rgba(100, 116, 139, 0.2)";
+                    e.currentTarget.style.borderColor = "rgba(100, 116, 139, 0.3)";
+                  }}
+                >
+                  📄 Download PDF Report
+                </button>
+              </div>
+
+              {/* Upgrade CTA for sample */}
+              {isSample && (
+                <div style={{
+                  marginTop: 32,
+                  padding: 32,
+                  background: "linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%)",
+                  border: "2px solid rgba(99, 102, 241, 0.4)",
+                  borderRadius: 16,
                   textAlign: "center",
                 }}>
-                  <h3 style={{ fontSize: 20, marginBottom: 8, fontWeight: 800 }}>
-                    Impressed? Analyze your real contract
+                  <h3 style={{ fontSize: 22, marginBottom: 12, fontWeight: 800 }}>
+                    Ready to analyze your real contract?
                   </h3>
-                  <p style={{ fontSize: 14, marginBottom: 16, opacity: 0.95 }}>
-                    ✓ Hidden renewal clauses  ✓ Liability caps  ✓ Vendor lock-in
+                  <p style={{ fontSize: 15, marginBottom: 24, color: "#cbd5e1" }}>
+                    Get instant analysis of your actual agreements
                   </p>
                   <button
                     onClick={pay}
                     style={{
-                      padding: "14px 28px",
-                      fontSize: 16,
+                      padding: "16px 32px",
+                      fontSize: 17,
                       fontWeight: 700,
                       borderRadius: 12,
                       background: "white",
-                      color: "#667eea",
+                      color: "#6366f1",
                       border: "none",
                       cursor: "pointer",
+                      transition: "all 0.3s",
+                      boxShadow: "0 4px 20px rgba(99, 102, 241, 0.3)"
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.transform = "translateY(-2px)";
+                      e.currentTarget.style.boxShadow = "0 6px 30px rgba(99, 102, 241, 0.4)";
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.transform = "translateY(0)";
+                      e.currentTarget.style.boxShadow = "0 4px 20px rgba(99, 102, 241, 0.3)";
                     }}
                   >
-                    Unlock full analysis for 349 kr
+                    Unlock Full Analysis for 349 kr
                   </button>
-                  <p style={{ fontSize: 12, marginTop: 12, opacity: 0.9 }}>
-                    💳 Secure payment via Stripe  •  No subscription  •  One-time purchase
+                  <p style={{ fontSize: 13, marginTop: 16, color: "#94a3b8" }}>
+                    💳 One-time payment • No subscription • Instant access
                   </p>
                 </div>
               )}
             </div>
           )}
 
-          <div style={{ marginTop: 60 }}>
-            <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16 }}>
-              Frequently Asked Questions
-            </h3>
-
-            <div style={{ marginBottom: 12 }}>
-              <strong>Q: Are my contracts safe?</strong>
-              <p style={{ fontSize: 14, color: "#cbd5f5", margin: "4px 0 8px" }}>
-                TrustTerms processes contracts securely in memory only. Your documents
-                are not stored or used for training AI models.
-              </p>
-            </div>
-
-            <div style={{ marginBottom: 12 }}>
-              <strong>Q: Can AI really understand legal contracts?</strong>
-              <p style={{ fontSize: 14, color: "#cbd5f5", margin: "4px 0 8px" }}>
-                TrustTerms uses advanced AI trained to spot common commercial and SaaS
-                contract risks. It highlights potential financial exposure and non-standard clauses.
-              </p>
-            </div>
-
-            <div style={{ marginBottom: 12 }}>
-              <strong>Q: Is this legal advice?</strong>
-              <p style={{ fontSize: 14, color: "#cbd5f5", margin: "4px 0 8px" }}>
-                No. This is general information to support decision-making. Always consult
-                a qualified lawyer for binding advice.
-              </p>
-            </div>
-
-            <div style={{ marginBottom: 12 }}>
-              <strong>Q: When is this analysis enough?</strong>
-              <p style={{ fontSize: 14, color: "#cbd5f5", margin: "4px 0 8px" }}>
-                It's perfect for spotting high-risk clauses quickly before contract review.
-                Use it as a sanity check to avoid surprises and negotiate smarter.
-              </p>
-            </div>
-
-            <div style={{
-              marginTop: 32,
-              padding: 24,
-              borderRadius: 12,
-              background: "#020617",
+          {/* FAQ Section */}
+          <div style={{ marginTop: 80 }}>
+            <h2 style={{ 
+              fontSize: 32, 
+              fontWeight: 800, 
+              marginBottom: 32,
+              textAlign: "center"
             }}>
-              <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 12 }}>
-                Why CFOs and Founders Trust TrustTerms
-              </h3>
-              <ul style={{ fontSize: 14, color: "#cbd5f5", lineHeight: 1.6, paddingLeft: 20 }}>
-                <li>Instant contract analysis without waiting for a lawyer</li>
-                <li>Clear, non-legal language for decision-making</li>
-                <li>Secure: contracts are not stored or shared</li>
-                <li>Supports smart negotiation — saves time and money</li>
-              </ul>
+              Frequently Asked Questions
+            </h2>
+
+            <div style={{ 
+              display: "grid", 
+              gap: 20,
+              maxWidth: 700,
+              margin: "0 auto"
+            }}>
+              {[
+                {
+                  q: "Are my contracts safe?",
+                  a: "Yes. Contracts are processed in memory only and immediately deleted. Never stored, never used for AI training."
+                },
+                {
+                  q: "Is this legal advice?",
+                  a: "No. This is general information to help you spot risks. Always consult a qualified lawyer for binding legal decisions."
+                },
+                {
+                  q: "How accurate is the AI analysis?",
+                  a: "Our AI is trained specifically on SaaS contracts and compares clauses to market standards. Use it as a first pass before legal review."
+                },
+                {
+                  q: "What happens after I pay?",
+                  a: "You get instant access to analyze your contract. Paste it in the box above and click 'Analyze'. Results in 60 seconds."
+                }
+              ].map((item, i) => (
+                <div key={i} style={{
+                  background: "rgba(15, 23, 42, 0.6)",
+                  border: "1px solid rgba(100, 116, 139, 0.2)",
+                  borderRadius: 12,
+                  padding: 24
+                }}>
+                  <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 8 }}>
+                    {item.q}
+                  </h3>
+                  <p style={{ fontSize: 14, color: "#94a3b8", lineHeight: 1.6, margin: 0 }}>
+                    {item.a}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
 
-          <div style={{ marginTop: 40, fontSize: 12, color: "#94a3b8", textAlign: "center" }}>
-            <p style={{ marginBottom: 8 }}>
-              Contracts are processed securely and not stored after analysis.
+          {/* Footer */}
+          <div style={{ 
+            marginTop: 80, 
+            paddingTop: 40,
+            borderTop: "1px solid rgba(100, 116, 139, 0.2)",
+            textAlign: "center",
+            fontSize: 13,
+            color: "#64748b"
+          }}>
+            <p style={{ marginBottom: 12 }}>
+              🔒 Contracts processed securely • Never stored • GDPR compliant
             </p>
             <p>
-              <a href="/privacy" style={{ color: "#6366f1", marginRight: 16 }}>Privacy Policy</a>
-              <a href="/terms" style={{ color: "#6366f1" }}>Terms of Service</a>
+              <a href="/privacy" style={{ color: "#6366f1", marginRight: 20, textDecoration: "none" }}>
+                Privacy Policy
+              </a>
+              <a href="/terms" style={{ color: "#6366f1", textDecoration: "none" }}>
+                Terms of Service
+              </a>
             </p>
           </div>
         </div>

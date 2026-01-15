@@ -1,34 +1,32 @@
 import { useState, useEffect } from 'react';
 
 export default function CookieBanner() {
-  const [show, setShow] = useState(false);
+  const [showBanner, setShowBanner] = useState(false);
 
   useEffect(() => {
+    // Kolla om användaren redan har svarat
     const consent = localStorage.getItem('cookie-consent');
     if (!consent) {
-      setShow(true);
+      setShowBanner(true);
     }
   }, []);
 
-  const accept = () => {
+  const handleAccept = () => {
+    console.log('🍪 User accepted cookies');
     localStorage.setItem('cookie-consent', 'accepted');
-    setShow(false);
-    // PostHog will start tracking automatically since we check consent in _app.tsx
-    if (typeof window !== 'undefined' && (window as any).posthog) {
-      (window as any).posthog.opt_in_capturing();
-    }
+    setShowBanner(false);
+    
+    // Dispatcha custom event så _app.tsx kan reagera
+    window.dispatchEvent(new Event('cookieConsentChanged'));
   };
 
-  const decline = () => {
+  const handleDecline = () => {
+    console.log('🍪 User declined cookies');
     localStorage.setItem('cookie-consent', 'declined');
-    setShow(false);
-    // Opt out of PostHog tracking
-    if (typeof window !== 'undefined' && (window as any).posthog) {
-      (window as any).posthog.opt_out_capturing();
-    }
+    setShowBanner(false);
   };
 
-  if (!show) return null;
+  if (!showBanner) return null;
 
   return (
     <div
@@ -38,61 +36,53 @@ export default function CookieBanner() {
         left: 0,
         right: 0,
         background: '#1e293b',
-        borderTop: '1px solid #334155',
+        color: 'white',
         padding: '20px',
+        boxShadow: '0 -2px 10px rgba(0,0,0,0.3)',
         zIndex: 9999,
-        boxShadow: '0 -4px 6px -1px rgba(0, 0, 0, 0.1)'
+        borderTop: '1px solid #334155'
       }}
     >
       <div
         style={{
-          maxWidth: '1200px',
+          maxWidth: 1200,
           margin: '0 auto',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '16px'
+          gap: 20,
+          flexWrap: 'wrap'
         }}
       >
-        <div style={{ flex: 1, minWidth: '300px' }}>
-          <p style={{ fontSize: 14, color: '#e2e8f0', margin: 0 }}>
-            We use cookies to improve your experience and analyze site usage.{' '}
-            <a
-              href="/privacy"
-              style={{ color: '#6366f1', textDecoration: 'underline' }}
-            >
-              Learn more
-            </a>
-          </p>
-        </div>
-
-        <div style={{ display: 'flex', gap: '12px' }}>
+        <p style={{ margin: 0, fontSize: 14, flex: 1, minWidth: 300 }}>
+          We use cookies to analyze site usage and improve your experience. By continuing, you accept our use of analytics cookies.
+        </p>
+        <div style={{ display: 'flex', gap: 12 }}>
           <button
-            onClick={decline}
+            onClick={handleDecline}
             style={{
-              padding: '8px 16px',
+              padding: '10px 20px',
               fontSize: 14,
               fontWeight: 600,
               borderRadius: 8,
+              border: '1px solid #475569',
               background: 'transparent',
-              color: '#94a3b8',
-              border: '1px solid #334155',
+              color: '#cbd5e1',
               cursor: 'pointer'
             }}
           >
             Decline
           </button>
           <button
-            onClick={accept}
+            onClick={handleAccept}
             style={{
-              padding: '8px 16px',
+              padding: '10px 20px',
               fontSize: 14,
               fontWeight: 600,
               borderRadius: 8,
+              border: 'none',
               background: '#6366f1',
               color: 'white',
-              border: 'none',
               cursor: 'pointer'
             }}
           >
