@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import * as Sentry from "@sentry/nextjs";
 import { analytics } from "../lib/analytics";
 import Meta from "../components/Meta";
 
@@ -8,6 +9,7 @@ export default function Home() {
   const [contractText, setContractText] = useState("");
   const [analysis, setAnalysis] = useState("");
   const [loading, setLoading] = useState(false);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSample, setIsSample] = useState(false);
@@ -25,7 +27,12 @@ export default function Home() {
   ];
 
   useEffect(() => {
-    analytics.conversionFunnelStep("landed");
+    // Vänta lite så PostHog hinner initieras
+    const timer = setTimeout(() => {
+      analytics.conversionFunnelStep("landed");
+    }, 500);
+    
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
@@ -53,11 +60,32 @@ export default function Home() {
 
   const pay = async () => {
     setError(null);
+    setCheckoutLoading(true);
     analytics.checkoutStarted();
     analytics.conversionFunnelStep("clicked_pay");
-    const res = await fetch("/api/create-checkout-session", { method: "POST" });
-    const data = await res.json();
-    window.location.href = data.url;
+    
+    try {
+      const res = await fetch("/api/create-checkout-session", { method: "POST" });
+      
+      if (!res.ok) {
+        throw new Error("Failed to create checkout session");
+      }
+      
+      const data = await res.json();
+      window.location.href = data.url;
+    } catch (err: any) {
+      console.error("Checkout error:", err);
+      
+      // Log to Sentry
+      Sentry.captureException(err, {
+        tags: {
+          action: "checkout_failed",
+        },
+      });
+      
+      setError("Failed to start checkout. Please try again.");
+      setCheckoutLoading(false);
+    }
   };
 
   const extractRiskLevel = (text: string) => {
@@ -95,10 +123,7 @@ export default function Home() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Analysis failed");
-        analytics.analysisFailed(data.error || "Unknown error", isSample);
-        setLoading(false);
-        return;
+        throw new Error(data.error || "Analysis failed");
       }
 
       const risk = extractRiskLevel(data.analysis);
@@ -114,9 +139,25 @@ export default function Home() {
       } else {
         analytics.conversionFunnelStep("analyzed_own");
       }
-    } catch {
-      setError("Something went wrong. Please try again.");
-      analytics.analysisFailed("Network error", isSample);
+    } catch (err: any) {
+      console.error("Analysis error:", err);
+      
+      const errorMessage = err.message || "Something went wrong. Please try again.";
+      setError(errorMessage);
+      
+      // Log to Sentry
+      Sentry.captureException(err, {
+        tags: {
+          action: "analysis_failed",
+          is_sample: isSample,
+        },
+        extra: {
+          contract_length: contractText.length,
+          error_message: errorMessage,
+        },
+      });
+      
+      analytics.analysisFailed(errorMessage, isSample);
     }
 
     setLoading(false);
@@ -125,21 +166,37 @@ export default function Home() {
   const downloadPdf = async () => {
     analytics.pdfDownloaded(riskLevel || "UNKNOWN");
     
-    const res = await fetch("/api/export-pdf", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ analysis, riskLevel }),
-    });
+    try {
+      const res = await fetch("/api/export-pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ analysis, riskLevel }),
+      });
 
-    const blob = await res.blob();
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "TrustTerms_Contract_Analysis.pdf";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    window.URL.revokeObjectURL(url);
+      if (!res.ok) {
+        throw new Error("PDF export failed");
+      }
+
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "TrustTerms_Contract_Analysis.pdf";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err: any) {
+      console.error("PDF download error:", err);
+      
+      Sentry.captureException(err, {
+        tags: {
+          action: "pdf_download_failed",
+        },
+      });
+      
+      setError("Failed to download PDF. Please try again.");
+    }
   };
 
   const handleSampleClick = () => {
@@ -155,9 +212,9 @@ export default function Home() {
   return (
     <>
       <Meta />
-      <main style={{ 
+      <main style={{
         background: "linear-gradient(to bottom, #0f172a 0%, #1e293b 100%)",
-        minHeight: "100vh", 
+        minHeight: "100vh",
         color: "white",
         position: "relative",
         overflow: "hidden"
@@ -192,9 +249,9 @@ export default function Home() {
               ⚡ AI-POWERED CONTRACT ANALYSIS
             </div>
 
-            <h1 style={{ 
-              fontSize: 56, 
-              fontWeight: 900, 
+            <h1 style={{
+              fontSize: 56,
+              fontWeight: 900,
               marginBottom: 20,
               background: "linear-gradient(to right, #ffffff, #a5b4fc)",
               WebkitBackgroundClip: "text",
@@ -205,21 +262,21 @@ export default function Home() {
               TrustTerms
             </h1>
 
-            <p style={{ 
-              fontSize: 20, 
-              color: "#cbd5e1", 
+            <p style={{
+              fontSize: 20,
+              color: "#cbd5e1",
               marginBottom: 32,
               lineHeight: 1.6,
               maxWidth: 600,
               margin: "0 auto 32px"
             }}>
-              Spot hidden risks in SaaS contracts before you sign. 
+              Spot hidden risks in SaaS contracts before you sign.
               Built for founders and CFOs who need answers in minutes, not days.
             </p>
 
-            <div style={{ 
-              display: "flex", 
-              gap: 16, 
+            <div style={{
+              display: "flex",
+              gap: 16,
               justifyContent: "center",
               flexWrap: "wrap",
               fontSize: 14,
@@ -232,8 +289,8 @@ export default function Home() {
           </div>
 
           {/* Value Props Cards */}
-          <div style={{ 
-            display: "grid", 
+          <div style={{
+            display: "grid",
             gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
             gap: 20,
             marginBottom: 60
@@ -356,8 +413,8 @@ Or click above to try a sample contract first (completely free, no payment neede
                     fontSize: 18,
                     fontWeight: 700,
                     borderRadius: 12,
-                    background: (!canAnalyze || loading) 
-                      ? "rgba(100, 116, 139, 0.3)" 
+                    background: (!canAnalyze || loading)
+                      ? "rgba(100, 116, 139, 0.3)"
                       : "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)",
                     color: "white",
                     border: "none",
@@ -386,40 +443,47 @@ Or click above to try a sample contract first (completely free, no payment neede
               {!accessToken && !isSample && (
                 <button
                   onClick={pay}
+                  disabled={checkoutLoading}
                   style={{
                     width: "100%",
                     padding: "18px 32px",
                     fontSize: 18,
                     fontWeight: 700,
                     borderRadius: 12,
-                    background: "linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)",
+                    background: checkoutLoading 
+                      ? "rgba(100, 116, 139, 0.3)"
+                      : "linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)",
                     color: "white",
                     border: "none",
-                    cursor: "pointer",
+                    cursor: checkoutLoading ? "not-allowed" : "pointer",
                     transition: "all 0.3s",
-                    boxShadow: "0 4px 20px rgba(99, 102, 241, 0.3)",
+                    boxShadow: checkoutLoading ? "none" : "0 4px 20px rgba(99, 102, 241, 0.3)",
                   }}
                   onMouseEnter={e => {
-                    e.currentTarget.style.transform = "translateY(-2px)";
-                    e.currentTarget.style.boxShadow = "0 6px 30px rgba(99, 102, 241, 0.5)";
+                    if (!checkoutLoading) {
+                      e.currentTarget.style.transform = "translateY(-2px)";
+                      e.currentTarget.style.boxShadow = "0 6px 30px rgba(99, 102, 241, 0.5)";
+                    }
                   }}
                   onMouseLeave={e => {
-                    e.currentTarget.style.transform = "translateY(0)";
-                    e.currentTarget.style.boxShadow = "0 4px 20px rgba(99, 102, 241, 0.3)";
+                    if (!checkoutLoading) {
+                      e.currentTarget.style.transform = "translateY(0)";
+                      e.currentTarget.style.boxShadow = "0 4px 20px rgba(99, 102, 241, 0.3)";
+                    }
                   }}
                 >
-                  💳 Pay 349 kr to Analyze Your Contract
+                  {checkoutLoading ? "⏳ Loading checkout..." : "💳 Pay 349 kr to Analyze Your Contract"}
                 </button>
               )}
 
               {/* Info text under button */}
               {!accessToken && !isSample && (
-                <p style={{ 
-                  fontSize: 13, 
-                  color: "#94a3b8", 
-                  textAlign: "center", 
+                <p style={{
+                  fontSize: 13,
+                  color: "#94a3b8",
+                  textAlign: "center",
                   margin: 0,
-                  lineHeight: 1.5 
+                  lineHeight: 1.5
                 }}>
                   One-time payment • No subscription • Instant access
                   <br />
@@ -590,28 +654,33 @@ Or click above to try a sample contract first (completely free, no payment neede
                   </p>
                   <button
                     onClick={pay}
+                    disabled={checkoutLoading}
                     style={{
                       padding: "16px 32px",
                       fontSize: 17,
                       fontWeight: 700,
                       borderRadius: 12,
-                      background: "white",
+                      background: checkoutLoading ? "rgba(100, 116, 139, 0.3)" : "white",
                       color: "#6366f1",
                       border: "none",
-                      cursor: "pointer",
+                      cursor: checkoutLoading ? "not-allowed" : "pointer",
                       transition: "all 0.3s",
-                      boxShadow: "0 4px 20px rgba(99, 102, 241, 0.3)"
+                      boxShadow: checkoutLoading ? "none" : "0 4px 20px rgba(99, 102, 241, 0.3)"
                     }}
                     onMouseEnter={e => {
-                      e.currentTarget.style.transform = "translateY(-2px)";
-                      e.currentTarget.style.boxShadow = "0 6px 30px rgba(99, 102, 241, 0.4)";
+                      if (!checkoutLoading) {
+                        e.currentTarget.style.transform = "translateY(-2px)";
+                        e.currentTarget.style.boxShadow = "0 6px 30px rgba(99, 102, 241, 0.4)";
+                      }
                     }}
                     onMouseLeave={e => {
-                      e.currentTarget.style.transform = "translateY(0)";
-                      e.currentTarget.style.boxShadow = "0 4px 20px rgba(99, 102, 241, 0.3)";
+                      if (!checkoutLoading) {
+                        e.currentTarget.style.transform = "translateY(0)";
+                        e.currentTarget.style.boxShadow = "0 4px 20px rgba(99, 102, 241, 0.3)";
+                      }
                     }}
                   >
-                    Unlock Full Analysis for 349 kr
+                    {checkoutLoading ? "Loading..." : "Unlock Full Analysis for 349 kr"}
                   </button>
                   <p style={{ fontSize: 13, marginTop: 16, color: "#94a3b8" }}>
                     💳 One-time payment • No subscription • Instant access
@@ -623,17 +692,17 @@ Or click above to try a sample contract first (completely free, no payment neede
 
           {/* FAQ Section */}
           <div style={{ marginTop: 80 }}>
-            <h2 style={{ 
-              fontSize: 32, 
-              fontWeight: 800, 
+            <h2 style={{
+              fontSize: 32,
+              fontWeight: 800,
               marginBottom: 32,
               textAlign: "center"
             }}>
               Frequently Asked Questions
             </h2>
 
-            <div style={{ 
-              display: "grid", 
+            <div style={{
+              display: "grid",
               gap: 20,
               maxWidth: 700,
               margin: "0 auto"
@@ -674,8 +743,8 @@ Or click above to try a sample contract first (completely free, no payment neede
           </div>
 
           {/* Footer */}
-          <div style={{ 
-            marginTop: 80, 
+          <div style={{
+            marginTop: 80,
             paddingTop: 40,
             borderTop: "1px solid rgba(100, 116, 139, 0.2)",
             textAlign: "center",

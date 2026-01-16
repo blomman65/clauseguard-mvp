@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import OpenAI from "openai";
+import * as Sentry from "@sentry/nextjs";
 import { consumeAccessToken } from "../../lib/accessTokens";
 import { rateLimit, getClientIp } from "../../lib/rateLimit";
 
@@ -197,6 +198,24 @@ RISK LEVEL GUIDELINES:
 
   } catch (err: any) {
     console.error("❌ OpenAI analysis error:", err);
+    
+    // Log to Sentry
+    Sentry.captureException(err, {
+      tags: {
+        api_route: "analyze",
+        is_sample: isSample,
+        error_type: err.status ? "openai_api_error" : "unknown_error",
+      },
+      extra: {
+        contract_length: sanitizedContract.length,
+        error_message: err.message,
+        error_status: err.status,
+        client_ip: clientIp,
+      },
+      user: {
+        ip_address: clientIp,
+      },
+    });
     
     if (err.status === 429) {
       return res.status(503).json({
