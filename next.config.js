@@ -11,16 +11,16 @@ const nextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              // Script-src: egna scripts + PostHog + Stripe
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline' eu.posthog.com eu-assets.i.posthog.com js.stripe.com",
+              // Script-src: egna scripts + PostHog + Stripe + Sentry
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' eu.posthog.com eu-assets.i.posthog.com js.stripe.com js.sentry-cdn.com",
               // Styles
               "style-src 'self' 'unsafe-inline'",
-              // Bilder
+              // Bilder: lägg till Sentry
               "img-src 'self' data: https: eu.posthog.com eu-assets.i.posthog.com",
               // Fonts
               "font-src 'self' data:",
-              // Connect: API-anrop, websockets - FIXAD MED eu.i.posthog.com
-              "connect-src 'self' api.stripe.com eu.posthog.com eu-assets.i.posthog.com eu.i.posthog.com api.openai.com https://vercel.live",
+              // Connect: API-anrop - KRITISK FIX: lägg till Sentry domains
+              "connect-src 'self' api.stripe.com eu.posthog.com eu-assets.i.posthog.com eu.i.posthog.com api.openai.com https://vercel.live *.ingest.de.sentry.io *.sentry.io",
               // Iframes (Stripe checkout)
               "frame-src js.stripe.com",
               // Övrigt säkerhet

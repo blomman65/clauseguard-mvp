@@ -71,8 +71,10 @@ export default async function handler(
 
   if (!rateLimitResult.success) {
     const resetDate = new Date(rateLimitResult.reset);
+    const minutesUntilReset = Math.ceil((rateLimitResult.reset - Date.now()) / 60000);
+    
     return res.status(429).json({
-      error: "Too many requests. Please try again later.",
+      error: `Too many requests. Please try again in ${minutesUntilReset} minute${minutesUntilReset > 1 ? 's' : ''}.`,
       reset: resetDate.toISOString(),
       remaining: 0
     });
@@ -210,6 +212,7 @@ RISK LEVEL GUIDELINES:
         contract_length: sanitizedContract.length,
         error_message: err.message,
         error_status: err.status,
+        error_code: err.code,
         client_ip: clientIp,
       },
       user: {
@@ -217,20 +220,33 @@ RISK LEVEL GUIDELINES:
       },
     });
     
+    // ⚠️ KRITISK FIX: Bättre felhantering för olika OpenAI errors
     if (err.status === 429) {
       return res.status(503).json({
-        error: "Service temporarily unavailable. Please try again in a moment."
+        error: "Our AI service is experiencing high demand. Please try again in 30 seconds."
       });
     }
     
-    if (err.status === 401) {
+    if (err.status === 401 || err.status === 403) {
       return res.status(500).json({
-        error: "Configuration error. Please contact support."
+        error: "Service configuration error. Please contact support at support@trustterms.com"
+      });
+    }
+
+    if (err.code === 'context_length_exceeded') {
+      return res.status(400).json({
+        error: "Contract is too complex for analysis. Please try a shorter version."
+      });
+    }
+
+    if (err.message?.includes('timeout')) {
+      return res.status(504).json({
+        error: "Analysis took too long. Please try again."
       });
     }
 
     return res.status(500).json({
-      error: "Analysis failed. Please try again."
+      error: "Analysis failed. Please try again in a moment."
     });
   }
 }

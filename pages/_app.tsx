@@ -9,7 +9,7 @@ export default function App({ Component, pageProps }: AppProps) {
   const [analyticsReady, setAnalyticsReady] = useState(false);
   const [consentChecked, setConsentChecked] = useState(false);
 
-  // Initialize analytics based on consent
+  // ⚠️ KRITISK FIX: Initialize analytics based on consent
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -23,13 +23,15 @@ export default function App({ Component, pageProps }: AppProps) {
         initAnalytics();
         setAnalyticsReady(true);
         
-        // Track initial pageview
+        // ⚠️ FIX: Vänta lite extra så PostHog hinner initieras
         setTimeout(() => {
           analytics.pageView(router.pathname);
-        }, 100);
+        }, 300);
       } else if (consent === 'declined') {
         console.log('❌ Cookie consent declined - analytics disabled');
         setAnalyticsReady(false);
+      } else {
+        console.log('⏳ No consent decision yet');
       }
       
       setConsentChecked(true);
@@ -51,13 +53,19 @@ export default function App({ Component, pageProps }: AppProps) {
     };
   }, [router.pathname, analyticsReady]);
 
-  // Track route changes (only if analytics is active)
+  // ⚠️ KRITISK FIX: Track route changes (only if analytics is active)
   useEffect(() => {
-    if (!analyticsReady) return;
+    if (!analyticsReady) {
+      console.log('⏭️ Skipping route tracking - analytics not ready');
+      return;
+    }
 
     const handleRouteChange = (url: string) => {
       console.log('🔄 Route changed:', url);
-      analytics.pageView(url);
+      // ⚠️ FIX: Liten delay för att säkerställa analytics är redo
+      setTimeout(() => {
+        analytics.pageView(url);
+      }, 100);
     };
 
     router.events.on('routeChangeComplete', handleRouteChange);
