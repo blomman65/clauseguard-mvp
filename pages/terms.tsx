@@ -220,7 +220,7 @@ export default function Terms() {
               14. Contact
             </h2>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7 }}>
-              Questions about these terms? Contact: <strong>support@trustterms.com</strong>
+              Questions about these terms? Contact: <strong>trustterms.help@outlook.com</strong>
             </p>
           </section>
         </div>

@@ -155,7 +155,7 @@ export default function Privacy() {
               9. Contact Us
             </h2>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7 }}>
-              Questions about privacy? Email us at: <strong>privacy@trustterms.com</strong>
+              Questions about privacy? Email us at: <strong>trustterms.help@outlook.com</strong>
             </p>
           </section>
 
