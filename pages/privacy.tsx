@@ -104,7 +104,7 @@ export default function Privacy() {
             </ul>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7, marginTop: 12 }}>
               Since we don't store contract text or require accounts, there is minimal personal 
-              data to manage. For any privacy requests, contact: <strong>privacy@trustterms.com</strong>
+              data to manage. For any privacy requests, contact: <strong>trustterms.help@outlook.com</strong>
             </p>
           </section>
 
