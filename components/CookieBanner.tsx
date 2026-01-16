@@ -2,45 +2,66 @@ import { useState, useEffect } from 'react';
 
 export default function CookieBanner() {
   const [showBanner, setShowBanner] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // Kolla om användaren redan har svarat
-    const consent = localStorage.getItem('cookie-consent');
-    if (!consent) {
-      setShowBanner(true);
+    setMounted(true);
+    // Kolla consent endast när komponenten är mounted
+    if (typeof window !== 'undefined') {
+      try {
+        const consent = localStorage.getItem('cookie-consent');
+        if (!consent) {
+          setShowBanner(true);
+        }
+      } catch (e) {
+        // Om localStorage inte funkar, visa inte banner
+        console.warn('localStorage not available');
+      }
     }
   }, []);
 
   const handleAccept = () => {
     console.log('🍪 User accepted cookies');
-    localStorage.setItem('cookie-consent', 'accepted');
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('cookie-consent', 'accepted');
+        window.dispatchEvent(new Event('cookieConsentChanged'));
+      } catch (e) {
+        console.warn('Could not save cookie consent');
+      }
+    }
     setShowBanner(false);
-    
-    // Dispatcha custom event så _app.tsx kan reagera
-    window.dispatchEvent(new Event('cookieConsentChanged'));
   };
 
   const handleDecline = () => {
     console.log('🍪 User declined cookies');
-    localStorage.setItem('cookie-consent', 'declined');
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('cookie-consent', 'declined');
+      } catch (e) {
+        console.warn('Could not save cookie consent');
+      }
+    }
     setShowBanner(false);
   };
 
-  if (!showBanner) return null;
+  // Visa inte banner förrän komponenten är mounted
+  if (!mounted || !showBanner) return null;
 
   return (
     <div
       style={{
-        position: 'fixed',
+        position: "fixed",
         bottom: 0,
         left: 0,
         right: 0,
-        background: '#1e293b',
-        color: 'white',
-        padding: '20px',
-        boxShadow: '0 -2px 10px rgba(0,0,0,0.3)',
+        background: "rgba(15, 23, 42, 0.98)",
+        backdropFilter: 'blur(12px)',
+        color: "white",
+        padding: '24px',
+        boxShadow: '0 -4px 24px rgba(0, 0, 0, 0.4)',
         zIndex: 9999,
-        borderTop: '1px solid #334155'
+        borderTop: '1px solid rgba(100, 116, 139, 0.3)'
       }}
     >
       <div
@@ -50,25 +71,34 @@ export default function CookieBanner() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          gap: 20,
+          gap: 24,
           flexWrap: 'wrap'
         }}
       >
-        <p style={{ margin: 0, fontSize: 14, flex: 1, minWidth: 300 }}>
+        <p style={{ margin: 0, fontSize: 15, flex: 1, minWidth: 300, color: '#e2e8f0', lineHeight: 1.6 }}>
           We use cookies to analyze site usage and improve your experience. By continuing, you accept our use of analytics cookies.
         </p>
         <div style={{ display: 'flex', gap: 12 }}>
           <button
             onClick={handleDecline}
             style={{
-              padding: '10px 20px',
+              padding: '12px 24px',
               fontSize: 14,
-              fontWeight: 600,
-              borderRadius: 8,
-              border: '1px solid #475569',
+              fontWeight: 700,
+              borderRadius: 10,
+              border: '1px solid rgba(148, 163, 184, 0.4)',
               background: 'transparent',
               color: '#cbd5e1',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = 'rgba(148, 163, 184, 0.1)';
+              e.currentTarget.style.borderColor = 'rgba(148, 163, 184, 0.6)';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = 'transparent';
+              e.currentTarget.style.borderColor = 'rgba(148, 163, 184, 0.4)';
             }}
           >
             Decline
@@ -76,14 +106,24 @@ export default function CookieBanner() {
           <button
             onClick={handleAccept}
             style={{
-              padding: '10px 20px',
+              padding: '12px 24px',
               fontSize: 14,
-              fontWeight: 600,
-              borderRadius: 8,
+              fontWeight: 700,
+              borderRadius: 10,
               border: 'none',
-              background: '#6366f1',
+              background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
               color: 'white',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+              boxShadow: '0 2px 8px rgba(99, 102, 241, 0.3)'
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.transform = 'translateY(-1px)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(99, 102, 241, 0.4)';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 2px 8px rgba(99, 102, 241, 0.3)';
             }}
           >
             Accept

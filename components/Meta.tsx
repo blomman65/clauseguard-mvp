@@ -12,28 +12,28 @@ export default function Meta({
   image = "/og-image.png"
 }: MetaProps) {
   const url = "https://trustterms.vercel.app";
-  
+ 
   return (
     <Head>
       <title>{title}</title>
       <meta name="description" content={description} />
-      
+     
       {/* Open Graph */}
       <meta property="og:type" content="website" />
       <meta property="og:url" content={url} />
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
       <meta property="og:image" content={`${url}${image}`} />
-      
+     
       {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={`${url}${image}`} />
-      
+     
       {/* Favicon */}
       <link rel="icon" href="/favicon.ico" />
-      
+     
       {/* Structured Data */}
       <script
         type="application/ld+json"
@@ -48,11 +48,6 @@ export default function Meta({
               "@type": "Offer",
               "price": "349",
               "priceCurrency": "SEK"
-            },
-            "aggregateRating": {
-              "@type": "AggregateRating",
-              "ratingValue": "4.8",
-              "ratingCount": "47"
             }
           })
         }}

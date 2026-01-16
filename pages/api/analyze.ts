@@ -20,7 +20,27 @@ function sanitizeInput(text: string): string {
     .replace(/<script>/gi, '')
     .replace(/javascript:/gi, '')
     .replace(/on\w+\s*=/gi, '')
+    .replace(/[<>]/g, '') // Extra skydd mot HTML injection
     .slice(0, MAX_CONTRACT_LENGTH);
+}
+
+// SÄKERHETSFÖRBÄTTRING: Verifiera att requesten kommer från rätt origin
+function verifyOrigin(req: NextApiRequest): boolean {
+  const allowedOrigins = [
+    process.env.NEXT_PUBLIC_APP_URL,
+    'https://trustterms.vercel.app',
+    'http://localhost:3000' // För development
+  ];
+  
+  const origin = req.headers.origin || req.headers.referer;
+  
+  // I produktion, kräv rätt origin
+  if (process.env.NODE_ENV === 'production') {
+    return allowedOrigins.some(allowed => origin?.startsWith(allowed || ''));
+  }
+  
+  // I development, tillåt alla
+  return true;
 }
 
 export default async function handler(
@@ -29,6 +49,12 @@ export default async function handler(
 ) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  // SÄKERHETSFÖRBÄTTRING: Verifiera origin
+  if (!verifyOrigin(req)) {
+    console.warn('⚠️ Request from unauthorized origin:', req.headers.origin);
+    return res.status(403).json({ error: "Unauthorized origin" });
   }
 
   const { contractText, accessToken, isSample } = req.body;
@@ -55,7 +81,6 @@ export default async function handler(
   // ===== RATE LIMITING =====
   
   const clientIp = getClientIp(req);
-  console.log('🔍 Client IP:', clientIp);
   
   const rateLimitConfig = isSample
     ? { limit: 3, window: 3600 }
@@ -67,15 +92,12 @@ export default async function handler(
     rateLimitConfig.window
   );
 
-  console.log('🔒 Rate limit result:', rateLimitResult);
-
   if (!rateLimitResult.success) {
-    const resetDate = new Date(rateLimitResult.reset);
     const minutesUntilReset = Math.ceil((rateLimitResult.reset - Date.now()) / 60000);
     
     return res.status(429).json({
       error: `Too many requests. Please try again in ${minutesUntilReset} minute${minutesUntilReset > 1 ? 's' : ''}.`,
-      reset: resetDate.toISOString(),
+      reset: new Date(rateLimitResult.reset).toISOString(),
       remaining: 0
     });
   }
@@ -102,7 +124,11 @@ export default async function handler(
   
   if (isSample && sanitizedContract.trim() === SAMPLE_CONTRACT_TEXT.trim()) {
     if (cachedSampleAnalysis) {
-      console.log('✅ Returning cached sample analysis');
+      // Rate limit headers
+      res.setHeader('X-RateLimit-Limit', rateLimitConfig.limit.toString());
+      res.setHeader('X-RateLimit-Remaining', rateLimitResult.remaining.toString());
+      res.setHeader('X-RateLimit-Reset', new Date(rateLimitResult.reset).toISOString());
+      
       return res.status(200).json({
         analysis: cachedSampleAnalysis,
         cached: true
@@ -113,8 +139,6 @@ export default async function handler(
   // ===== OPENAI ANALYSIS =====
 
   try {
-    console.log('🤖 Calling OpenAI API...');
-    
     const completion = await openai.chat.completions.create({
       model: "gpt-4o",
       max_tokens: 1200,
@@ -181,8 +205,6 @@ RISK LEVEL GUIDELINES:
 
     const analysis = completion.choices[0].message.content || "Analysis failed";
 
-    console.log('✅ OpenAI analysis complete');
-
     // Cache sample analysis
     if (isSample && sanitizedContract.trim() === SAMPLE_CONTRACT_TEXT.trim()) {
       cachedSampleAnalysis = analysis;
@@ -201,7 +223,7 @@ RISK LEVEL GUIDELINES:
   } catch (err: any) {
     console.error("❌ OpenAI analysis error:", err);
     
-    // Log to Sentry
+    // Log to Sentry (endast om enabled)
     Sentry.captureException(err, {
       tags: {
         api_route: "analyze",
@@ -210,17 +232,12 @@ RISK LEVEL GUIDELINES:
       },
       extra: {
         contract_length: sanitizedContract.length,
-        error_message: err.message,
         error_status: err.status,
         error_code: err.code,
-        client_ip: clientIp,
-      },
-      user: {
-        ip_address: clientIp,
       },
     });
     
-    // ⚠️ KRITISK FIX: Bättre felhantering för olika OpenAI errors
+    // FÖRBÄTTRAD felhantering - exponera aldrig interna detaljer
     if (err.status === 429) {
       return res.status(503).json({
         error: "Our AI service is experiencing high demand. Please try again in 30 seconds."
@@ -228,8 +245,10 @@ RISK LEVEL GUIDELINES:
     }
     
     if (err.status === 401 || err.status === 403) {
+      // Logga internt men ge generiskt svar
+      console.error("🔴 CRITICAL: OpenAI API key issue!");
       return res.status(500).json({
-        error: "Service configuration error. Please contact support at support@trustterms.com"
+        error: "Service temporarily unavailable. Please try again later."
       });
     }
 
@@ -239,12 +258,13 @@ RISK LEVEL GUIDELINES:
       });
     }
 
-    if (err.message?.includes('timeout')) {
+    if (err.message?.includes('timeout') || err.code === 'ETIMEDOUT') {
       return res.status(504).json({
         error: "Analysis took too long. Please try again."
       });
     }
 
+    // Generiskt fel - exponera ALDRIG stack traces eller interna meddelanden
     return res.status(500).json({
       error: "Analysis failed. Please try again in a moment."
     });

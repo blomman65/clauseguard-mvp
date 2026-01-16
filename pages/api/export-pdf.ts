@@ -2,17 +2,19 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import PDFDocument from "pdfkit";
 import * as Sentry from "@sentry/nextjs";
 
-const MAX_ANALYSIS_LENGTH = 50000; // Förhindra extremt stora PDFs
+const MAX_ANALYSIS_LENGTH = 50000;
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (req.method !== "POST") return res.status(405).end();
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
 
   const { analysis, riskLevel } = req.body;
 
-  // ⚠️ KRITISK FIX: Validering
+  // Validering
   if (!analysis || !riskLevel) {
     return res.status(400).json({ error: "Missing analysis data" });
   }
@@ -22,8 +24,8 @@ export default async function handler(
   }
 
   if (analysis.length > MAX_ANALYSIS_LENGTH) {
-    return res.status(400).json({ 
-      error: "Analysis too large for PDF export" 
+    return res.status(400).json({
+      error: "Analysis too large for PDF export"
     });
   }
 
@@ -31,7 +33,8 @@ export default async function handler(
     const doc = new PDFDocument({
       size: "A4",
       margin: 50,
-      bufferPages: true, // ⚠️ FIX: Förhindra minnesläckor
+      bufferPages: true,
+      autoFirstPage: true,
     });
 
     res.setHeader("Content-Type", "application/pdf");
@@ -40,7 +43,7 @@ export default async function handler(
       'attachment; filename="TrustTerms_Contract_Analysis.pdf"'
     );
 
-    // ⚠️ KRITISK FIX: Error handling för PDF stream
+    // Error handling för PDF stream
     doc.on('error', (err) => {
       console.error('PDF generation error:', err);
       Sentry.captureException(err, {
@@ -53,13 +56,20 @@ export default async function handler(
 
     doc.pipe(res);
 
-    // Title
+    // Header med logo-simulering
     doc
-      .fontSize(22)
+      .fontSize(28)
       .font("Helvetica-Bold")
-      .text("TrustTerms – Contract Risk Analysis");
+      .fillColor("#6366f1")
+      .text("TrustTerms", { align: "left" });
 
-    doc.moveDown();
+    doc
+      .fontSize(12)
+      .font("Helvetica")
+      .fillColor("#64748b")
+      .text("Contract Risk Analysis Report", { align: "left" });
+
+    doc.moveDown(1.5);
 
     // Risk badge
     const riskColor =
@@ -70,47 +80,124 @@ export default async function handler(
         : "#16A34A";
 
     doc
-      .fontSize(14)
+      .fontSize(16)
       .fillColor(riskColor)
       .font("Helvetica-Bold")
-      .text(`Overall risk level: ${riskLevel}`);
+      .text(`Overall Risk Level: ${riskLevel}`, { align: "left" });
 
     doc.moveDown();
-    doc.fillColor("black").font("Helvetica").fontSize(11);
-
-    // Analysis body - ⚠️ FIX: Hantera långa texter
-    const maxLineLength = 90;
-    const lines = analysis.split('\n');
     
-    for (const line of lines) {
-      if (line.length > maxLineLength) {
-        // Dela upp långa rader
-        const words = line.split(' ');
-        let currentLine = '';
-        
-        for (const word of words) {
-          if ((currentLine + word).length > maxLineLength) {
-            doc.text(currentLine.trim(), { lineGap: 4 });
-            currentLine = word + ' ';
-          } else {
-            currentLine += word + ' ';
-          }
-        }
-        
-        if (currentLine) {
-          doc.text(currentLine.trim(), { lineGap: 4 });
-        }
-      } else {
-        doc.text(line, { lineGap: 4 });
-      }
-    }
+    // Date
+    doc
+      .fontSize(10)
+      .fillColor("#64748b")
+      .font("Helvetica")
+      .text(`Generated: ${new Date().toLocaleString('sv-SE', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })}`, { align: "left" });
 
     doc.moveDown(2);
 
-    // Disclaimer med bättre formatering
+    // Horizontal line
+    doc
+      .strokeColor("#e2e8f0")
+      .lineWidth(1)
+      .moveTo(50, doc.y)
+      .lineTo(545, doc.y)
+      .stroke();
+
+    doc.moveDown(1.5);
+
+    // Analysis body med smart formatting
+    doc.fillColor("#0f172a").font("Helvetica").fontSize(11);
+
+    const lines = analysis.split('\n');
+    const pageHeight = 792; // A4 height in points
+    const bottomMargin = 100;
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      
+      // Check if we need a new page
+      if (doc.y > pageHeight - bottomMargin) {
+        doc.addPage();
+        doc.y = 50; // Reset to top margin
+      }
+      
+      // Handle different formatting
+      if (line.startsWith('##')) {
+        // Main headers
+        doc.moveDown(0.5);
+        doc
+          .font("Helvetica-Bold")
+          .fontSize(14)
+          .fillColor("#1e293b")
+          .text(line.replace(/^##\s*/, ''), {
+            lineGap: 6
+          });
+        doc.moveDown(0.3);
+        doc.font("Helvetica").fontSize(11).fillColor("#0f172a");
+      } else if (line.startsWith('###')) {
+        // Sub-headers
+        doc.moveDown(0.4);
+        doc
+          .font("Helvetica-Bold")
+          .fontSize(12)
+          .fillColor("#334155")
+          .text(line.replace(/^###\s*/, ''), {
+            lineGap: 5
+          });
+        doc.moveDown(0.2);
+        doc.font("Helvetica").fontSize(11).fillColor("#0f172a");
+      } else if (line.startsWith('**') && line.endsWith('**')) {
+        // Bold lines
+        doc
+          .font("Helvetica-Bold")
+          .text(line.replace(/\*\*/g, ''), {
+            lineGap: 4
+          });
+        doc.font("Helvetica");
+      } else if (line.startsWith('- ') || line.startsWith('* ')) {
+        // Bullet points
+        const bulletText = line.replace(/^[-*]\s*/, '');
+        doc.text(`• ${bulletText}`, {
+          indent: 20,
+          lineGap: 4
+        });
+      } else if (line.trim().length > 0) {
+        // Regular text
+        doc.text(line, {
+          align: 'left',
+          lineGap: 4
+        });
+      } else {
+        // Empty line
+        doc.moveDown(0.3);
+      }
+    }
+
+    // Footer on last page
+    doc.moveDown(3);
+
+    // Horizontal line
+    doc
+      .strokeColor("#e2e8f0")
+      .lineWidth(1)
+      .moveTo(50, doc.y)
+      .lineTo(545, doc.y)
+      .stroke();
+
+    doc.moveDown(1);
+
+    // Disclaimer
     doc
       .fontSize(9)
-      .fillColor("gray")
+      .fillColor("#64748b")
+      .font("Helvetica")
       .text(
         "DISCLAIMER: This analysis is generated by an AI system for informational purposes only and does not constitute legal advice. The analysis may contain errors or omissions. Always consult a qualified lawyer before making legal decisions or signing contracts.",
         {
@@ -119,24 +206,22 @@ export default async function handler(
         }
       );
 
-    doc.moveDown();
+    doc.moveDown(0.5);
 
-    // Footer med datum
+    // Footer link
     doc
       .fontSize(8)
-      .fillColor("#6B7280")
-      .text(
-        `Generated: ${new Date().toLocaleString('sv-SE')} | TrustTerms.vercel.app`,
-        {
-          align: 'center',
-        }
-      );
+      .fillColor("#6366f1")
+      .text("TrustTerms.vercel.app", {
+        align: 'center',
+        link: 'https://trustterms.vercel.app'
+      });
 
     doc.end();
 
   } catch (err: any) {
     console.error('❌ PDF export error:', err);
-    
+   
     Sentry.captureException(err, {
       tags: {
         api_route: 'export-pdf',

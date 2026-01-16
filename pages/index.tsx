@@ -121,10 +121,6 @@ export default function Home() {
       const data = await res.json();
 
       if (!res.ok) {
-        // ⚠️ FIX: Visa mer specifika felmeddelanden
-        if (res.status === 429) {
-          throw new Error(data.error || "Too many requests. Please wait a moment.");
-        }
         throw new Error(data.error || "Analysis failed");
       }
 
@@ -204,7 +200,6 @@ export default function Home() {
     analytics.sampleClicked();
     setContractText(sampleContract);
     setIsSample(true);
-    // ⚠️ FIX: Rensa tidigare analys när man byter till sample
     setAnalysis("");
     setRiskLevel(null);
     setError(null);
@@ -218,247 +213,503 @@ export default function Home() {
     <>
       <Meta />
       <main style={{
-        background: "linear-gradient(to bottom, #0f172a 0%, #1e293b 100%)",
+        background: "linear-gradient(180deg, #0a0e1a 0%, #0f172a 50%, #1e293b 100%)",
         minHeight: "100vh",
         color: "white",
         position: "relative",
         overflow: "hidden"
       }}>
-        {/* Subtle animated background */}
+        {/* Premium animated background */}
         <div style={{
           position: "absolute",
           top: 0,
           left: 0,
           right: 0,
           bottom: 0,
-          background: "radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%)",
-          pointerEvents: "none"
+          background: `
+            radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.12) 0%, transparent 50%),
+            radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 40% 60%, rgba(59, 130, 246, 0.08) 0%, transparent 40%)
+          `,
+          pointerEvents: "none",
+          animation: "gradientShift 15s ease infinite"
         }} />
 
-        <div style={{ maxWidth: 900, margin: "auto", padding: "80px 24px", position: "relative", zIndex: 1 }}>
+        {/* Refined grid pattern */}
+        <div style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundImage: `
+            linear-gradient(rgba(148, 163, 184, 0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(148, 163, 184, 0.04) 1px, transparent 1px)
+          `,
+          backgroundSize: "60px 60px",
+          pointerEvents: "none",
+          maskImage: "radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%)"
+        }} />
+
+        {/* Floating orbs for depth */}
+        <div style={{
+          position: "absolute",
+          top: "10%",
+          left: "5%",
+          width: 400,
+          height: 400,
+          background: "radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%)",
+          borderRadius: "50%",
+          filter: "blur(60px)",
+          pointerEvents: "none",
+          animation: "float 20s ease-in-out infinite"
+        }} />
+        
+        <div style={{
+          position: "absolute",
+          bottom: "10%",
+          right: "5%",
+          width: 350,
+          height: 350,
+          background: "radial-gradient(circle, rgba(139, 92, 246, 0.12) 0%, transparent 70%)",
+          borderRadius: "50%",
+          filter: "blur(60px)",
+          pointerEvents: "none",
+          animation: "float 25s ease-in-out infinite reverse"
+        }} />
+
+        <div style={{ 
+          maxWidth: 920, 
+          margin: "auto", 
+          padding: "100px 28px 80px", 
+          position: "relative", 
+          zIndex: 1 
+        }}>
           
-          {/* Header */}
-          <div style={{ textAlign: "center", marginBottom: 60 }}>
+          {/* Premium Header */}
+          <div style={{ textAlign: "center", marginBottom: 80 }}>
+            {/* Badge */}
             <div style={{
-              display: "inline-block",
-              padding: "8px 18px",
-              background: "rgba(99, 102, 241, 0.15)",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 10,
+              padding: "12px 26px",
+              background: "linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%)",
               border: "1px solid rgba(99, 102, 241, 0.4)",
-              borderRadius: 24,
+              borderRadius: 100,
               fontSize: 13,
               fontWeight: 700,
-              color: "#c7d2fe",
-              marginBottom: 24,
+              color: "#e0e7ff",
+              marginBottom: 32,
               letterSpacing: "0.5px",
-              textTransform: "uppercase"
+              textTransform: "uppercase",
+              boxShadow: "0 4px 20px rgba(99, 102, 241, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)"
             }}>
-              ⚡ AI-Powered Contract Analysis
+              <div style={{
+                width: 8,
+                height: 8,
+                borderRadius: "50%",
+                background: "linear-gradient(135deg, #818cf8 0%, #a78bfa 100%)",
+                boxShadow: "0 0 12px rgba(129, 140, 248, 0.6)"
+              }} />
+              AI-Powered Contract Analysis
             </div>
 
+            {/* Main Title with premium gradient */}
             <h1 style={{
-              fontSize: 64,
+              fontSize: 80,
               fontWeight: 900,
-              marginBottom: 24,
-              background: "linear-gradient(135deg, #ffffff 0%, #a5b4fc 100%)",
+              marginBottom: 32,
+              background: "linear-gradient(135deg, #ffffff 0%, #e0e7ff 40%, #c7d2fe 70%, #a5b4fc 100%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
-              letterSpacing: "-0.03em",
-              lineHeight: 1.1
+              letterSpacing: "-0.05em",
+              lineHeight: 0.95,
+              textShadow: "0 0 80px rgba(99, 102, 241, 0.3)",
+              position: "relative"
             }}>
               TrustTerms
             </h1>
 
+            {/* Subtitle with better hierarchy */}
             <p style={{
-              fontSize: 22,
-              color: "#e2e8f0",
-              marginBottom: 32,
+              fontSize: 26,
+              color: "#f1f5f9",
+              marginBottom: 16,
+              lineHeight: 1.5,
+              maxWidth: 740,
+              margin: "0 auto 16px",
+              fontWeight: 600,
+              letterSpacing: "-0.01em"
+            }}>
+              Spot hidden risks in SaaS contracts before you sign
+            </p>
+            
+            <p style={{
+              fontSize: 18,
+              color: "#cbd5e1",
+              maxWidth: 640,
+              margin: "0 auto 48px",
               lineHeight: 1.7,
-              maxWidth: 680,
-              margin: "0 auto 36px",
               fontWeight: 500
             }}>
-              Spot hidden risks in SaaS contracts before you sign.
-              <br />
-              Built for founders who value their time.
+              Built for founders who value their time and money
             </p>
 
+            {/* Feature badges with icons */}
             <div style={{
               display: "flex",
-              gap: 20,
+              gap: 24,
               justifyContent: "center",
               flexWrap: "wrap",
               fontSize: 15,
-              color: "#94a3b8",
-              fontWeight: 500
+              fontWeight: 600
             }}>
-              <span>✓ 60-second analysis</span>
-              <span>✓ No account needed</span>
-              <span>✓ Privacy-first</span>
+              {[
+                { icon: "⚡", text: "60-second analysis", color: "#fbbf24" },
+                { icon: "🔒", text: "Privacy-first", color: "#34d399" },
+                { icon: "🎯", text: "No account needed", color: "#60a5fa" }
+              ].map((item, i) => (
+                <div key={i} style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  padding: "12px 20px",
+                  background: "rgba(15, 23, 42, 0.6)",
+                  backdropFilter: "blur(12px)",
+                  border: "1px solid rgba(100, 116, 139, 0.3)",
+                  borderRadius: 12,
+                  color: "#e2e8f0"
+                }}>
+                  <span style={{ fontSize: 18, filter: `drop-shadow(0 0 8px ${item.color})` }}>{item.icon}</span>
+                  {item.text}
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Value Props Cards - ⚠️ FÖRBÄTTRAD DESIGN */}
+          {/* Premium Value Props Cards */}
           <div style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
             gap: 24,
-            marginBottom: 64
+            marginBottom: 80
           }}>
             {[
-              { emoji: "🔍", title: "Hidden Risks", desc: "Auto-renewals, liability caps, termination traps" },
-              { emoji: "💰", title: "Financial Impact", desc: "See what risky clauses could actually cost you" },
-              { emoji: "🎯", title: "Negotiation Tips", desc: "Know exactly what to push back on" }
+              { 
+                icon: "🔍",
+                iconBg: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
+                title: "Hidden Risks", 
+                desc: "Uncover auto-renewals, liability caps, and termination traps that could cost you thousands",
+                gradient: "linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(220, 38, 38, 0.05) 100%)",
+                borderColor: "rgba(239, 68, 68, 0.25)",
+                glowColor: "rgba(239, 68, 68, 0.15)"
+              },
+              { 
+                icon: "💰",
+                iconBg: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
+                title: "Financial Impact", 
+                desc: "See exactly what risky clauses could cost you in real dollars, not legal jargon",
+                gradient: "linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(217, 119, 6, 0.05) 100%)",
+                borderColor: "rgba(245, 158, 11, 0.25)",
+                glowColor: "rgba(245, 158, 11, 0.15)"
+              },
+              { 
+                icon: "🎯",
+                iconBg: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)",
+                title: "Negotiation Strategy", 
+                desc: "Get specific recommendations on what to push back on and how to phrase it",
+                gradient: "linear-gradient(135deg, rgba(34, 197, 94, 0.08) 0%, rgba(22, 163, 74, 0.05) 100%)",
+                borderColor: "rgba(34, 197, 94, 0.25)",
+                glowColor: "rgba(34, 197, 94, 0.15)"
+              }
             ].map((item, i) => (
               <div key={i} style={{
-                background: "rgba(15, 23, 42, 0.7)",
-                backdropFilter: "blur(12px)",
-                border: "1px solid rgba(100, 116, 139, 0.25)",
-                borderRadius: 18,
-                padding: 28,
-                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)"
+                background: item.gradient,
+                backdropFilter: "blur(16px)",
+                border: `1px solid ${item.borderColor}`,
+                borderRadius: 24,
+                padding: 36,
+                transition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
+                cursor: "default",
+                position: "relative",
+                overflow: "hidden"
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.transform = "translateY(-6px)";
-                e.currentTarget.style.borderColor = "rgba(99, 102, 241, 0.5)";
-                e.currentTarget.style.boxShadow = "0 12px 24px rgba(99, 102, 241, 0.15)";
+                e.currentTarget.style.transform = "translateY(-12px) scale(1.02)";
+                e.currentTarget.style.borderColor = "rgba(99, 102, 241, 0.6)";
+                e.currentTarget.style.boxShadow = `0 24px 48px ${item.glowColor}, 0 0 0 1px rgba(255, 255, 255, 0.1) inset`;
               }}
               onMouseLeave={e => {
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.borderColor = "rgba(100, 116, 139, 0.25)";
-                e.currentTarget.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.1)";
+                e.currentTarget.style.transform = "translateY(0) scale(1)";
+                e.currentTarget.style.borderColor = item.borderColor;
+                e.currentTarget.style.boxShadow = "none";
               }}>
-                <div style={{ fontSize: 36, marginBottom: 14 }}>{item.emoji}</div>
-                <h3 style={{ fontSize: 19, fontWeight: 700, marginBottom: 10, color: "#f1f5f9" }}>{item.title}</h3>
-                <p style={{ fontSize: 15, color: "#94a3b8", lineHeight: 1.6, margin: 0 }}>{item.desc}</p>
+                {/* Icon circle */}
+                <div style={{
+                  width: 64,
+                  height: 64,
+                  borderRadius: "50%",
+                  background: item.iconBg,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 28,
+                  marginBottom: 24,
+                  boxShadow: `0 8px 24px ${item.glowColor}, inset 0 2px 0 rgba(255, 255, 255, 0.2)`
+                }}>
+                  {item.icon}
+                </div>
+                
+                <h3 style={{ 
+                  fontSize: 22, 
+                  fontWeight: 800, 
+                  marginBottom: 14, 
+                  color: "#f8fafc", 
+                  letterSpacing: "-0.02em" 
+                }}>
+                  {item.title}
+                </h3>
+                
+                <p style={{ 
+                  fontSize: 16, 
+                  color: "#cbd5e1", 
+                  lineHeight: 1.7, 
+                  margin: 0,
+                  fontWeight: 500
+                }}>
+                  {item.desc}
+                </p>
               </div>
             ))}
-          </div>
-
-          {/* Main Analysis Card - ⚠️ FÖRBÄTTRAD DESIGN */}
+          </div>{/* Premium Main Analysis Card */}
           <div style={{
-            background: "rgba(15, 23, 42, 0.85)",
-            backdropFilter: "blur(24px)",
-            border: "1px solid rgba(100, 116, 139, 0.35)",
-            borderRadius: 24,
-            padding: 44,
-            boxShadow: "0 20px 60px rgba(0, 0, 0, 0.4)"
+            background: "linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.9) 100%)",
+            backdropFilter: "blur(40px)",
+            border: "1px solid rgba(148, 163, 184, 0.2)",
+            borderRadius: 32,
+            padding: 56,
+            boxShadow: `
+              0 32px 80px rgba(0, 0, 0, 0.6),
+              0 0 0 1px rgba(255, 255, 255, 0.03) inset,
+              0 2px 0 rgba(255, 255, 255, 0.05) inset
+            `,
+            position: "relative",
+            overflow: "hidden"
           }}>
-            
-            {/* Try Sample Button - ⚠️ FÖRBÄTTRAD */}
-            <div style={{ marginBottom: 24 }}>
+            {/* Top accent line */}
+            <div style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 3,
+              background: "linear-gradient(90deg, transparent 0%, #6366f1 20%, #8b5cf6 50%, #6366f1 80%, transparent 100%)",
+              opacity: 0.6
+            }} />
+
+            {/* Try Sample Button - Premium style */}
+            <div style={{ marginBottom: 32 }}>
               <button
                 onClick={handleSampleClick}
                 disabled={loading}
                 style={{
-                  fontSize: 15,
-                  color: "#a5b4fc",
+                  fontSize: 16,
+                  color: "#c7d2fe",
                   background: "transparent",
                   border: "none",
                   cursor: loading ? "not-allowed" : "pointer",
-                  textDecoration: "underline",
-                  fontWeight: 600,
-                  transition: "color 0.2s",
-                  opacity: loading ? 0.5 : 1
+                  textDecoration: "none",
+                  fontWeight: 700,
+                  transition: "all 0.3s ease",
+                  opacity: loading ? 0.4 : 1,
+                  padding: "12px 0",
+                  borderBottom: "2px solid transparent",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8
                 }}
-                onMouseEnter={e => !loading && (e.currentTarget.style.color = "#6366f1")}
-                onMouseLeave={e => !loading && (e.currentTarget.style.color = "#a5b4fc")}
+                onMouseEnter={e => {
+                  if (!loading) {
+                    e.currentTarget.style.color = "#a5b4fc";
+                    e.currentTarget.style.borderBottomColor = "#6366f1";
+                    e.currentTarget.style.transform = "translateX(-4px)";
+                  }
+                }}
+                onMouseLeave={e => {
+                  if (!loading) {
+                    e.currentTarget.style.color = "#c7d2fe";
+                    e.currentTarget.style.borderBottomColor = "transparent";
+                    e.currentTarget.style.transform = "translateX(0)";
+                  }
+                }}
               >
-                ← Try a sample SaaS contract (free)
+                <span style={{ fontSize: 18 }}>←</span> Try a sample SaaS contract (free)
               </button>
             </div>
 
-            {/* Textarea - ⚠️ FÖRBÄTTRAD */}
-            <textarea
-              placeholder="Paste your SaaS agreement here...
+            {/* Premium Textarea */}
+            <div style={{ position: "relative", marginBottom: 20 }}>
+              <textarea
+                placeholder="Paste your SaaS agreement here...
 
 Or click above to try a sample contract first (completely free, no payment needed)."
-              value={contractText}
-              onChange={(e) => {
-                setContractText(e.target.value);
-                setIsSample(false);
-                // ⚠️ FIX: Rensa fel när användaren börjar skriva
-                if (error) setError(null);
-              }}
-              disabled={loading}
-              style={{
-                width: "100%",
-                height: 300,
-                padding: 22,
-                borderRadius: 14,
-                border: isOverLimit ? "2px solid #ef4444" : "2px solid rgba(100, 116, 139, 0.4)",
-                fontSize: 15,
-                fontFamily: "ui-monospace, 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace",
-                color: "#0f172a",
-                background: loading ? "#f1f5f9" : "#f8fafc",
-                marginBottom: 14,
-                resize: "vertical",
-                transition: "all 0.3s",
-                outline: "none",
-                opacity: loading ? 0.6 : 1,
-                cursor: loading ? "not-allowed" : "text"
-              }}
-              onFocus={e => {
-                if (!isOverLimit && !loading) e.currentTarget.style.borderColor = "#6366f1";
-              }}
-              onBlur={e => {
-                if (!isOverLimit && !loading) e.currentTarget.style.borderColor = "rgba(100, 116, 139, 0.4)";
-              }}
-            />
-
-            {/* Character Count - ⚠️ FÖRBÄTTRAD */}
-            <div style={{
-              fontSize: 14,
-              color: isOverLimit ? "#ef4444" : "#64748b",
-              marginBottom: 28,
-              textAlign: "right",
-              fontWeight: 600
-            }}>
-              {charCount.toLocaleString()} / {MAX_CONTRACT_LENGTH.toLocaleString()} characters
-              {isOverLimit && " — Contract too long"}
+                value={contractText}
+                onChange={(e) => {
+                  setContractText(e.target.value);
+                  setIsSample(false);
+                  if (error) setError(null);
+                }}
+                disabled={loading}
+                style={{
+                  width: "100%",
+                  height: 340,
+                  padding: 28,
+                  borderRadius: 20,
+                  border: isOverLimit 
+                    ? "2px solid #ef4444" 
+                    : "2px solid rgba(148, 163, 184, 0.25)",
+                  fontSize: 16,
+                  fontFamily: "ui-monospace, 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace",
+                  color: "#0f172a",
+                  background: loading ? "#f1f5f9" : "#ffffff",
+                  resize: "vertical",
+                  transition: "all 0.3s ease",
+                  outline: "none",
+                  opacity: loading ? 0.7 : 1,
+                  cursor: loading ? "not-allowed" : "text",
+                  lineHeight: 1.65,
+                  boxShadow: "0 4px 16px rgba(0, 0, 0, 0.08)"
+                }}
+                onFocus={e => {
+                  if (!isOverLimit && !loading) {
+                    e.currentTarget.style.borderColor = "#6366f1";
+                    e.currentTarget.style.boxShadow = "0 0 0 4px rgba(99, 102, 241, 0.12), 0 8px 24px rgba(99, 102, 241, 0.15)";
+                  }
+                }}
+                onBlur={e => {
+                  if (!isOverLimit && !loading) {
+                    e.currentTarget.style.borderColor = "rgba(148, 163, 184, 0.25)";
+                    e.currentTarget.style.boxShadow = "0 4px 16px rgba(0, 0, 0, 0.08)";
+                  }
+                }}
+              />
             </div>
 
-            {/* Action Buttons */}
-            <div style={{ display: "flex", gap: 14, flexDirection: "column" }}>
+            {/* Character Count - Enhanced */}
+            <div style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 36,
+              padding: "16px 20px",
+              background: isOverLimit 
+                ? "rgba(239, 68, 68, 0.08)" 
+                : canAnalyze 
+                ? "rgba(34, 197, 94, 0.08)" 
+                : "rgba(100, 116, 139, 0.08)",
+              borderRadius: 12,
+              border: `1px solid ${
+                isOverLimit 
+                  ? "rgba(239, 68, 68, 0.3)" 
+                  : canAnalyze 
+                  ? "rgba(34, 197, 94, 0.3)" 
+                  : "rgba(100, 116, 139, 0.2)"
+              }`
+            }}>
+              <div style={{ 
+                fontSize: 14, 
+                color: isOverLimit 
+                  ? "#fca5a5" 
+                  : canAnalyze 
+                  ? "#86efac" 
+                  : "#94a3b8",
+                fontWeight: 600,
+                display: "flex",
+                alignItems: "center",
+                gap: 8
+              }}>
+                {canAnalyze && <span style={{ fontSize: 16 }}>✓</span>}
+                {canAnalyze && "Ready to analyze"}
+                {contractText.length > 0 && contractText.length < 50 && (
+                  <>
+                    <span style={{ fontSize: 16 }}>⚠️</span>
+                    Minimum 50 characters required
+                  </>
+                )}
+                {!contractText.length && "Paste your contract to get started"}
+              </div>
+              <div style={{
+                fontSize: 14,
+                color: isOverLimit 
+                  ? "#ef4444" 
+                  : charCount > MAX_CONTRACT_LENGTH * 0.9 
+                  ? "#f59e0b" 
+                  : "#64748b",
+                fontWeight: 700,
+                fontVariantNumeric: "tabular-nums"
+              }}>
+                {charCount.toLocaleString()} / {MAX_CONTRACT_LENGTH.toLocaleString()}
+                {isOverLimit && (
+                  <span style={{ marginLeft: 8, color: "#ef4444" }}>— Too long</span>
+                )}
+              </div>
+            </div>
+
+            {/* Premium Action Buttons */}
+            <div style={{ display: "flex", gap: 16, flexDirection: "column" }}>
               
-              {/* Analyze Button */}
+              {/* Analyze Button - Premium design */}
               {(accessToken || isSample) && (
                 <button
                   onClick={analyze}
                   disabled={loading || !canAnalyze}
                   style={{
                     width: "100%",
-                    padding: "20px 36px",
-                    fontSize: 18,
-                    fontWeight: 700,
-                    borderRadius: 14,
+                    padding: "24px 48px",
+                    fontSize: 19,
+                    fontWeight: 800,
+                    borderRadius: 18,
                     background: (!canAnalyze || loading)
-                      ? "rgba(100, 116, 139, 0.3)"
+                      ? "rgba(100, 116, 139, 0.25)"
                       : "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)",
                     color: "white",
                     border: "none",
                     cursor: (!canAnalyze || loading) ? "not-allowed" : "pointer",
-                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                    boxShadow: canAnalyze && !loading ? "0 4px 20px rgba(34, 197, 94, 0.35)" : "none",
+                    transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+                    boxShadow: canAnalyze && !loading 
+                      ? "0 8px 32px rgba(34, 197, 94, 0.4), inset 0 2px 0 rgba(255, 255, 255, 0.2)" 
+                      : "none",
+                    letterSpacing: "0.01em",
+                    position: "relative",
+                    overflow: "hidden"
                   }}
                   onMouseEnter={e => {
                     if (canAnalyze && !loading) {
-                      e.currentTarget.style.transform = "translateY(-2px)";
-                      e.currentTarget.style.boxShadow = "0 8px 32px rgba(34, 197, 94, 0.45)";
+                      e.currentTarget.style.transform = "translateY(-4px)";
+                      e.currentTarget.style.boxShadow = "0 16px 48px rgba(34, 197, 94, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.2)";
                     }
                   }}
                   onMouseLeave={e => {
                     if (canAnalyze && !loading) {
                       e.currentTarget.style.transform = "translateY(0)";
-                      e.currentTarget.style.boxShadow = "0 4px 20px rgba(34, 197, 94, 0.35)";
+                      e.currentTarget.style.boxShadow = "0 8px 32px rgba(34, 197, 94, 0.4), inset 0 2px 0 rgba(255, 255, 255, 0.2)";
                     }
                   }}
                 >
-                  {loading ? "⚡ Analyzing..." : "🔍 Analyze Contract"}
+                  {loading ? (
+                    <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12 }}>
+                      <span style={{ fontSize: 20 }}>⚡</span> Analyzing...
+                    </span>
+                  ) : (
+                    <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12 }}>
+                      <span style={{ fontSize: 20 }}>🔍</span> Analyze Contract
+                    </span>
+                  )}
                 </button>
               )}
 
-              {/* Pay Button */}
+              {/* Pay Button - Premium design */}
               {!accessToken && !isSample && (
                 <>
                   <button
@@ -466,140 +717,237 @@ Or click above to try a sample contract first (completely free, no payment neede
                     disabled={checkoutLoading}
                     style={{
                       width: "100%",
-                      padding: "20px 36px",
-                      fontSize: 18,
-                      fontWeight: 700,
-                      borderRadius: 14,
+                      padding: "24px 48px",
+                      fontSize: 19,
+                      fontWeight: 800,
+                      borderRadius: 18,
                       background: checkoutLoading
-                        ? "rgba(100, 116, 139, 0.3)"
+                        ? "rgba(100, 116, 139, 0.25)"
                         : "linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)",
                       color: "white",
                       border: "none",
                       cursor: checkoutLoading ? "not-allowed" : "pointer",
-                      transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                      boxShadow: checkoutLoading ? "none" : "0 4px 20px rgba(99, 102, 241, 0.35)",
+                      transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+                      boxShadow: checkoutLoading 
+                        ? "none" 
+                        : "0 8px 32px rgba(99, 102, 241, 0.4), inset 0 2px 0 rgba(255, 255, 255, 0.2)",
+                      letterSpacing: "0.01em",
+                      position: "relative",
+                      overflow: "hidden"
                     }}
                     onMouseEnter={e => {
                       if (!checkoutLoading) {
-                        e.currentTarget.style.transform = "translateY(-2px)";
-                        e.currentTarget.style.boxShadow = "0 8px 32px rgba(99, 102, 241, 0.5)";
+                        e.currentTarget.style.transform = "translateY(-4px)";
+                        e.currentTarget.style.boxShadow = "0 16px 48px rgba(99, 102, 241, 0.6), inset 0 2px 0 rgba(255, 255, 255, 0.2)";
                       }
                     }}
                     onMouseLeave={e => {
                       if (!checkoutLoading) {
                         e.currentTarget.style.transform = "translateY(0)";
-                        e.currentTarget.style.boxShadow = "0 4px 20px rgba(99, 102, 241, 0.35)";
+                        e.currentTarget.style.boxShadow = "0 8px 32px rgba(99, 102, 241, 0.4), inset 0 2px 0 rgba(255, 255, 255, 0.2)";
                       }
                     }}
                   >
-                    {checkoutLoading ? "⏳ Loading..." : "💳 Pay 349 kr to Analyze Your Contract"}
+                    {checkoutLoading ? (
+                      <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12 }}>
+                        <span style={{ fontSize: 20 }}>⏳</span> Loading...
+                      </span>
+                    ) : (
+                      <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12 }}>
+                        <span style={{ fontSize: 20 }}>💳</span> Pay 349 kr to Analyze Your Contract
+                      </span>
+                    )}
                   </button>
 
-                  <p style={{
-                    fontSize: 14,
-                    color: "#94a3b8",
-                    textAlign: "center",
-                    margin: 0,
-                    lineHeight: 1.6
+                  {/* Info box */}
+                  <div style={{
+                    padding: "24px",
+                    background: "linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%)",
+                    border: "1px solid rgba(99, 102, 241, 0.25)",
+                    borderRadius: 16,
+                    textAlign: "center"
                   }}>
-                    One-time payment • No subscription • Instant access
-                    <br />
-                    After payment, return here and click "Analyze"
-                  </p>
+                    <p style={{
+                      fontSize: 15,
+                      color: "#e0e7ff",
+                      margin: 0,
+                      lineHeight: 1.7,
+                      fontWeight: 600
+                    }}>
+                      One-time payment • No subscription • Instant access
+                    </p>
+                    <p style={{
+                      fontSize: 14,
+                      color: "#cbd5e1",
+                      margin: "8px 0 0",
+                      lineHeight: 1.6
+                    }}>
+                      After payment, return here and click "Analyze"
+                    </p>
+                  </div>
                 </>
               )}
             </div>
           </div>
 
-          {/* Loading State - ⚠️ FÖRBÄTTRAD */}
+          {/* Premium Loading State */}
           {loading && (
             <div style={{
-              marginTop: 36,
-              padding: 44,
-              background: "rgba(30, 41, 59, 0.85)",
-              backdropFilter: "blur(24px)",
-              border: "1px solid rgba(100, 116, 139, 0.35)",
-              borderRadius: 24,
+              marginTop: 48,
+              padding: 56,
+              background: "linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(30, 41, 59, 0.9) 100%)",
+              backdropFilter: "blur(40px)",
+              border: "1px solid rgba(148, 163, 184, 0.25)",
+              borderRadius: 32,
               textAlign: "center",
+              boxShadow: "0 32px 80px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05) inset"
             }}>
+              {/* Animated spinner */}
               <div style={{
-                width: 56,
-                height: 56,
-                border: "4px solid rgba(99, 102, 241, 0.2)",
+                width: 72,
+                height: 72,
+                border: "6px solid rgba(99, 102, 241, 0.15)",
                 borderTopColor: "#6366f1",
                 borderRadius: "50%",
-                margin: "0 auto 24px",
+                margin: "0 auto 32px",
                 animation: "spin 1s linear infinite",
+                boxShadow: "0 0 20px rgba(99, 102, 241, 0.3)"
               }} />
-              <p style={{ fontSize: 18, color: "#f1f5f9", fontWeight: 700, marginBottom: 10 }}>
+              
+              <p style={{ 
+                fontSize: 22, 
+                color: "#f8fafc", 
+                fontWeight: 800, 
+                marginBottom: 16,
+                letterSpacing: "-0.01em"
+              }}>
                 Analyzing {isSample ? "sample" : "your"} contract...
               </p>
-              <p style={{ fontSize: 15, color: "#cbd5e1" }}>
+              
+              <p style={{ 
+                fontSize: 17, 
+                color: "#cbd5e1", 
+                fontWeight: 600,
+                background: "linear-gradient(90deg, #cbd5e1 0%, #94a3b8 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent"
+              }}>
                 {loadingMessage}
               </p>
             </div>
           )}
 
-          {/* Error State - ⚠️ FÖRBÄTTRAD */}
+          {/* Premium Error State */}
           {error && (
             <div style={{
-              marginTop: 36,
-              padding: 28,
-              background: "rgba(239, 68, 68, 0.12)",
+              marginTop: 48,
+              padding: 36,
+              background: "linear-gradient(135deg, rgba(239, 68, 68, 0.12) 0%, rgba(220, 38, 38, 0.1) 100%)",
               border: "2px solid rgba(239, 68, 68, 0.4)",
-              borderRadius: 16,
-              color: "#fca5a5",
-              fontSize: 16,
-              fontWeight: 500,
+              borderRadius: 20,
               display: "flex",
               alignItems: "start",
-              gap: 12
+              gap: 20,
+              boxShadow: "0 12px 32px rgba(239, 68, 68, 0.25)"
             }}>
-              <span style={{ fontSize: 20 }}>⚠️</span>
-              <div>
-                {error}
+              <div style={{
+                width: 48,
+                height: 48,
+                borderRadius: "50%",
+                background: "rgba(239, 68, 68, 0.2)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 24,
+                flexShrink: 0
+              }}>
+                ⚠️
+              </div>
+              <div style={{ flex: 1 }}>
+                <p style={{ 
+                  fontSize: 18, 
+                  color: "#fca5a5", 
+                  fontWeight: 700,
+                  margin: "0 0 8px",
+                  letterSpacing: "-0.01em"
+                }}>
+                  {error}
+                </p>
+                {(error.includes("rate limit") || error.includes("Too many")) && (
+                  <p style={{ 
+                    fontSize: 15, 
+                    color: "#fecaca",
+                    margin: 0,
+                    lineHeight: 1.6
+                  }}>
+                    This helps us keep costs down and prevent abuse. Thanks for understanding!
+                  </p>
+                )}
               </div>
             </div>
           )}
 
-          {/* Analysis Results - ⚠️ FÖRBÄTTRAD */}
+          {/* Premium Analysis Results */}
           {analysis && (
             <div style={{
-              marginTop: 44,
-              background: "rgba(15, 23, 42, 0.85)",
-              backdropFilter: "blur(24px)",
-              border: "1px solid rgba(100, 116, 139, 0.35)",
-              padding: 44,
-              borderRadius: 24,
-              boxShadow: "0 20px 60px rgba(0, 0, 0, 0.4)"
+              marginTop: 56,
+              background: "linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.9) 100%)",
+              backdropFilter: "blur(40px)",
+              border: "1px solid rgba(148, 163, 184, 0.25)",
+              padding: 56,
+              borderRadius: 32,
+              boxShadow: "0 32px 80px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05) inset",
+              position: "relative",
+              overflow: "hidden"
             }}>
-              {/* Risk Badge - ⚠️ FÖRBÄTTRAD */}
+              {/* Top accent */}
+              <div style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 3,
+                background: riskLevel === "HIGH"
+                  ? "linear-gradient(90deg, transparent 0%, #ef4444 50%, transparent 100%)"
+                  : riskLevel === "MEDIUM"
+                  ? "linear-gradient(90deg, transparent 0%, #f59e0b 50%, transparent 100%)"
+                  : "linear-gradient(90deg, transparent 0%, #22c55e 50%, transparent 100%)"
+              }} />
+
+              {/* Premium Risk Badge */}
               {riskLevel && (
                 <div style={{
                   display: "inline-flex",
                   alignItems: "center",
-                  gap: 10,
-                  marginBottom: 28,
-                  padding: "12px 24px",
-                  borderRadius: 999,
-                  background:
-                    riskLevel === "HIGH" ? "rgba(239, 68, 68, 0.18)" :
-                    riskLevel === "MEDIUM" ? "rgba(245, 158, 11, 0.18)" : "rgba(34, 197, 94, 0.18)",
+                  gap: 14,
+                  marginBottom: 36,
+                  padding: "16px 32px",
+                  borderRadius: 100,
+                  background: riskLevel === "HIGH" 
+                    ? "linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(220, 38, 38, 0.15) 100%)"
+                    : riskLevel === "MEDIUM" 
+                    ? "linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(217, 119, 6, 0.15) 100%)" 
+                    : "linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(22, 163, 74, 0.15) 100%)",
                   border: `2px solid ${
                     riskLevel === "HIGH" ? "#ef4444" :
                     riskLevel === "MEDIUM" ? "#f59e0b" : "#22c55e"
                   }`,
-                  fontSize: 15,
-                  fontWeight: 800,
-                  color:
-                    riskLevel === "HIGH" ? "#fca5a5" :
+                  fontSize: 17,
+                  fontWeight: 900,
+                  color: riskLevel === "HIGH" ? "#fca5a5" :
                     riskLevel === "MEDIUM" ? "#fcd34d" : "#86efac",
+                  boxShadow: `0 8px 24px ${
+                    riskLevel === "HIGH" ? "rgba(239, 68, 68, 0.35)" :
+                    riskLevel === "MEDIUM" ? "rgba(245, 158, 11, 0.35)" : "rgba(34, 197, 94, 0.35)"
+                  }, inset 0 1px 0 rgba(255, 255, 255, 0.1)`,
+                  letterSpacing: "0.03em"
                 }}>
                   <div style={{
-                    width: 10,
-                    height: 10,
+                    width: 14,
+                    height: 14,
                     borderRadius: "50%",
-                    background: "currentColor"
+                    background: "currentColor",
+                    boxShadow: "0 0 16px currentColor, 0 0 8px currentColor inset"
                   }} />
                   OVERALL RISK: {riskLevel}
                 </div>
@@ -609,134 +957,194 @@ Or click above to try a sample contract first (completely free, no payment neede
               {isSample && (
                 <div style={{
                   display: "inline-block",
-                  marginLeft: 12,
-                  marginBottom: 28,
-                  padding: "12px 18px",
-                  background: "rgba(250, 204, 21, 0.18)",
-                  border: "1px solid rgba(250, 204, 21, 0.4)",
-                  borderRadius: 10,
-                  fontSize: 13,
+                  marginLeft: 16,
+                  marginBottom: 36,
+                  padding: "16px 26px",
+                  background: "linear-gradient(135deg, rgba(250, 204, 21, 0.2) 0%, rgba(234, 179, 8, 0.15) 100%)",
+                  border: "1px solid rgba(250, 204, 21, 0.5)",
+                  borderRadius: 100,
+                  fontSize: 14,
                   color: "#fde047",
-                  fontWeight: 700,
+                  fontWeight: 800,
+                  letterSpacing: "0.05em",
+                  boxShadow: "0 4px 16px rgba(250, 204, 21, 0.2)"
                 }}>
                   📋 SAMPLE ANALYSIS
                 </div>
               )}
 
-              {/* Analysis content - ⚠️ FÖRBÄTTRAD TYPOGRAFI */}
+              {/* Analysis content with better typography */}
               <div style={{
                 whiteSpace: "pre-wrap",
                 lineHeight: 1.85,
-                fontSize: 16,
-                color: "#e2e8f0"
+                fontSize: 17,
+                color: "#e2e8f0",
+                fontWeight: 400,
+                letterSpacing: "-0.01em"
               }}>
                 {analysis}
               </div>
 
-              {/* Action buttons */}
-              <div style={{ marginTop: 36, display: "flex", gap: 14, flexWrap: "wrap" }}>
+              {/* Premium Action buttons */}
+              <div style={{ marginTop: 48, display: "flex", gap: 16, flexWrap: "wrap" }}>
                 <button
                   onClick={downloadPdf}
                   style={{
-                    padding: "14px 28px",
-                    fontSize: 16,
+                    padding: "18px 36px",
+                    fontSize: 17,
                     fontWeight: 700,
-                    borderRadius: 12,
-                    background: "rgba(100, 116, 139, 0.25)",
+                    borderRadius: 16,
+                    background: "linear-gradient(135deg, rgba(100, 116, 139, 0.3) 0%, rgba(71, 85, 105, 0.3) 100%)",
                     color: "#f1f5f9",
-                    border: "1px solid rgba(100, 116, 139, 0.4)",
+                    border: "1px solid rgba(148, 163, 184, 0.4)",
                     cursor: "pointer",
-                    transition: "all 0.3s"
+                    transition: "all 0.3s ease",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 12,
+                    boxShadow: "0 4px 16px rgba(0, 0, 0, 0.2)"
                   }}
                   onMouseEnter={e => {
-                    e.currentTarget.style.background = "rgba(100, 116, 139, 0.35)";
-                    e.currentTarget.style.borderColor = "rgba(100, 116, 139, 0.6)";
+                    e.currentTarget.style.background = "linear-gradient(135deg, rgba(100, 116, 139, 0.5) 0%, rgba(71, 85, 105, 0.5) 100%)";
+                    e.currentTarget.style.borderColor = "rgba(148, 163, 184, 0.6)";
+                    e.currentTarget.style.transform = "translateY(-3px)";
+                    e.currentTarget.style.boxShadow = "0 8px 24px rgba(0, 0, 0, 0.3)";
                   }}
                   onMouseLeave={e => {
-                    e.currentTarget.style.background = "rgba(100, 116, 139, 0.25)";
-                    e.currentTarget.style.borderColor = "rgba(100, 116, 139, 0.4)";
+                    e.currentTarget.style.background = "linear-gradient(135deg, rgba(100, 116, 139, 0.3) 0%, rgba(71, 85, 105, 0.3) 100%)";
+                    e.currentTarget.style.borderColor = "rgba(148, 163, 184, 0.4)";
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow = "0 4px 16px rgba(0, 0, 0, 0.2)";
                   }}
                 >
-                  📄 Download PDF Report
+                  <span style={{ fontSize: 22 }}>📄</span> Download PDF Report
                 </button>
               </div>
 
-              {/* Upgrade CTA for sample - ⚠️ FÖRBÄTTRAD */}
+              {/* Premium Upgrade CTA for sample */}
               {isSample && (
                 <div style={{
-                  marginTop: 36,
-                  padding: 36,
-                  background: "linear-gradient(135deg, rgba(99, 102, 241, 0.25) 0%, rgba(139, 92, 246, 0.25) 100%)",
+                  marginTop: 52,
+                  padding: 48,
+                  background: "linear-gradient(135deg, rgba(99, 102, 241, 0.25) 0%, rgba(139, 92, 246, 0.2) 100%)",
                   border: "2px solid rgba(99, 102, 241, 0.5)",
-                  borderRadius: 20,
+                  borderRadius: 28,
                   textAlign: "center",
+                  boxShadow: "0 16px 48px rgba(99, 102, 241, 0.25), inset 0 2px 0 rgba(255, 255, 255, 0.1)",
+                  position: "relative",
+                  overflow: "hidden"
                 }}>
-                  <h3 style={{ fontSize: 24, marginBottom: 14, fontWeight: 800, color: "#f1f5f9" }}>
-                    Ready to analyze your real contract?
-                  </h3>
-                  <p style={{ fontSize: 16, marginBottom: 28, color: "#e2e8f0" }}>
-                    Get instant analysis of your actual agreements
-                  </p>
-                  <button
-                    onClick={pay}
-                    disabled={checkoutLoading}
-                    style={{
-                      padding: "18px 36px",
-                      fontSize: 18,
-                      fontWeight: 700,
-                      borderRadius: 14,
-                      background: checkoutLoading ? "rgba(100, 116, 139, 0.3)" : "white",
-                      color: "#6366f1",
-                      border: "none",
-                      cursor: checkoutLoading ? "not-allowed" : "pointer",
-                      transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                      boxShadow: checkoutLoading ? "none" : "0 4px 20px rgba(99, 102, 241, 0.3)"
-                    }}
-                    onMouseEnter={e => {
-                      if (!checkoutLoading) {
-                        e.currentTarget.style.transform = "translateY(-2px)";
-                        e.currentTarget.style.boxShadow = "0 8px 32px rgba(99, 102, 241, 0.4)";
-                      }
-                    }}
-                    onMouseLeave={e => {
-                      if (!checkoutLoading) {
-                        e.currentTarget.style.transform = "translateY(0)";
-                        e.currentTarget.style.boxShadow = "0 4px 20px rgba(99, 102, 241, 0.3)";
-                      }
-                    }}
-                  >
-                    {checkoutLoading ? "Loading..." : "Unlock Full Analysis for 349 kr"}
-                  </button>
-                  <p style={{ fontSize: 14, marginTop: 18, color: "#cbd5e1" }}>
-                    💳 One-time payment • No subscription • Instant access
-                  </p>
+                  {/* Accent glow */}
+                  <div style={{
+                    position: "absolute",
+                    top: "-50%",
+                    left: "-50%",
+                    width: "200%",
+                    height: "200%",
+                    background: "radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%)",
+                    pointerEvents: "none"
+                  }} />
+                  
+                  <div style={{ position: "relative" }}>
+                    <h3 style={{ 
+                      fontSize: 30, 
+                      marginBottom: 18, 
+                      fontWeight: 900, 
+                      color: "#f8fafc", 
+                      letterSpacing: "-0.02em" 
+                    }}>
+                      Ready to analyze your real contract?
+                    </h3>
+                    
+                    <p style={{ 
+                      fontSize: 18, 
+                      marginBottom: 36, 
+                      color: "#e0e7ff", 
+                      lineHeight: 1.7,
+                      maxWidth: 600,
+                      margin: "0 auto 36px"
+                    }}>
+                      Get instant analysis of your actual agreements with the same depth and clarity
+                    </p>
+                    
+                    <button
+                      onClick={pay}
+                      disabled={checkoutLoading}
+                      style={{
+                        padding: "22px 48px",
+                        fontSize: 20,
+                        fontWeight: 800,
+                        borderRadius: 18,
+                        background: checkoutLoading ? "rgba(100, 116, 139, 0.3)" : "white",
+                        color: checkoutLoading ? "#94a3b8" : "#6366f1",
+                        border: "none",
+                        cursor: checkoutLoading ? "not-allowed" : "pointer",
+                        transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+                        boxShadow: checkoutLoading 
+                          ? "none" 
+                          : "0 8px 32px rgba(255, 255, 255, 0.35), inset 0 2px 0 rgba(255, 255, 255, 0.5)",
+                        letterSpacing: "-0.01em"
+                      }}
+                      onMouseEnter={e => {
+                        if (!checkoutLoading) {
+                          e.currentTarget.style.transform = "translateY(-4px) scale(1.02)";
+                          e.currentTarget.style.boxShadow = "0 16px 48px rgba(255, 255, 255, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.5)";
+                        }
+                      }}
+                      onMouseLeave={e => {
+                        if (!checkoutLoading) {
+                          e.currentTarget.style.transform = "translateY(0) scale(1)";
+                          e.currentTarget.style.boxShadow = "0 8px 32px rgba(255, 255, 255, 0.35), inset 0 2px 0 rgba(255, 255, 255, 0.5)";
+                        }
+                      }}
+                    >
+                      {checkoutLoading ? "Loading..." : "Unlock Full Analysis for 349 kr"}
+                    </button>
+                    
+                    <p style={{ 
+                      fontSize: 15, 
+                      marginTop: 24, 
+                      color: "#cbd5e1", 
+                      fontWeight: 600 
+                    }}>
+                      One-time payment • No subscription • Instant access
+                    </p>
+                  </div>
                 </div>
               )}
             </div>
           )}
 
-          {/* FAQ Section - OFÖRÄNDRAD men bättre spacing */}
-          <div style={{ marginTop: 96 }}>
-            <h2 style={{
-              fontSize: 36,
-              fontWeight: 800,
-              marginBottom: 40,
-              textAlign: "center",
-              color: "#f1f5f9"
-            }}>
-              Frequently Asked Questions
-            </h2>
-
-            <div style={{
+          {/* Premium FAQ Section */}
+          <div style={{ marginTop: 120 }}>
+            <div style={{ textAlign: "center", marginBottom: 56 }}>
+              <h2 style={{
+                fontSize: 44,
+                fontWeight: 900,
+                color: "#f8fafc",
+                letterSpacing: "-0.03em",
+                marginBottom: 16
+              }}>
+                Frequently Asked Questions
+              </h2>
+              <p style={{
+                fontSize: 17,
+                color: "#94a3b8",
+                maxWidth: 600,
+                margin: "0 auto"
+              }}>
+                Everything you need to know about TrustTerms
+              </p>
+            </div><div style={{
               display: "grid",
-              gap: 24,
-              maxWidth: 720,
+              gap: 20,
+              maxWidth: 800,
               margin: "0 auto"
             }}>
               {[
                 {
                   q: "Are my contracts safe?",
-                  a: "Yes. Contracts are processed in memory only and immediately deleted. Never stored, never used for AI training."
+                  a: "Yes. Contracts are processed in memory only and immediately deleted. Never stored, never used for AI training. We take your privacy seriously."
                 },
                 {
                   q: "Is this legal advice?",
@@ -744,23 +1152,50 @@ Or click above to try a sample contract first (completely free, no payment neede
                 },
                 {
                   q: "How accurate is the AI analysis?",
-                  a: "Our AI is trained specifically on SaaS contracts and compares clauses to market standards. Use it as a first pass before legal review."
+                  a: "Our AI is specifically trained on SaaS contracts and compares clauses to market standards. Use it as a first pass before legal review to save time and money."
                 },
                 {
                   q: "What happens after I pay?",
-                  a: "You get instant access to analyze your contract. Paste it in the box above and click 'Analyze'. Results in 60 seconds."
+                  a: "You get instant access to analyze your contract. Paste it in the box above and click 'Analyze'. Results in under 60 seconds."
                 }
               ].map((item, i) => (
                 <div key={i} style={{
-                  background: "rgba(15, 23, 42, 0.7)",
-                  border: "1px solid rgba(100, 116, 139, 0.25)",
-                  borderRadius: 16,
-                  padding: 28
+                  background: "linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.7) 100%)",
+                  backdropFilter: "blur(12px)",
+                  border: "1px solid rgba(148, 163, 184, 0.2)",
+                  borderRadius: 20,
+                  padding: 32,
+                  transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+                  cursor: "default"
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.background = "linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.9) 100%)";
+                  e.currentTarget.style.borderColor = "rgba(99, 102, 241, 0.4)";
+                  e.currentTarget.style.transform = "translateY(-4px)";
+                  e.currentTarget.style.boxShadow = "0 12px 32px rgba(0, 0, 0, 0.3)";
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.background = "linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.7) 100%)";
+                  e.currentTarget.style.borderColor = "rgba(148, 163, 184, 0.2)";
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "none";
                 }}>
-                  <h3 style={{ fontSize: 17, fontWeight: 700, marginBottom: 10, color: "#f1f5f9" }}>
+                  <h3 style={{ 
+                    fontSize: 19, 
+                    fontWeight: 800, 
+                    marginBottom: 14, 
+                    color: "#f8fafc",
+                    letterSpacing: "-0.01em"
+                  }}>
                     {item.q}
                   </h3>
-                  <p style={{ fontSize: 15, color: "#94a3b8", lineHeight: 1.7, margin: 0 }}>
+                  <p style={{ 
+                    fontSize: 16, 
+                    color: "#cbd5e1", 
+                    lineHeight: 1.8, 
+                    margin: 0,
+                    fontWeight: 500
+                  }}>
                     {item.a}
                   </p>
                 </div>
@@ -768,25 +1203,82 @@ Or click above to try a sample contract first (completely free, no payment neede
             </div>
           </div>
 
-          {/* Footer - ⚠️ FÖRBÄTTRAD */}
+          {/* Premium Footer */}
           <div style={{
-            marginTop: 96,
-            paddingTop: 44,
-            borderTop: "1px solid rgba(100, 116, 139, 0.25)",
-            textAlign: "center",
-            fontSize: 14,
-            color: "#64748b"
+            marginTop: 120,
+            paddingTop: 56,
+            borderTop: "1px solid rgba(148, 163, 184, 0.15)",
+            textAlign: "center"
           }}>
-            <p style={{ marginBottom: 16, color: "#94a3b8" }}>
-              🔒 Contracts processed securely • Never stored • GDPR compliant
-            </p>
-            <p>
-              <a href="/privacy" style={{ color: "#6366f1", marginRight: 24, textDecoration: "none", fontWeight: 600 }}>
+            {/* Trust badges */}
+            <div style={{
+              display: "flex",
+              gap: 32,
+              justifyContent: "center",
+              flexWrap: "wrap",
+              marginBottom: 32
+            }}>
+              {[
+                { icon: "🔒", text: "Contracts processed securely" },
+                { icon: "🗑️", text: "Never stored" },
+                { icon: "🇪🇺", text: "GDPR compliant" }
+              ].map((item, i) => (
+                <div key={i} style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  fontSize: 15,
+                  color: "#94a3b8",
+                  fontWeight: 600
+                }}>
+                  <span style={{ fontSize: 18, filter: "drop-shadow(0 0 8px rgba(99, 102, 241, 0.4))" }}>
+                    {item.icon}
+                  </span>
+                  {item.text}
+                </div>
+              ))}
+            </div>
+
+            {/* Links */}
+            <div style={{ marginBottom: 32 }}>
+              <a 
+                href="/privacy" 
+                style={{ 
+                  color: "#818cf8", 
+                  marginRight: 32, 
+                  textDecoration: "none", 
+                  fontWeight: 600,
+                  fontSize: 15,
+                  transition: "color 0.3s"
+                }}
+                onMouseEnter={e => e.currentTarget.style.color = "#a5b4fc"}
+                onMouseLeave={e => e.currentTarget.style.color = "#818cf8"}
+              >
                 Privacy Policy
               </a>
-              <a href="/terms" style={{ color: "#6366f1", textDecoration: "none", fontWeight: 600 }}>
+              <a 
+                href="/terms" 
+                style={{ 
+                  color: "#818cf8", 
+                  textDecoration: "none", 
+                  fontWeight: 600,
+                  fontSize: 15,
+                  transition: "color 0.3s"
+                }}
+                onMouseEnter={e => e.currentTarget.style.color = "#a5b4fc"}
+                onMouseLeave={e => e.currentTarget.style.color = "#818cf8"}
+              >
                 Terms of Service
               </a>
+            </div>
+
+            {/* Copyright */}
+            <p style={{
+              fontSize: 14,
+              color: "#64748b",
+              margin: 0
+            }}>
+              © {new Date().getFullYear()} TrustTerms. All rights reserved.
             </p>
           </div>
         </div>
@@ -795,6 +1287,17 @@ Or click above to try a sample contract first (completely free, no payment neede
       <style jsx>{`
         @keyframes spin {
           to { transform: rotate(360deg); }
+        }
+        
+        @keyframes gradientShift {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.8; }
+        }
+        
+        @keyframes float {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          33% { transform: translate(30px, -30px) scale(1.05); }
+          66% { transform: translate(-20px, 20px) scale(0.95); }
         }
       `}</style>
     </>
