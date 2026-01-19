@@ -46,7 +46,7 @@ export default function Meta({
             "description": "AI-powered SaaS contract risk analysis for startups and CFOs",
             "offers": {
               "@type": "Offer",
-              "price": "349",
+              "price": "149",
               "priceCurrency": "SEK"
             }
           })
