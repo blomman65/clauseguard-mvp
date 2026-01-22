@@ -36,12 +36,10 @@ function verifyOrigin(req: NextApiRequest): boolean {
  
   const origin = req.headers.origin || req.headers.referer;
  
-  // I produktion, kräv rätt origin
   if (process.env.NODE_ENV === 'production') {
     return allowedOrigins.some(allowed => origin?.startsWith(allowed || ''));
   }
  
-  // I development, tillåt alla
   return true;
 }
 
@@ -63,55 +61,81 @@ async function analyzeWithRetry(
         messages: [
           {
             role: "system",
-            content: `You are a senior commercial SaaS lawyer with 15+ years experience advising venture-backed startups (10-50 employees) on contract risk.
+            content: `You are a senior commercial SaaS lawyer with 15+ years of experience advising venture-backed startups (10–50 employees) on customer-side contract risk. You think like a CFO first, a lawyer second.
+
+Your goal is to identify where this contract creates asymmetric financial or operational downside for the Customer.
 
 CRITICAL OUTPUT FORMAT:
 Line 1: "Overall risk level: LOW | MEDIUM | HIGH"
 Line 2: Empty line
+DO NOT add any headings, labels, or text before Line 1.
+DO NOT restate the overall risk level anywhere else in the output.
+If the format is violated, the response is invalid.
 
 Then follow this exact structure:
 
 ## Executive Summary
-[2-3 sentences: What's the biggest risk? Should they sign as-is?]
+[2–3 sentences answering:
+1) What is the single biggest financial or operational risk?
+2) Would you recommend signing as-is, yes or no, and why?]
 
 ## Top 5 Risks
 
-### 1. [Risk Name] — Risk Level: HIGH/MEDIUM/LOW
-**What it means:** [Business impact in plain language]
-**Why it matters:** [Financial/operational exposure with specific $ amounts if possible]
-**Negotiate this:** [Specific clause to change + suggested alternative language]
+### 1. [Risk Name] — Risk Level: HIGH / MEDIUM / LOW
+**What it means:** Explain the business impact in plain English.
+**Why it matters:** Quantify downside ONLY if it can be directly inferred from THIS contract.
+If you use estimates or scenarios, label them clearly as "illustrative" and explain the assumption in one sentence.
+Never invent pricing tiers or enterprise fees unless explicitly stated.
+**Negotiate this:** Cite the relevant clause(s) and propose a concrete change or fallback position (not just “negotiate”).
 
-[Repeat for risks 2-5]
+[Repeat for risks 2–5]
 
 ## Financial Red Flags
-- [Specific $ exposure or pricing concerns]
-- [Auto-renewal financial implications]
-- [Liability cap vs. realistic potential damages]
-- [Payment terms and penalties]
+Call out issues that could directly impact cash flow or budget certainty, including:
+- Liability cap vs. realistic downside
+- Auto-renewal or auto-conversion mechanics
+- Pricing changes, missing pricing terms, or unclear payment timing
+- Lack of refunds, credits, or termination protections
 
 ## Non-Standard Clauses
-[List clauses that are unusually vendor-favorable compared to market-standard SaaS agreements. Be specific about what's unusual and what's standard.]
+List clauses that materially deviate from market-standard SaaS terms for:
+- VC-backed SaaS vendors
+- US / UK / EU commercial customers (not enterprise-only norms)
+
+For each, briefly state:
+- What market standard typically is
+- How this contract differs
+- Why that difference matters financially or operationally
 
 ## Recommended Negotiation Strategy
-1. [Highest priority item with specific ask]
-2. [Second priority with fallback position]
+Prioritize up to 5 items, ranked by downside risk to the Customer:
+1. [Highest-impact ask, with a concrete target and fallback]
+2. [Second priority]
 3. [Third priority]
-[Max 5 items total, prioritized by financial impact]
 
-CRITICAL RULES:
-- Be brutally honest about risk levels - don't sugarcoat
-- Focus on financial exposure over legal theory
-- Use specific examples and numbers from THIS contract
-- Compare explicitly to market-standard SaaS terms (e.g., "Market standard is 12 months liability cap, this contract only caps at 3 months")
-- If a critical clause is MISSING (e.g., no liability cap stated at all), flag as HIGH risk
-- Avoid legal jargon - write for a CFO, not a lawyer
-- For each risk, answer: "What could this cost us in real money?"
-- If you see red flags like unilateral pricing changes, unlimited liability, or auto-renewal >12 months, explicitly call them out
+Focus on what the Customer must fix vs. what is “nice to have.”
+
+RISK ASSESSMENT RULES (DO NOT IGNORE):
+- If any single clause could realistically expose the Customer to >$50k in loss, data breach liability, or loss of core functionality with no recourse, the overall risk should be HIGH.
+- If multiple MEDIUM risks compound (e.g. AI disclaimers + liability cap + no indemnity), explicitly call this out and consider escalating the overall risk.
+- Missing protections (e.g. no liability cap, no termination right, no data protection language) are HIGH risk by default.
+- Do not average risk levels mechanically — use judgment.
 
 RISK LEVEL GUIDELINES:
-- HIGH: Could cost >$50k or create existential operational risk
-- MEDIUM: Could cost $10-50k or create significant hassle
-- LOW: Minor financial exposure (<$10k) or standard market terms`,
+- HIGH: Could cost >$50k, create regulatory exposure, or materially disrupt operations
+- MEDIUM: Could cost $10k–$50k or create ongoing commercial friction
+- LOW: <$10k exposure or clearly market-standard terms
+
+STYLE RULES:
+- Be blunt and commercially realistic
+- Avoid legal jargon
+- Write for a CFO or founder who will not read the contract itself
+- Do not soften conclusions to be polite
+- FORMATTING RULES:
+  - Use Markdown only
+  - Do NOT use bullet symbols (•)
+  - Use bold labels exactly as shown (**What it means:** etc.)
+  - Do not nest lists inside the Top 5 Risks section`,
           },
           {
             role: "user",
@@ -129,25 +153,21 @@ RISK LEVEL GUIDELINES:
       lastError = err;
       console.error(`❌ OpenAI API attempt ${attempt + 1} failed:`, err.message);
       
-      // Om det är sista försöket, kasta error
       if (attempt === maxRetries - 1) {
         break;
       }
       
-      // Vissa errors ska inte retries
       if (err.status === 401 || err.status === 403 || err.status === 400) {
         console.error("🔴 Non-retryable error, stopping retries");
         break;
       }
       
-      // Exponential backoff: 1s, 2s, 4s
       const delay = INITIAL_RETRY_DELAY * Math.pow(2, attempt);
       console.log(`⏳ Retrying in ${delay}ms...`);
       await new Promise(resolve => setTimeout(resolve, delay));
     }
   }
   
-  // Om vi kommer hit har alla retries failat
   throw lastError;
 }
 
@@ -159,7 +179,6 @@ export default async function handler(
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  // Verifiera origin
   if (!verifyOrigin(req)) {
     console.warn('⚠️ Request from unauthorized origin:', req.headers.origin);
     return res.status(403).json({ error: "Unauthorized origin" });
@@ -167,8 +186,6 @@ export default async function handler(
 
   const { contractText, accessToken, isSample } = req.body;
 
-  // ===== VALIDATION =====
- 
   if (!contractText || typeof contractText !== 'string') {
     return res.status(400).json({ error: "Contract text is required" });
   }
@@ -183,11 +200,8 @@ export default async function handler(
     });
   }
 
-  // Sanitize input
   const sanitizedContract = sanitizeInput(contractText);
 
-  // ===== RATE LIMITING =====
- 
   const clientIp = getClientIp(req);
  
   const rateLimitConfig = isSample
@@ -210,8 +224,6 @@ export default async function handler(
     });
   }
 
-  // ===== AUTHORIZATION =====
- 
   if (!isSample) {
     if (!accessToken || typeof accessToken !== 'string') {
       return res.status(403).json({
@@ -228,13 +240,10 @@ export default async function handler(
     }
   }
 
-  // ===== SAMPLE ANALYSIS OPTIMIZATION =====
- 
   if (isSample && sanitizedContract.trim() === SAMPLE_CONTRACT_TEXT.trim()) {
     if (cachedSampleAnalysis) {
       console.log('📦 Returning cached sample analysis');
       
-      // Rate limit headers
       res.setHeader('X-RateLimit-Limit', rateLimitConfig.limit.toString());
       res.setHeader('X-RateLimit-Remaining', rateLimitResult.remaining.toString());
       res.setHeader('X-RateLimit-Reset', new Date(rateLimitResult.reset).toISOString());
@@ -246,18 +255,14 @@ export default async function handler(
     }
   }
 
-  // ===== OPENAI ANALYSIS WITH RETRY =====
-
   try {
     const analysis = await analyzeWithRetry(sanitizedContract);
 
-    // Cache sample analysis
     if (isSample && sanitizedContract.trim() === SAMPLE_CONTRACT_TEXT.trim()) {
       cachedSampleAnalysis = analysis;
       console.log('💾 Cached sample analysis for future requests');
     }
 
-    // Rate limit headers
     res.setHeader('X-RateLimit-Limit', rateLimitConfig.limit.toString());
     res.setHeader('X-RateLimit-Remaining', rateLimitResult.remaining.toString());
     res.setHeader('X-RateLimit-Reset', new Date(rateLimitResult.reset).toISOString());
@@ -270,7 +275,6 @@ export default async function handler(
   } catch (err: any) {
     console.error("❌ OpenAI analysis error (after all retries):", err);
    
-    // Log to Sentry med extra context
     Sentry.captureException(err, {
       tags: {
         api_route: "analyze",
@@ -285,7 +289,6 @@ export default async function handler(
       },
     });
    
-    // FÖRBÄTTRAD felhantering - exponera aldrig interna detaljer
     if (err.status === 429) {
       return res.status(503).json({
         error: "Our AI service is experiencing high demand. Please try again in 30 seconds."
@@ -293,7 +296,6 @@ export default async function handler(
     }
    
     if (err.status === 401 || err.status === 403) {
-      // KRITISKT: API key problem - alert admins via Sentry
       console.error("🔴 CRITICAL: OpenAI API key issue!");
       Sentry.captureMessage("OpenAI API authentication failed", {
         level: "fatal",
@@ -317,7 +319,6 @@ export default async function handler(
       });
     }
 
-    // Generiskt fel - exponera ALDRIG stack traces eller interna meddelanden
     return res.status(500).json({
       error: "Analysis failed. Please try again in a moment."
     });

@@ -238,7 +238,7 @@ export default function Home() {
     <>
       <Meta />
       <main style={{
-        background: "linear-gradient(180deg, #0a0e1a 0%, #0f172a 50%, #1e293b 100%)",
+        background: "linear-gradient(180deg, #050810 0%, #0a0e1a 50%, #0f172a 100%)",
         minHeight: "100vh",
         color: "white",
         position: "relative",
@@ -1019,16 +1019,174 @@ Or click above to try a sample contract first (completely free, no payment neede
 
 
               {/* Analysis content with better typography */}
-              <div style={{
-                whiteSpace: "pre-wrap",
-                lineHeight: 1.85,
-                fontSize: 17,
-                color: "#e2e8f0",
-                fontWeight: 400,
-                letterSpacing: "-0.01em"
-              }}>
-                {analysis}
-              </div>
+              {/* Analysis content with better typography */}
+<div style={{
+  lineHeight: 1.7,
+  fontSize: 16,
+  color: "#cbd5e1",
+  fontWeight: 400,
+  letterSpacing: "-0.011em",
+  maxWidth: 800
+}}>
+  {analysis.split('\n').map((line, index) => {
+    const trimmedLine = line.trim();
+
+    // --- SPECIAL: Overall Risk Line ---
+    if (index === 0 && trimmedLine.startsWith("Overall risk level:")) {
+      return (
+        <h2 key={index} style={{
+          fontSize: 32,
+          fontWeight: 800,
+          background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+          backgroundClip: "text",
+          marginTop: 0,
+          marginBottom: 32,
+          letterSpacing: "-0.035em",
+          lineHeight: 1.2
+        }}>
+          {trimmedLine}
+        </h2>
+      );
+    }
+
+    // --- HEADINGS ---
+    if (trimmedLine.startsWith('##')) {
+      return (
+        <h3 key={index} style={{
+          fontSize: 20,
+          fontWeight: 700,
+          color: "#f1f5f9",
+          marginTop: index === 0 ? 0 : 48,
+          marginBottom: 20,
+          letterSpacing: "-0.022em",
+          lineHeight: 1.3,
+          borderBottom: "1px solid rgba(148, 163, 184, 0.15)",
+          paddingBottom: 12
+        }}>
+          {trimmedLine.replace(/^##\s*/, '')}
+        </h3>
+      );
+    }
+    if (trimmedLine.startsWith('#')) {
+      return (
+        <h2 key={index} style={{
+          fontSize: 26,
+          fontWeight: 800,
+          color: "#f8fafc",
+          marginTop: index === 0 ? 0 : 56,
+          marginBottom: 28,
+          letterSpacing: "-0.03em",
+          lineHeight: 1.25
+        }}>
+          {trimmedLine.replace(/^#\s*/, '')}
+        </h2>
+      );
+    }
+
+    // --- BULLETS / DASHES ---
+    let normalizedLine = trimmedLine.replace(/^•\s*/, '- ').replace(/^\*\s*/, '- ');
+
+    if (normalizedLine.startsWith('-')) {
+      return (
+        <div key={index} style={{
+          display: 'flex',
+          gap: 14,
+          marginBottom: 14,
+          paddingLeft: 4,
+          position: 'relative'
+        }}>
+          <span style={{ 
+            color: "#6366f1", 
+            fontWeight: 600,
+            fontSize: 24,
+            lineHeight: 1.7,
+            marginTop: -2
+          }}>•</span>
+          <span style={{ 
+            flex: 1,
+            color: "#e2e8f0"
+          }}>
+            {normalizedLine.replace(/^-+\s*/, '')}
+          </span>
+        </div>
+      );
+    }
+
+    // --- NUMRERADE LISTOR ---
+    if (/^\d+\./.test(trimmedLine)) {
+      const numberMatch = trimmedLine.match(/^(\d+)\./);
+      const number = numberMatch ? numberMatch[1] : '';
+      return (
+        <div key={index} style={{
+          display: 'flex',
+          gap: 14,
+          marginBottom: 14,
+          paddingLeft: 4
+        }}>
+          <span style={{ 
+            color: "#8b5cf6", 
+            fontWeight: 700,
+            fontSize: 16,
+            lineHeight: 1.7,
+            minWidth: 28,
+            textAlign: 'right'
+          }}>{number}.</span>
+          <span style={{ 
+            flex: 1,
+            color: "#e2e8f0"
+          }}>
+            {trimmedLine.replace(/^\d+\.\s*/, '')}
+          </span>
+        </div>
+      );
+    }
+
+    // --- FETSTIL ---
+    let processedLine = line;
+    const boldRegex = /\*\*(.+?)\*\*/g;
+    const parts = [];
+    let lastIndex = 0;
+    let match;
+
+    while ((match = boldRegex.exec(line)) !== null) {
+      if (match.index > lastIndex) {
+        parts.push(line.substring(lastIndex, match.index));
+      }
+      parts.push(
+        <strong key={`bold-${index}-${match.index}`} style={{ 
+          color: "#f1f5f9", 
+          fontWeight: 650
+        }}>
+          {match[1]}
+        </strong>
+      );
+      lastIndex = match.index + match[0].length;
+    }
+
+    if (lastIndex < line.length) {
+      parts.push(line.substring(lastIndex));
+    }
+
+    // --- TOM RAD ---
+    if (trimmedLine === '') {
+      return <div key={index} style={{ height: 20 }} />;
+    }
+
+    // --- VANLIG TEXT ---
+    return (
+      <p key={index} style={{ 
+        marginBottom: 14,
+        lineHeight: 1.7,
+        color: "#cbd5e1"
+      }}>
+        {parts.length > 0 ? parts : line}
+      </p>
+    );
+  })}
+</div>
+
 
 
               {/* Premium Action buttons */}
@@ -1355,4 +1513,3 @@ Or click above to try a sample contract first (completely free, no payment neede
     </>
   );
 }
-
