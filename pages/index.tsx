@@ -19,7 +19,32 @@ export default function Home() {
   const [loadingMessage, setLoadingMessage] = useState("");
 
 
-  const sampleContract = `This Agreement shall automatically renew for successive 12-month terms unless either party provides written notice at least 90 days prior to the end of the current term. The Vendor may modify pricing and terms upon renewal with 30 days notice. Liability is capped at fees paid in the last three (3) months. The Vendor may terminate this Agreement for convenience upon 30 days written notice.`;
+  const sampleContract = `SAAS SERVICE AGREEMENT
+
+This Software as a Service Agreement ("Agreement") is entered into between CloudTech Solutions Inc. ("Vendor") and the subscribing customer ("Customer").
+
+1. TERM AND RENEWAL
+This Agreement shall commence on the date of Customer's first payment and continue for an initial term of twelve (12) months. This Agreement shall automatically renew for successive twelve (12) month terms unless either party provides written notice of non-renewal at least ninety (90) days prior to the end of the current term. Vendor may modify pricing and terms upon renewal with thirty (30) days written notice.
+
+2. FEES AND PAYMENT
+Customer agrees to pay the subscription fees as set forth in the applicable order form. All fees are non-refundable except as expressly set forth herein. Vendor reserves the right to modify pricing upon renewal or with sixty (60) days notice during the subscription term. Late payments will accrue interest at 1.5% per month or the maximum rate permitted by law, whichever is less.
+
+3. LIABILITY AND INDEMNIFICATION
+Vendor's total liability under this Agreement is limited to the amount of fees paid by Customer in the three (3) months immediately preceding the claim. Vendor shall not be liable for any indirect, incidental, consequential, or punitive damages. Customer agrees to indemnify Vendor against any third-party claims arising from Customer's use of the Service.
+
+4. TERMINATION
+Either party may terminate this Agreement for convenience upon thirty (30) days written notice. Vendor may terminate immediately upon Customer's breach of payment obligations or violation of acceptable use policies. Upon termination, Customer shall immediately cease use of the Service and all fees paid are non-refundable.
+
+5. DATA AND PRIVACY
+Customer data will be stored on Vendor's servers in the United States. Vendor may use Customer data to improve the Service and for marketing purposes. Upon termination, Vendor will retain Customer data for ninety (90) days, after which it may be permanently deleted at Vendor's discretion.
+
+6. WARRANTIES AND DISCLAIMERS
+THE SERVICE IS PROVIDED "AS IS" WITHOUT WARRANTIES OF ANY KIND. Vendor does not warrant that the Service will be uninterrupted or error-free. Vendor disclaims all warranties, express or implied, including merchantability and fitness for a particular purpose.
+
+7. CHANGES TO SERVICE
+Vendor reserves the right to modify or discontinue any feature of the Service at any time without notice or liability to Customer.
+
+By clicking "I Accept" or using the Service, Customer agrees to be bound by these terms.`;
 
 
   const loadingMessages = [
@@ -1478,7 +1503,22 @@ Or click above to try a sample contract first (completely free, no payment neede
               >
                 Terms of Service
               </a>
-            </div>
+              <a
+              href="/contact"
+    style={{
+      color: "#818cf8",
+      marginLeft: 32,
+      textDecoration: "none",
+      fontWeight: 600,
+      fontSize: 15,
+      transition: "color 0.3s"
+    }}
+    onMouseEnter={e => e.currentTarget.style.color = "#a5b4fc"}
+    onMouseLeave={e => e.currentTarget.style.color = "#818cf8"}
+  >
+    Contact & Support
+  </a>
+</div>
 
 
             {/* Copyright */}
