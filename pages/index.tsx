@@ -792,7 +792,7 @@ Or click above to try a sample contract first (completely free, no payment neede
                       </span>
                     ) : (
                       <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12 }}>
-                        <span style={{ fontSize: 20 }}>💳</span> Pay 349 kr to Analyze Your Contract
+                        <span style={{ fontSize: 20 }}>💳</span> Pay 149 kr to Analyze Your Contract
                       </span>
                     )}
                   </button>
@@ -1145,7 +1145,7 @@ Or click above to try a sample contract first (completely free, no payment neede
                         }
                       }}
                     >
-                      {checkoutLoading ? "Loading..." : "Unlock Full Analysis for 349 kr"}
+                      {checkoutLoading ? "Loading..." : "Unlock Full Analysis for 149 kr"}
                     </button>
                    
                     <p style={{
