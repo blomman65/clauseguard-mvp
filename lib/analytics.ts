@@ -22,21 +22,19 @@ export const initAnalytics = () => {
       loaded: (posthogInstance) => {
         isInitialized = true;
         console.log('✅ PostHog initialized successfully');
-        
-        // OPT IN direkt efter init - detta är nyckeln!
+       
         posthogInstance.opt_in_capturing();
         console.log('✅ PostHog capturing enabled');
       },
-      capture_pageview: true, // ÄNDRAT: Låt PostHog hantera pageviews automatiskt
+      capture_pageview: false,
       capture_pageleave: true,
       autocapture: false,
       persistence: 'localStorage',
       session_recording: {
         recordCrossOriginIframes: false,
       },
-      // TA BORT opt_out_capturing_by_default helt!
     });
-    
+   
     console.log('📊 PostHog configuration complete');
   } catch (error) {
     console.error('❌ PostHog init failed:', error);

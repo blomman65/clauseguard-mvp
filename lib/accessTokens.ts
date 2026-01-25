@@ -7,15 +7,14 @@ import { kv } from '@vercel/kv';
 export async function createAccessToken(token: string): Promise<void> {
   try {
     console.log('🔑 Creating access token:', token.substring(0, 8) + '...');
-    
-    // Lagra token med 24 timmars TTL (time to live)
+   
     await kv.set(`token:${token}`, {
       created: Date.now(),
       status: 'valid'
     }, {
       ex: 86400 // 24 timmar i sekunder
     });
-    
+   
     console.log('✅ Access token created successfully');
   } catch (error) {
     console.error('❌ Error creating access token:', error);
@@ -30,24 +29,46 @@ export async function createAccessToken(token: string): Promise<void> {
 export async function consumeAccessToken(token: string): Promise<boolean> {
   try {
     console.log('🔍 Checking access token:', token.substring(0, 8) + '...');
-    
-    // Kontrollera om token finns
+   
     const tokenData = await kv.get(`token:${token}`);
-    
+   
     if (!tokenData) {
       console.log('❌ Token not found or already used');
       return false;
     }
-    
+   
     console.log('✅ Token valid, consuming...');
-    
-    // Ta bort token (one-time use)
+   
     await kv.del(`token:${token}`);
-    
+   
     console.log('✅ Token consumed successfully');
     return true;
   } catch (error) {
     console.error('❌ Error consuming access token:', error);
+    return false;
+  }
+}
+
+/**
+ * Reaktiverar en token (används vid tekniska fel)
+ * Återställer en token så den kan användas igen
+ */
+export async function reactivateAccessToken(token: string): Promise<boolean> {
+  try {
+    console.log('🔄 Reactivating access token:', token.substring(0, 8) + '...');
+   
+    await kv.set(`token:${token}`, {
+      created: Date.now(),
+      status: 'reactivated',
+      reactivatedAt: Date.now()
+    }, {
+      ex: 86400
+    });
+   
+    console.log('✅ Token reactivated successfully');
+    return true;
+  } catch (error) {
+    console.error('❌ Error reactivating access token:', error);
     return false;
   }
 }

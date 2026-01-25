@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import Stripe from "stripe";
-import { randomUUID } from "crypto";
-import { createAccessToken } from "../../lib/accessTokens";
+import { kv } from '@vercel/kv';
 import { rateLimit, getClientIp } from "../../lib/rateLimit";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
@@ -21,8 +20,8 @@ export default async function handler(
   );
 
   if (!rateLimitResult.success) {
-    return res.status(429).json({ 
-      error: "Too many verification attempts. Please try again later." 
+    return res.status(429).json({
+      error: "Too many verification attempts. Please try again later."
     });
   }
 
@@ -41,14 +40,28 @@ export default async function handler(
   try {
     console.log('💳 Verifying payment for session:', session_id);
     
-    // Hämta Stripe session
+    // Försök hämta token från KV (lagrat av webhook)
+    const token = await kv.get<string>(`session:${session_id}`);
+    
+    if (token) {
+      console.log(`✅ Token found in KV for session ${session_id}`);
+      
+      return res.status(200).json({
+        accessToken: token,
+        expiresIn: 86400 // 24 timmar i sekunder
+      });
+    }
+    
+    // Fallback: Om webhook inte körts än, verifiera med Stripe direkt
+    console.log('⚠️ Token not found in KV, falling back to Stripe verification');
+    
     const session = await stripe.checkout.sessions.retrieve(session_id);
 
     // Kontrollera att betalningen är genomförd
     if (session.payment_status !== "paid") {
-      return res.status(403).json({ 
+      return res.status(403).json({
         error: "Payment not completed",
-        status: session.payment_status 
+        status: session.payment_status
       });
     }
 
@@ -57,20 +70,18 @@ export default async function handler(
     const twentyFourHoursAgo = Date.now() - (24 * 60 * 60 * 1000);
     
     if (sessionCreated < twentyFourHoursAgo) {
-      return res.status(403).json({ 
-        error: "Session expired. Please make a new purchase." 
+      return res.status(403).json({
+        error: "Session expired. Please make a new purchase."
       });
     }
 
-    // Skapa access token
-    const token = randomUUID();
-    await createAccessToken(token);
-
-    console.log(`✅ Access token created for session ${session_id}`);
-
-    return res.status(200).json({ 
-      accessToken: token,
-      expiresIn: 86400 // 24 timmar i sekunder
+    // Om vi kommer hit betyder det att webhook inte körts än
+    // Detta kan hända om webhook är långsam eller om det är development
+    console.log('⚠️ Payment verified but webhook not processed yet. Waiting for webhook...');
+    
+    return res.status(202).json({
+      message: "Payment verified. Please wait a few seconds and try again.",
+      status: "processing"
     });
 
   } catch (err: any) {
@@ -78,13 +89,13 @@ export default async function handler(
     
     // Stripe-specifika fel
     if (err.type === 'StripeInvalidRequestError') {
-      return res.status(400).json({ 
-        error: "Invalid session ID" 
+      return res.status(400).json({
+        error: "Invalid session ID"
       });
     }
 
-    return res.status(500).json({ 
-      error: "Verification failed. Please contact support." 
+    return res.status(500).json({
+      error: "Verification failed. Please contact support."
     });
   }
 }
