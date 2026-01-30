@@ -4,6 +4,7 @@ import { randomUUID } from "crypto";
 import { createAccessToken } from "../../../lib/accessTokens";
 import { kv } from '@vercel/kv';
 import * as Sentry from "@sentry/nextjs";
+import { rateLimit, getClientIp } from "../../../lib/rateLimit";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
   apiVersion: "2025-12-15.clover",
@@ -11,14 +12,12 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET as string;
 
-// VIKTIGT: Disable body parsing, behöver raw body för webhook verification
 export const config = {
   api: {
     bodyParser: false,
   },
 };
 
-// Helper för att läsa raw body
 async function getRawBody(req: NextApiRequest): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     const chunks: Buffer[] = [];
@@ -36,6 +35,29 @@ export default async function handler(
     return res.status(405).json({ error: "Method not allowed" });
   }
 
+  const clientIp = getClientIp(req);
+  const rateLimitResult = await rateLimit(
+    `webhook:stripe:${clientIp}`,
+    30,
+    60
+  );
+
+  if (!rateLimitResult.success) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn('⚠️ Webhook rate limit exceeded from IP:', clientIp);
+    }
+    
+    Sentry.captureMessage('Webhook rate limit exceeded', {
+      level: 'warning',
+      tags: { webhook: 'rate_limit_exceeded' },
+      extra: { ip: clientIp }
+    });
+    
+    return res.status(429).json({
+      error: "Too many webhook requests"
+    });
+  }
+
   let event: Stripe.Event;
 
   try {
@@ -43,24 +65,30 @@ export default async function handler(
     const signature = req.headers["stripe-signature"] as string;
 
     if (!signature) {
-      console.error("❌ Missing stripe-signature header");
+      if (process.env.NODE_ENV !== 'production') {
+        console.error("❌ Missing stripe-signature header");
+      }
       return res.status(400).json({ error: "Missing signature" });
     }
 
-    // Verifiera att requesten verkligen kommer från Stripe
     event = stripe.webhooks.constructEvent(
       rawBody,
       signature,
-      webhookSecret
+      webhookSecret,
+      300
     );
 
-    console.log(`✅ Webhook verified: ${event.type} (${event.id})`);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`✅ Webhook verified: ${event.type} (${event.id})`);
+    }
 
   } catch (err: any) {
-    console.error("❌ Webhook signature verification failed:", err.message);
+    if (process.env.NODE_ENV !== 'production') {
+      console.error("❌ Webhook signature verification failed:", err.message);
+    }
     
     Sentry.captureException(err, {
-      tags: { 
+      tags: {
         webhook: "stripe_verification_failed",
         api_route: "webhooks/stripe"
       },
@@ -69,7 +97,6 @@ export default async function handler(
     return res.status(400).json({ error: `Webhook Error: ${err.message}` });
   }
 
-  // Hantera olika event types
   try {
     switch (event.type) {
       case "checkout.session.completed":
@@ -81,17 +108,20 @@ export default async function handler(
         break;
 
       default:
-        console.log(`ℹ️ Unhandled event type: ${event.type}`);
+        if (process.env.NODE_ENV !== 'production') {
+          console.log(`ℹ️ Unhandled event type: ${event.type}`);
+        }
     }
 
-    // Returnera 200 för att bekräfta att vi tagit emot eventet
     res.status(200).json({ received: true });
 
   } catch (err: any) {
-    console.error("❌ Error handling webhook event:", err);
+    if (process.env.NODE_ENV !== 'production') {
+      console.error("❌ Error handling webhook event:", err);
+    }
     
     Sentry.captureException(err, {
-      tags: { 
+      tags: {
         webhook: "event_handling_failed",
         event_type: event.type
       },
@@ -100,73 +130,68 @@ export default async function handler(
       }
     });
     
-    // Returnera 500 så Stripe försöker igen
     res.status(500).json({ error: "Webhook handler failed" });
   }
 }
 
-// Hantera genomförd betalning
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
-  console.log("💳 Checkout completed:", session.id);
+  if (process.env.NODE_ENV !== 'production') {
+    console.log("💳 Checkout completed:", session.id.substring(0, 8) + '...');
+  }
 
-  // Kontrollera att betalningen är genomförd
   if (session.payment_status !== "paid") {
-    console.warn("⚠️ Payment not completed:", session.payment_status);
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn("⚠️ Payment not completed:", session.payment_status);
+    }
     return;
   }
 
   try {
-    // Skapa access token
     const token = randomUUID();
     await createAccessToken(token);
     
-    console.log(`✅ Access token created: ${token.substring(0, 8)}...`);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`✅ Access token created: ${token.substring(0, 8)}...`);
+    }
     
-    // Lagra mapping mellan session_id och token
-    // Detta gör att vi kan hämta token från /api/verify-payment
     await kv.set(
-      `session:${session.id}`, 
-      token, 
-      { ex: 86400 } // 24 timmar
+      `session:${session.id}`,
+      token,
+      { ex: 86400 }
     );
     
-    console.log(`✅ Session mapping stored: ${session.id} -> token`);
-
-    // Optional: Skicka email med token (om du har email från Stripe)
-    // const customerEmail = session.customer_details?.email;
-    // if (customerEmail) {
-    //   await sendAccessTokenEmail(customerEmail, token);
-    // }
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`✅ Session mapping stored: ${session.id.substring(0, 8)}... -> token`);
+    }
 
   } catch (err: any) {
-    console.error("❌ Failed to create access token:", err);
+    if (process.env.NODE_ENV !== 'production') {
+      console.error("❌ Failed to create access token:", err);
+    }
     
     Sentry.captureException(err, {
-      tags: { 
+      tags: {
         webhook: "token_creation_failed",
-        critical: true 
+        critical: true
       },
-      extra: { 
-        session_id: session.id,
+      extra: {
+        session_id: session.id.substring(0, 8) + '...',
         payment_status: session.payment_status
       },
     });
     
-    throw err; // Re-throw så Stripe försöker igen
+    throw err;
   }
 }
 
-// Hantera refunds
 async function handleRefund(charge: Stripe.Charge) {
-  console.log("💰 Refund processed:", charge.id);
+  if (process.env.NODE_ENV !== 'production') {
+    console.log("💰 Refund processed:", charge.id);
+  }
   
-  // Hitta session ID från charge metadata (om vi lagrat det)
-  // För nu loggar vi bara - du kan lägga till logik för att invalidera tokens
-  
-  // TODO: Om du vill kan du invalidera access token här
-  // const sessionId = charge.metadata?.session_id;
-  // if (sessionId) {
-  //   await kv.del(`session:${sessionId}`);
-  //   await kv.del(`token:${token}`);
-  // }
+  Sentry.captureMessage('Refund processed', {
+    level: 'info',
+    tags: { webhook: 'refund' },
+    extra: { charge_id: charge.id }
+  });
 }

@@ -24,6 +24,7 @@ export default function CookieBanner() {
     if (typeof window !== 'undefined') {
       try {
         localStorage.setItem('cookie-consent', 'accepted');
+        localStorage.setItem('cookie-consent-timestamp', new Date().toISOString());
         localStorage.setItem('cookie-analytics', 'true');
         window.dispatchEvent(new Event('cookieConsentChanged'));
       } catch (e) {
@@ -39,6 +40,7 @@ export default function CookieBanner() {
     if (typeof window !== 'undefined') {
       try {
         localStorage.setItem('cookie-consent', 'declined');
+        localStorage.setItem('cookie-consent-timestamp', new Date().toISOString());
         localStorage.setItem('cookie-analytics', 'false');
       } catch (e) {
         console.warn('Could not save cookie consent');
@@ -53,6 +55,7 @@ export default function CookieBanner() {
     if (typeof window !== 'undefined') {
       try {
         localStorage.setItem('cookie-consent', analytics ? 'accepted' : 'declined');
+        localStorage.setItem('cookie-consent-timestamp', new Date().toISOString());
         localStorage.setItem('cookie-analytics', analytics ? 'true' : 'false');
         if (analytics) {
           window.dispatchEvent(new Event('cookieConsentChanged'));

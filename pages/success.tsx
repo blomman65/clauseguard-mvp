@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 
 export default function Success() {
-  const [status, setStatus] = useState<'verifying' | 'processing' | 'error'>('verifying');
+  const [status, setStatus] = useState<'verifying' | 'processing' | 'success' | 'error'>('verifying');
   const [retryCount, setRetryCount] = useState(0);
-  const MAX_RETRIES = 10; // Max 10 försök (10 sekunder)
+  const [errorMessage, setErrorMessage] = useState<string>('');
+  const MAX_RETRIES = 5; // Reducerat från 10 till 5 (5 sekunder total)
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -11,17 +12,27 @@ export default function Success() {
     
     if (!sessionId) {
       setStatus('error');
+      setErrorMessage('Missing session ID. Please contact support.');
       return;
     }
 
     const verifyPayment = async () => {
       try {
+        console.log('🔍 Verifying payment, attempt:', retryCount + 1);
+        
         const res = await fetch(`/api/verify-payment?session_id=${sessionId}`);
         const data = await res.json();
 
         if (res.status === 200 && data.accessToken) {
           // Success! Redirect till main page med token
-          window.location.href = `/?token=${data.accessToken}`;
+          console.log('✅ Payment verified, redirecting...');
+          setStatus('success');
+          
+          // Ge användaren en kort feedback innan redirect
+          setTimeout(() => {
+            window.location.href = `/?token=${data.accessToken}`;
+          }, 500);
+          
         } else if (res.status === 202) {
           // Webhook inte körts än, försök igen
           console.log('⏳ Webhook processing, retrying...', retryCount + 1);
@@ -32,17 +43,27 @@ export default function Success() {
             // Retry efter 1 sekund
             setTimeout(verifyPayment, 1000);
           } else {
-            // Ge upp efter max retries
+            // Ge upp efter max retries - men detta borde inte hända nu med fallback
+            console.error('❌ Max retries reached');
             setStatus('error');
+            setErrorMessage('Payment verification timed out. Please refresh the page or contact support.');
           }
         } else {
           // Annat fel
-          console.error('Verification failed:', data);
+          console.error('❌ Verification failed:', data);
           setStatus('error');
+          setErrorMessage(data.error || 'Payment verification failed. Please contact support.');
         }
       } catch (err) {
-        console.error('Verification error:', err);
-        setStatus('error');
+        console.error('❌ Verification error:', err);
+        
+        if (retryCount < MAX_RETRIES) {
+          setRetryCount(prev => prev + 1);
+          setTimeout(verifyPayment, 1000);
+        } else {
+          setStatus('error');
+          setErrorMessage('Network error. Please check your connection and try again.');
+        }
       }
     };
 
@@ -110,6 +131,30 @@ export default function Success() {
           </>
         )}
 
+        {status === 'success' && (
+          <>
+            <div style={{
+              width: 64,
+              height: 64,
+              background: "rgba(34, 197, 94, 0.2)",
+              borderRadius: "50%",
+              margin: "0 auto 24px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 32
+            }}>
+              ✅
+            </div>
+            <h1 style={{ fontSize: 24, marginBottom: 12, fontWeight: 700, color: "#86efac" }}>
+              Payment Verified!
+            </h1>
+            <p style={{ fontSize: 15, color: "#cbd5e1", marginBottom: 24 }}>
+              Redirecting you to analyze your contract...
+            </p>
+          </>
+        )}
+
         {status === 'error' && (
           <>
             <div style={{
@@ -126,10 +171,10 @@ export default function Success() {
               ❌
             </div>
             <h1 style={{ fontSize: 24, marginBottom: 12, fontWeight: 700, color: "#fca5a5" }}>
-              Verification Failed
+              Verification Issue
             </h1>
             <p style={{ fontSize: 15, color: "#cbd5e1", marginBottom: 24 }}>
-              We couldn't verify your payment. This might be temporary.
+              {errorMessage || "We couldn't verify your payment. This might be temporary."}
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <button
@@ -165,7 +210,7 @@ export default function Success() {
               </a>
             </div>
             <p style={{ fontSize: 13, color: "#94a3b8", marginTop: 24, margin: 0 }}>
-              If this persists, contact support at trustterms.help@outlook.com with your Stripe session ID
+              If this persists, contact support at <strong>trustterms.help@outlook.com</strong> with your payment confirmation
             </p>
           </>
         )}

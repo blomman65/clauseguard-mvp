@@ -3,6 +3,7 @@ import PDFDocument from "pdfkit";
 import * as Sentry from "@sentry/nextjs";
 
 const MAX_ANALYSIS_LENGTH = 50000;
+const VALID_RISK_LEVELS = ['LOW', 'MEDIUM', 'HIGH'] as const;
 
 export default async function handler(
   req: NextApiRequest,
@@ -14,13 +15,16 @@ export default async function handler(
 
   const { analysis, riskLevel } = req.body;
 
-  // Validering
   if (!analysis || !riskLevel) {
     return res.status(400).json({ error: "Missing analysis data" });
   }
 
   if (typeof analysis !== 'string' || typeof riskLevel !== 'string') {
     return res.status(400).json({ error: "Invalid data format" });
+  }
+
+  if (!VALID_RISK_LEVELS.includes(riskLevel as any)) {
+    return res.status(400).json({ error: "Invalid risk level" });
   }
 
   if (analysis.length > MAX_ANALYSIS_LENGTH) {
@@ -30,10 +34,8 @@ export default async function handler(
   }
 
   try {
-    // Generera PDF till buffer först (så vi kan hantera errors innan headers skickas)
     const pdfBuffer = await generatePDF(analysis, riskLevel);
     
-    // Nu när vi vet att PDF:en är klar, skicka headers och data
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
       "Content-Disposition",
@@ -60,7 +62,6 @@ export default async function handler(
   }
 }
 
-// Generera PDF till buffer
 async function generatePDF(analysis: string, riskLevel: string): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     const doc = new PDFDocument({
@@ -77,7 +78,6 @@ async function generatePDF(analysis: string, riskLevel: string): Promise<Buffer>
     doc.on('error', reject);
 
     try {
-      // Header med logo-simulering
       doc
         .fontSize(28)
         .font("Helvetica-Bold")
@@ -92,7 +92,6 @@ async function generatePDF(analysis: string, riskLevel: string): Promise<Buffer>
 
       doc.moveDown(1.5);
 
-      // Risk badge
       const riskColor =
         riskLevel === "HIGH"
           ? "#DC2626"
@@ -108,7 +107,6 @@ async function generatePDF(analysis: string, riskLevel: string): Promise<Buffer>
 
       doc.moveDown();
       
-      // Date
       doc
         .fontSize(10)
         .fillColor("#64748b")
@@ -123,7 +121,6 @@ async function generatePDF(analysis: string, riskLevel: string): Promise<Buffer>
 
       doc.moveDown(2);
 
-      // Horizontal line
       doc
         .strokeColor("#e2e8f0")
         .lineWidth(1)
@@ -133,25 +130,21 @@ async function generatePDF(analysis: string, riskLevel: string): Promise<Buffer>
 
       doc.moveDown(1.5);
 
-      // Analysis body med smart formatting
       doc.fillColor("#0f172a").font("Helvetica").fontSize(11);
 
       const lines = analysis.split('\n');
-      const pageHeight = 792; // A4 height in points
+      const pageHeight = 792;
       const bottomMargin = 100;
       
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
         
-        // Check if we need a new page
         if (doc.y > pageHeight - bottomMargin) {
           doc.addPage();
-          doc.y = 50; // Reset to top margin
+          doc.y = 50;
         }
         
-        // Handle different formatting
         if (line.startsWith('##')) {
-          // Main headers
           doc.moveDown(0.5);
           doc
             .font("Helvetica-Bold")
@@ -163,7 +156,6 @@ async function generatePDF(analysis: string, riskLevel: string): Promise<Buffer>
           doc.moveDown(0.3);
           doc.font("Helvetica").fontSize(11).fillColor("#0f172a");
         } else if (line.startsWith('###')) {
-          // Sub-headers
           doc.moveDown(0.4);
           doc
             .font("Helvetica-Bold")
@@ -175,7 +167,6 @@ async function generatePDF(analysis: string, riskLevel: string): Promise<Buffer>
           doc.moveDown(0.2);
           doc.font("Helvetica").fontSize(11).fillColor("#0f172a");
         } else if (line.startsWith('**') && line.endsWith('**')) {
-          // Bold lines
           doc
             .font("Helvetica-Bold")
             .text(line.replace(/\*\*/g, ''), {
@@ -183,28 +174,23 @@ async function generatePDF(analysis: string, riskLevel: string): Promise<Buffer>
             });
           doc.font("Helvetica");
         } else if (line.startsWith('- ') || line.startsWith('* ')) {
-          // Bullet points
           const bulletText = line.replace(/^[-*]\s*/, '');
           doc.text(`• ${bulletText}`, {
             indent: 20,
             lineGap: 4
           });
         } else if (line.trim().length > 0) {
-          // Regular text
           doc.text(line, {
             align: 'left',
             lineGap: 4
           });
         } else {
-          // Empty line
           doc.moveDown(0.3);
         }
       }
 
-      // Footer on last page
       doc.moveDown(3);
 
-      // Horizontal line
       doc
         .strokeColor("#e2e8f0")
         .lineWidth(1)
@@ -214,7 +200,6 @@ async function generatePDF(analysis: string, riskLevel: string): Promise<Buffer>
 
       doc.moveDown(1);
 
-      // Disclaimer
       doc
         .fontSize(9)
         .fillColor("#64748b")
@@ -229,7 +214,6 @@ async function generatePDF(analysis: string, riskLevel: string): Promise<Buffer>
 
       doc.moveDown(0.5);
 
-      // Footer link
       doc
         .fontSize(8)
         .fillColor("#6366f1")

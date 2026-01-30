@@ -40,24 +40,24 @@ export default function Contact() {
         title="Contact & Support - TrustTerms"
         description="Get help with TrustTerms or contact our support team"
       />
-     
+      
       <main style={{ background: "#0f172a", minHeight: "100vh", color: "white" }}>
         <div style={{ maxWidth: 800, margin: "auto", padding: "60px 20px" }}>
           <a href="/" style={{ color: '#6366f1', fontSize: 14, textDecoration: 'none' }}>
             ← Back to TrustTerms
           </a>
-         
+          
           <h1 style={{ fontSize: 36, fontWeight: 800, marginTop: 24, marginBottom: 16 }}>
             Contact & Support
           </h1>
-         
+          
           <p style={{ fontSize: 16, color: '#cbd5e1', marginBottom: 48, lineHeight: 1.7 }}>
-            We&apos;re here to help! Get in touch with any questions, issues, or feedback.
+            We're here to help! Get in touch with any questions, issues, or feedback.
           </p>
 
-          <section style={{ 
-            marginBottom: 48, 
-            padding: 32, 
+          <section style={{
+            marginBottom: 48,
+            padding: 32,
             background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
             border: '1px solid rgba(99, 102, 241, 0.3)',
             borderRadius: 16
@@ -67,8 +67,8 @@ export default function Contact() {
             </h2>
             <p style={{ fontSize: 17, color: '#cbd5e1', marginBottom: 12, lineHeight: 1.7 }}>
               <strong>Email:</strong>{' '}
-              <a 
-                href="mailto:trustterms.help@outlook.com" 
+              <a
+                href="mailto:trustterms.help@outlook.com"
                 style={{ color: '#818cf8', textDecoration: 'none', fontWeight: 600 }}
               >
                 trustterms.help@outlook.com
@@ -125,8 +125,8 @@ export default function Contact() {
                   How do I get a refund?
                 </h3>
                 <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.6, margin: 0 }}>
-                  Email us at trustterms.help@outlook.com with your Stripe session ID within 48 hours. 
-                  Refunds are provided for technical failures, duplicate payments, or service unavailability. 
+                  Email us at trustterms.help@outlook.com with your Stripe session ID within 48 hours.
+                  Refunds are provided for technical failures, duplicate payments, or service unavailability.
                   See our <a href="/terms" style={{ color: '#818cf8' }}>Terms of Service</a> for details.
                 </p>
               </div>
@@ -136,7 +136,7 @@ export default function Contact() {
                   The analysis failed. What should I do?
                 </h3>
                 <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.6, margin: 0 }}>
-                  Email us immediately with details of the error. We&apos;ll either reactivate your access 
+                  Email us immediately with details of the error. We'll either reactivate your access
                   token or provide a full refund. Technical failures on our end are always refunded.
                 </p>
               </div>
@@ -146,8 +146,8 @@ export default function Contact() {
                   How do I delete my data?
                 </h3>
                 <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.6, margin: 0 }}>
-                  We don&apos;t store your contract text on our servers. It&apos;s processed via OpenAI&apos;s API, 
-                  which retains data for 30 days before permanent deletion. For analytics data deletion, 
+                  We don't store your contract text on our servers. It's processed via OpenAI's API,
+                  which retains data for 30 days before permanent deletion. For analytics data deletion,
                   email us. See our <a href="/privacy" style={{ color: '#818cf8' }}>Privacy Policy</a>.
                 </p>
               </div>
@@ -157,7 +157,7 @@ export default function Contact() {
                   Can I get a receipt or invoice?
                 </h3>
                 <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.6, margin: 0 }}>
-                  Yes! Check your email for the Stripe receipt, or contact us and we&apos;ll send you one.
+                  Yes! Check your email for the Stripe receipt, or contact us and we'll send you one.
                 </p>
               </div>
             </div>
@@ -188,30 +188,55 @@ export default function Contact() {
             </h2>
             
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7, marginBottom: 16 }}>
-              TrustTerms is an AI-powered contract analysis tool designed to help startups and 
+              TrustTerms is an AI-powered contract analysis tool designed to help startups and
               small businesses identify risks in SaaS and commercial agreements before signing.
             </p>
             
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7, marginBottom: 16 }}>
-              We built this tool because we believe legal protection shouldn&apos;t only be accessible 
-              to those who can afford expensive lawyers. Our AI analysis gives you the insights 
+              We built this tool because we believe legal protection shouldn't only be accessible
+              to those who can afford expensive lawyers. Our AI analysis gives you the insights
               you need to negotiate better deals and avoid costly mistakes.
             </p>
             
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7, marginBottom: 0 }}>
-              <strong>Privacy-first:</strong> We never store your contracts on our servers. 
-              Your data is processed securely via OpenAI's API, which retains it for 30 days 
+              <strong>Privacy-first:</strong> We never store your contracts on our servers.
+              Your data is processed securely via OpenAI's API, which retains it for 30 days
               for abuse monitoring before permanent deletion.
             </p>
           </section>
 
-          <div style={{ 
-            paddingTop: 32, 
+          <section style={{ marginBottom: 48 }}>
+            <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 16, color: '#f8fafc' }}>
+              Company Information
+            </h2>
+            <div style={{
+              padding: 24,
+              background: 'rgba(30, 41, 59, 0.5)',
+              border: '1px solid rgba(148, 163, 184, 0.2)',
+              borderRadius: 12
+            }}>
+              <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7, margin: 0 }}>
+                <strong style={{ color: '#f1f5f9' }}>Business Name:</strong> TrustTerms<br />
+                <strong style={{ color: '#f1f5f9' }}>Legal Entity:</strong> Enskild Firma (Sole Proprietorship)<br />
+                <strong style={{ color: '#f1f5f9' }}>Organization Number:</strong> [Lägg till efter registrering]<br />
+                <strong style={{ color: '#f1f5f9' }}>Contact Email:</strong>{' '}
+                <a href="mailto:trustterms.help@outlook.com" style={{ color: '#818cf8' }}>
+                  trustterms.help@outlook.com
+                </a>
+              </p>
+            </div>
+          </section>
+
+          <div style={{
+            paddingTop: 32,
             borderTop: '1px solid rgba(148, 163, 184, 0.2)',
             display: 'flex',
             gap: 24,
             flexWrap: 'wrap'
           }}>
+            <a href="/about" style={{ color: '#818cf8', fontSize: 15, fontWeight: 600, textDecoration: 'none' }}>
+              About
+            </a>
             <a href="/privacy" style={{ color: '#818cf8', fontSize: 15, fontWeight: 600, textDecoration: 'none' }}>
               Privacy Policy
             </a>

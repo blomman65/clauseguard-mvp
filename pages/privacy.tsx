@@ -7,29 +7,48 @@ export default function Privacy() {
         title="Privacy Policy - TrustTerms"
         description="How TrustTerms handles your data and protects your privacy"
       />
-     
+      
       <main style={{ background: "#0f172a", minHeight: "100vh", color: "white" }}>
         <div style={{ maxWidth: 800, margin: "auto", padding: "60px 20px" }}>
           <a href="/" style={{ color: '#6366f1', fontSize: 14, textDecoration: 'none' }}>
             ← Back to TrustTerms
           </a>
-         
+          
           <h1 style={{ fontSize: 36, fontWeight: 800, marginTop: 24, marginBottom: 16 }}>
             Privacy Policy
           </h1>
-         
+          
           <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 40 }}>
-            Last updated: January 23, 2025
+            Last updated: January 26, 2025
           </p>
 
           <section style={{ marginBottom: 32 }}>
             <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12 }}>
-              1. What Data We Collect
+              1. Data Controller
+            </h2>
+            <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7 }}>
+              <strong>Legal Entity:</strong> TrustTerms, Enskild Firma<br />
+              <strong>Organization Number:</strong> [Lägg till efter registrering]<br />
+              <strong>Contact Email:</strong> trustterms.help@outlook.com<br />
+              <strong>Response Time:</strong> Within 30 days for GDPR requests
+            </p>
+            <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7, marginTop: 12 }}>
+              For official company records, see{' '}
+              <a href="https://www.bolagsverket.se" target="_blank" rel="noopener noreferrer" style={{ color: '#6366f1' }}>
+                Bolagsverket
+              </a>
+              {' '}(Swedish Companies Registration Office).
+            </p>
+          </section>
+
+          <section style={{ marginBottom: 32 }}>
+            <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12 }}>
+              2. What Data We Collect
             </h2>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7 }}>
               <strong>Contract Text:</strong> When you submit a contract for analysis, we process it
-              via OpenAI's API. <strong>Important:</strong> OpenAI retains API data for 30 days for abuse 
-              monitoring purposes before permanent deletion. Your contract is never stored on our servers, 
+              via OpenAI's API. <strong>Important:</strong> OpenAI retains API data for 30 days for abuse
+              monitoring purposes before permanent deletion. Your contract is never stored on our servers,
               but is temporarily retained by OpenAI during this period. After 30 days, it is permanently deleted.
             </p>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7, marginTop: 12 }}>
@@ -38,19 +57,19 @@ export default function Privacy() {
               payment confirmation, session ID, and payment timestamp.
             </p>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7, marginTop: 12 }}>
-              <strong>Analytics Data:</strong> With your consent, we use PostHog to collect anonymous 
-              usage data (page views, button clicks, analysis completion). No personal identifiers are 
+              <strong>Analytics Data:</strong> With your consent, we use PostHog to collect anonymous
+              usage data (page views, button clicks, analysis completion). No personal identifiers are
               collected. You can opt out via our cookie banner.
             </p>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7, marginTop: 12 }}>
-              <strong>Technical Data:</strong> We collect IP addresses for rate limiting and security 
-              purposes. These are stored temporarily (24 hours) in our rate limiting system.
+              <strong>Technical Data:</strong> We collect IP addresses for rate limiting and security
+              purposes. These are stored temporarily (1 hour) in our rate limiting system.
             </p>
           </section>
 
           <section style={{ marginBottom: 32 }}>
             <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12 }}>
-              2. How We Use Your Data
+              3. How We Use Your Data
             </h2>
             <ul style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.8, paddingLeft: 20 }}>
               <li>To provide contract analysis services via OpenAI's API</li>
@@ -63,7 +82,7 @@ export default function Privacy() {
 
           <section style={{ marginBottom: 32 }}>
             <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12 }}>
-              3. Data Sharing & Third Parties
+              4. Data Sharing & Third Parties
             </h2>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7 }}>
               We share data only with:
@@ -71,10 +90,10 @@ export default function Privacy() {
             <ul style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.8, paddingLeft: 20, marginTop: 12 }}>
               <li><strong>OpenAI:</strong> Contract text is sent to OpenAI's API for analysis.
               OpenAI retains this data for 30 days for abuse monitoring, then permanently deletes it.
-              OpenAI does not use API data to train their models. <a href="https://openai.com/policies/api-data-usage-policies" 
+              OpenAI does not use API data to train their models. <a href="https://openai.com/policies/api-data-usage-policies"
               style={{ color: '#6366f1' }} target="_blank" rel="noopener noreferrer">Learn more</a></li>
               <li><strong>Stripe:</strong> Payment processing only. Stripe complies with PCI-DSS standards.</li>
-              <li><strong>PostHog (EU):</strong> Anonymous analytics (only if you accept cookies). 
+              <li><strong>PostHog (EU):</strong> Anonymous analytics (only if you accept cookies).
               All data is stored in EU servers.</li>
               <li><strong>Vercel:</strong> Hosting infrastructure (EU/global regions)</li>
               <li><strong>Upstash (Vercel KV):</strong> Temporary token storage (max 24 hours)</li>
@@ -86,14 +105,14 @@ export default function Privacy() {
 
           <section style={{ marginBottom: 32 }}>
             <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12 }}>
-              4. Data Retention
+              5. Data Retention
             </h2>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7 }}>
-              <strong>Contract text:</strong> Retained by OpenAI for 30 days, then permanently deleted. 
+              <strong>Contract text:</strong> Retained by OpenAI for 30 days, then permanently deleted.
               Not stored on our servers.
             </p>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7, marginTop: 8 }}>
-              <strong>Payment records:</strong> Stored by Stripe per their retention policy (7 years for 
+              <strong>Payment records:</strong> Stored by Stripe per their retention policy (7 years for
               tax compliance)
             </p>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7, marginTop: 8 }}>
@@ -109,7 +128,7 @@ export default function Privacy() {
 
           <section style={{ marginBottom: 32 }}>
             <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12 }}>
-              5. Your Rights (GDPR)
+              6. Your Rights (GDPR)
             </h2>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7 }}>
               Under GDPR, you have the right to:
@@ -123,8 +142,8 @@ export default function Privacy() {
               <li>Lodge a complaint with your local data protection authority</li>
             </ul>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7, marginTop: 12 }}>
-              Since we don't store contract text (beyond OpenAI's 30-day retention) or require accounts, 
-              there is minimal personal data to manage. For any privacy requests or to exercise your rights, 
+              Since we don't store contract text (beyond OpenAI's 30-day retention) or require accounts,
+              there is minimal personal data to manage. For any privacy requests or to exercise your rights,
               contact: <strong>trustterms.help@outlook.com</strong>
             </p>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7, marginTop: 12 }}>
@@ -134,7 +153,30 @@ export default function Privacy() {
 
           <section style={{ marginBottom: 32 }}>
             <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12 }}>
-              6. Security
+              7. Data Breach Notification
+            </h2>
+            <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7 }}>
+              In the unlikely event of a data breach affecting your personal data, we will notify 
+              affected users within 72 hours as required by GDPR Article 33. Notifications will be 
+              sent to the email address associated with your payment (if available) or posted prominently 
+              on our website.
+            </p>
+          </section>
+
+          <section style={{ marginBottom: 32 }}>
+            <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12 }}>
+              8. Data Processing Agreement (DPA)
+            </h2>
+            <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7 }}>
+              For business customers processing personal data of EU citizens through our service, 
+              we can provide a Data Processing Agreement (DPA) upon request. Contact{' '}
+              <strong>trustterms.help@outlook.com</strong> to request a DPA.
+            </p>
+          </section>
+
+          <section style={{ marginBottom: 32 }}>
+            <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12 }}>
+              9. Security
             </h2>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7 }}>
               We implement industry-standard security measures:
@@ -152,7 +194,7 @@ export default function Privacy() {
 
           <section style={{ marginBottom: 32 }}>
             <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12 }}>
-              7. Cookies & Tracking
+              10. Cookies & Tracking
             </h2>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7 }}>
               We use cookies for:
@@ -162,14 +204,15 @@ export default function Privacy() {
               <li><strong>Analytics (optional):</strong> PostHog tracking - requires your explicit consent</li>
             </ul>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7, marginTop: 12 }}>
-              You can control cookie preferences via our cookie banner or browser settings. Declining 
-              cookies will not affect core functionality.
+              You can control cookie preferences via our cookie banner or browser settings. Declining
+              cookies will not affect core functionality. We record the timestamp of your consent 
+              for compliance purposes.
             </p>
           </section>
 
           <section style={{ marginBottom: 32 }}>
             <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12 }}>
-              8. International Data Transfers
+              11. International Data Transfers
             </h2>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7 }}>
               Your data may be processed in:
@@ -179,44 +222,55 @@ export default function Privacy() {
               <li><strong>USA:</strong> OpenAI API (with Standard Contractual Clauses), Stripe payments</li>
             </ul>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7, marginTop: 12 }}>
-              All transfers comply with GDPR requirements via Standard Contractual Clauses (SCCs) 
+              All transfers comply with GDPR requirements via Standard Contractual Clauses (SCCs)
               and adequate safeguards.
             </p>
           </section>
 
           <section style={{ marginBottom: 32 }}>
             <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12 }}>
-              9. Children's Privacy
+              12. Children's Privacy
             </h2>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7 }}>
-              Our service is not intended for anyone under 18 years of age. We do not knowingly 
-              collect data from children.
+              Our service is not intended for anyone under 16 years of age (or the applicable age 
+              in your jurisdiction). We do not knowingly collect data from children. If you believe 
+              we have inadvertently collected data from a child, please contact us immediately.
             </p>
           </section>
 
           <section style={{ marginBottom: 32 }}>
             <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12 }}>
-              10. Changes to This Policy
+              13. Changes to This Policy
             </h2>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7 }}>
-              We may update this policy occasionally. Material changes will be notified via email 
-              (if we have your email) or a prominent notice on our website. Continued use after 
-              changes constitutes acceptance.
+              We may update this policy occasionally. Material changes will be notified via email
+              (if we have your email) or a prominent notice on our website. The "Last updated" date
+              at the top will reflect the most recent changes. Continued use after changes constitutes 
+              acceptance.
             </p>
           </section>
 
           <section style={{ marginBottom: 32 }}>
             <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12 }}>
-              11. Contact & Data Controller
+              14. Contact & Supervisory Authority
             </h2>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7 }}>
-              <strong>Data Controller:</strong> TrustTerms<br />
+              <strong>Data Controller:</strong> TrustTerms, Enskild Firma<br />
               <strong>Email:</strong> trustterms.help@outlook.com<br />
               <strong>Response time:</strong> Within 30 days for GDPR requests
             </p>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7, marginTop: 12 }}>
-              For privacy questions, concerns, or to exercise your GDPR rights, email us at the 
+              For privacy questions, concerns, or to exercise your GDPR rights, email us at the
               address above.
+            </p>
+            <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7, marginTop: 12 }}>
+              If you are not satisfied with our response, you have the right to lodge a complaint 
+              with the Swedish Data Protection Authority (<a 
+                href="https://www.imy.se" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                style={{ color: '#6366f1' }}
+              >Integritetsskyddsmyndigheten</a>) or your local data protection authority.
             </p>
           </section>
 
@@ -228,8 +282,8 @@ export default function Privacy() {
             border: '1px solid #334155'
           }}>
             <p style={{ fontSize: 14, color: '#cbd5e1', margin: 0 }}>
-              <strong>🔒 Your contracts are processed securely.</strong> We process them via OpenAI's 
-              API, which retains data for 30 days before permanent deletion. We never store your 
+              <strong>🔒 Your contracts are processed securely.</strong> We process them via OpenAI's
+              API, which retains data for 30 days before permanent deletion. We never store your
               contracts on our servers.
             </p>
           </div>

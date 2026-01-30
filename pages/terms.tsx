@@ -7,19 +7,19 @@ export default function Terms() {
         title="Terms of Service - TrustTerms"
         description="Terms and conditions for using TrustTerms"
       />
-     
+      
       <main style={{ background: "#0f172a", minHeight: "100vh", color: "white" }}>
         <div style={{ maxWidth: 800, margin: "auto", padding: "60px 20px" }}>
           <a href="/" style={{ color: '#6366f1', fontSize: 14, textDecoration: 'none' }}>
             ← Back to TrustTerms
           </a>
-         
+          
           <h1 style={{ fontSize: 36, fontWeight: 800, marginTop: 24, marginBottom: 16 }}>
             Terms of Service
           </h1>
-         
+          
           <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 40 }}>
-            Last updated: January 23, 2025
+            Last updated: January 26, 2025
           </p>
 
           <section style={{ marginBottom: 32 }}>
@@ -41,7 +41,7 @@ export default function Terms() {
               agreements. The service:
             </p>
             <ul style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.8, paddingLeft: 20, marginTop: 12 }}>
-              <li>Analyzes contract text using AI technology (powered by OpenAI)</li>
+              <li>Analyzes contract text using AI technology (powered by OpenAI GPT-4)</li>
               <li>Identifies potential risks and non-standard clauses</li>
               <li>Provides recommendations for negotiation</li>
               <li>Generates PDF reports of analysis results</li>
@@ -60,6 +60,8 @@ export default function Terms() {
               <li>Is for informational purposes only</li>
               <li>Should not replace consultation with a qualified lawyer</li>
               <li>May contain errors, omissions, or miss important legal issues</li>
+              <li>May misinterpret complex legal clauses or nuances</li>
+              <li>May provide incomplete risk assessments</li>
               <li>Does not create an attorney-client relationship</li>
               <li>Should not be relied upon as a substitute for professional legal counsel</li>
             </ul>
@@ -83,6 +85,7 @@ export default function Terms() {
               <li>Not submit malicious content or attempt security breaches</li>
               <li>Only analyze contracts you have the legal right to analyze</li>
               <li>Not use the service to violate any applicable laws or regulations</li>
+              <li>Not reverse engineer, decompile, or attempt to extract our AI prompts or system design</li>
             </ul>
           </section>
 
@@ -96,7 +99,7 @@ export default function Terms() {
             </p>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7, marginTop: 12 }}>
               <strong>Payment Processing:</strong> Payments are processed securely via Stripe.
-              We do not store credit card information. All payment data is handled by Stripe in 
+              We do not store credit card information. All payment data is handled by Stripe in
               compliance with PCI-DSS standards.
             </p>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7, marginTop: 12 }}>
@@ -105,26 +108,26 @@ export default function Terms() {
             </p>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7, marginTop: 12 }}>
               <strong>Refund Policy:</strong> Due to the nature of our service (instant digital
-              delivery), refunds are generally not provided. However, we offer refunds in the 
+              delivery), refunds are generally not provided. However, we offer refunds in the
               following cases:
             </p>
             <ul style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.8, paddingLeft: 20, marginTop: 8 }}>
-              <li><strong>Technical failure:</strong> If our service fails to deliver an analysis 
-              due to our technical issues (not user error), we will provide a full refund or 
+              <li><strong>Technical failure:</strong> If our service fails to deliver an analysis
+              due to our technical issues (not user error), we will provide a full refund or
               reactivate your access token at no charge.</li>
-              <li><strong>Duplicate payment:</strong> If you are accidentally charged twice for 
+              <li><strong>Duplicate payment:</strong> If you are accidentally charged twice for
               the same analysis, we will refund the duplicate charge.</li>
-              <li><strong>Service unavailable:</strong> If our service is unavailable for more 
+              <li><strong>Service unavailable:</strong> If our service is unavailable for more
               than 4 hours after payment, you are entitled to a full refund.</li>
             </ul>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7, marginTop: 12 }}>
-              To request a refund, contact <strong>trustterms.help@outlook.com</strong> within 
-              48 hours of payment with your Stripe session ID. Refunds are processed within 5-10 
+              To request a refund, contact <strong>trustterms.help@outlook.com</strong> within
+              48 hours of payment with your Stripe session ID. Refunds are processed within 5-10
               business days.
             </p>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7, marginTop: 12 }}>
-              <strong>No refunds for:</strong> Change of mind, user error (e.g., uploading wrong 
-              contract), dissatisfaction with AI analysis results, or after successfully receiving 
+              <strong>No refunds for:</strong> Change of mind, user error (e.g., uploading wrong
+              contract), dissatisfaction with AI analysis results, or after successfully receiving
               an analysis.
             </p>
           </section>
@@ -135,12 +138,12 @@ export default function Terms() {
             </h2>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7 }}>
               <strong>Your Content:</strong> You retain all rights to contracts you submit.
-              We do not claim ownership of your contract text. By submitting content, you grant 
+              We do not claim ownership of your contract text. By submitting content, you grant
               us a limited license to process it solely for providing the service.
             </p>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7, marginTop: 12 }}>
               <strong>Our Service:</strong> TrustTerms, including all content, features, functionality,
-              design, and branding, is owned by us and protected by copyright, trademark, and other 
+              design, and branding, is owned by us and protected by copyright, trademark, and other
               intellectual property laws.
             </p>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7, marginTop: 12 }}>
@@ -163,20 +166,20 @@ export default function Terms() {
               TO THE MAXIMUM EXTENT PERMITTED BY LAW:
             </p>
             <ul style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.8, paddingLeft: 20, marginTop: 12 }}>
-              <li>TrustTerms is provided "AS IS" and "AS AVAILABLE" without warranties of any kind, 
+              <li>TrustTerms is provided "AS IS" and "AS AVAILABLE" without warranties of any kind,
               express or implied</li>
-              <li>We do not guarantee accuracy, completeness, reliability, or timeliness of analysis 
+              <li>We do not guarantee accuracy, completeness, reliability, or timeliness of analysis
               results</li>
-              <li>We are not liable for any direct, indirect, incidental, consequential, or punitive 
+              <li>We are not liable for any direct, indirect, incidental, consequential, or punitive
               damages arising from use of our service</li>
-              <li>Our total liability is limited to the amount you paid for the specific service 
+              <li>Our total liability is limited to the amount you paid for the specific service
               that gave rise to the claim (149 SEK)</li>
               <li>We are not liable for decisions made based on our analysis</li>
-              <li>We are not liable for losses resulting from: AI errors, service downtime, data 
-              breaches, third-party services (OpenAI, Stripe), or your misuse of the service</li>
+              <li>We are not liable for losses resulting from: AI errors or limitations, service downtime, 
+              data breaches, third-party services (OpenAI, Stripe), or your misuse of the service</li>
             </ul>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7, marginTop: 12 }}>
-              Some jurisdictions do not allow limitation of liability for certain damages. In such 
+              Some jurisdictions do not allow limitation of liability for certain damages. In such
               cases, our liability is limited to the maximum extent permitted by law.
             </p>
           </section>
@@ -186,12 +189,12 @@ export default function Terms() {
               8. Data Processing & Privacy
             </h2>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7 }}>
-              <strong>Contract Data:</strong> Contracts are processed via OpenAI's API, which 
-              retains data for 30 days for abuse monitoring before permanent deletion. We do not 
+              <strong>Contract Data:</strong> Contracts are processed via OpenAI's API, which
+              retains data for 30 days for abuse monitoring before permanent deletion. We do not
               store contracts on our servers.
             </p>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7, marginTop: 12 }}>
-              <strong>Third-Party Services:</strong> We use OpenAI (analysis), Stripe (payments), 
+              <strong>Third-Party Services:</strong> We use OpenAI (analysis), Stripe (payments),
               PostHog (analytics), and Vercel (hosting). Each has their own privacy policies.
             </p>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7, marginTop: 12 }}>
@@ -205,7 +208,7 @@ export default function Terms() {
               9. Service Availability & Uptime
             </h2>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7 }}>
-              We strive for high availability but do not guarantee uninterrupted service. We may 
+              We strive for high availability but do not guarantee uninterrupted service. We may
               suspend service for:
             </p>
             <ul style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.8, paddingLeft: 20, marginTop: 12 }}>
@@ -215,7 +218,7 @@ export default function Terms() {
               <li>Legal compliance or abuse prevention</li>
             </ul>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7, marginTop: 12 }}>
-              If service is unavailable for more than 4 hours after your payment, you may request 
+              If service is unavailable for more than 4 hours after your payment, you may request
               a refund or token reactivation.
             </p>
           </section>
@@ -233,7 +236,7 @@ export default function Terms() {
               <li>Payment verification: 20 per hour per IP address</li>
             </ul>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7, marginTop: 12 }}>
-              Abuse of the service (e.g., automated scraping, API reverse engineering, excessive 
+              Abuse of the service (e.g., automated scraping, API reverse engineering, excessive
               requests) may result in temporary or permanent blocking without refund.
             </p>
           </section>
@@ -258,10 +261,31 @@ export default function Terms() {
 
           <section style={{ marginBottom: 32 }}>
             <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12 }}>
-              12. Indemnification
+              12. Force Majeure
             </h2>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7 }}>
-              You agree to indemnify and hold harmless TrustTerms from any claims, damages, or 
+              We are not liable for failures or delays in performance due to circumstances beyond 
+              our reasonable control, including but not limited to:
+            </p>
+            <ul style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.8, paddingLeft: 20, marginTop: 12 }}>
+              <li>OpenAI API outages or service disruptions</li>
+              <li>Natural disasters, acts of God, or severe weather</li>
+              <li>War, terrorism, civil unrest, or government actions</li>
+              <li>Internet infrastructure failures or cyber attacks</li>
+              <li>Pandemics or public health emergencies</li>
+              <li>Strikes, labor disputes, or supplier failures</li>
+            </ul>
+            <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7, marginTop: 12 }}>
+              In such cases, our obligations will be suspended for the duration of the force majeure event.
+            </p>
+          </section>
+
+          <section style={{ marginBottom: 32 }}>
+            <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12 }}>
+              13. Indemnification
+            </h2>
+            <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7 }}>
+              You agree to indemnify and hold harmless TrustTerms from any claims, damages, or
               expenses arising from:
             </p>
             <ul style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.8, paddingLeft: 20, marginTop: 12 }}>
@@ -274,61 +298,69 @@ export default function Terms() {
 
           <section style={{ marginBottom: 32 }}>
             <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12 }}>
-              13. Changes to Terms
+              14. Changes to Terms
             </h2>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7 }}>
-              We may update these terms at any time. Material changes will be posted on this page 
-              with an updated "Last updated" date. Continued use of the service after changes 
-              constitutes acceptance of new terms.
+              We may update these terms at any time. Material changes will be posted on this page
+              with an updated "Last updated" date. For significant changes, we will provide notice 
+              via email (if available) or a prominent banner on the website. Continued use of the 
+              service after changes constitutes acceptance of new terms.
             </p>
           </section>
 
           <section style={{ marginBottom: 32 }}>
             <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12 }}>
-              14. Governing Law & Dispute Resolution
+              15. Governing Law & Dispute Resolution
             </h2>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7 }}>
-              These terms are governed by the laws of Sweden, without regard to conflict of law 
+              These terms are governed by the laws of Sweden, without regard to conflict of law
               provisions. Any disputes shall be resolved in Swedish courts.
             </p>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7, marginTop: 12 }}>
-              For EU consumers: Nothing in these terms affects your statutory rights under EU law.
+              <strong>For EU consumers:</strong> Nothing in these terms affects your statutory 
+              rights under EU consumer protection laws. You have the right to bring disputes to 
+              your local consumer protection authority or court.
             </p>
           </section>
 
           <section style={{ marginBottom: 32 }}>
             <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12 }}>
-              15. Contact & Company Information
+              16. Contact & Company Information
             </h2>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7 }}>
               <strong>Service Name:</strong> TrustTerms<br />
+              <strong>Legal Entity:</strong> Enskild Firma (Sole Proprietorship)<br />
+              <strong>Organization Number:</strong> [Lägg till efter registrering]<br />
               <strong>Website:</strong> trustterms.vercel.app<br />
               <strong>Support Email:</strong> trustterms.help@outlook.com<br />
               <strong>Response Time:</strong> Within 48 hours for support requests
             </p>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7, marginTop: 12 }}>
-              For questions about these terms, refund requests, or technical support, 
+              For questions about these terms, refund requests, or technical support,
               contact us at the email above.
             </p>
           </section>
 
           <section style={{ marginBottom: 32 }}>
             <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12 }}>
-              16. Severability
+              17. Severability
             </h2>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7 }}>
-              If any provision of these terms is found to be unenforceable, the remaining 
-              provisions will continue in full force and effect.
+              If any provision of these terms is found to be unenforceable or invalid by a court 
+              of competent jurisdiction, the remaining provisions will continue in full force and 
+              effect. The invalid provision will be modified to the minimum extent necessary to 
+              make it valid and enforceable.
             </p>
           </section>
 
           <section style={{ marginBottom: 32 }}>
             <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12 }}>
-              17. Entire Agreement
+              18. Entire Agreement
             </h2>
             <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7 }}>
-              These terms, together with our Privacy Policy, constitute the entire agreement 
-              between you and TrustTerms regarding use of the service.
+              These terms, together with our Privacy Policy, constitute the entire agreement
+              between you and TrustTerms regarding use of the service and supersede all prior 
+              agreements, understandings, or representations.
             </p>
           </section>
         </div>

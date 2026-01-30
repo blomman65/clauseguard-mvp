@@ -42,6 +42,15 @@ By clicking "I Accept" or using the Service, Customer agrees to be bound by thes
 let cachedSampleAnalysis: string | null = null;
 
 function sanitizeInput(text: string): string {
+  if (text.includes('<?php') || text.includes('<script>')) {
+    throw new Error('Invalid content detected');
+  }
+  
+  const specialChars = (text.match(/[^\w\s]/g) || []).length;
+  if (specialChars > text.length * 0.3) {
+    throw new Error('Contract contains too many special characters');
+  }
+  
   return text
     .replace(/<script>/gi, '')
     .replace(/javascript:/gi, '')
@@ -51,7 +60,6 @@ function sanitizeInput(text: string): string {
 }
 
 function verifyOrigin(req: NextApiRequest): boolean {
-  // I produktion: strikt verifiering
   if (process.env.NODE_ENV === 'production') {
     const allowedOrigins = [
       process.env.NEXT_PUBLIC_APP_URL,
@@ -59,35 +67,52 @@ function verifyOrigin(req: NextApiRequest): boolean {
     ].filter(Boolean);
     
     const origin = req.headers.origin;
+    const originString = Array.isArray(origin) ? origin[0] : origin;
     
-    // Kräv exact match av origin
-    if (!origin || !allowedOrigins.includes(origin)) {
-      console.warn('⚠️ Request blocked - invalid origin:', origin);
+    if (!originString || !allowedOrigins.includes(originString)) {
       return false;
     }
     
     return true;
   }
   
-  // I development: tillåt localhost
   const origin = req.headers.origin;
-  if (origin && (
-    origin.startsWith('http://localhost:') ||
-    origin.startsWith('http://127.0.0.1:')
+  const originString = Array.isArray(origin) ? origin[0] : origin;
+  
+  if (originString && (
+    originString.startsWith('http://localhost:') ||
+    originString.startsWith('http://127.0.0.1:')
   )) {
     return true;
   }
   
-  console.warn('⚠️ Development mode - invalid origin:', origin);
   return false;
 }
 
 function verifyContentType(req: NextApiRequest): boolean {
   const contentType = req.headers['content-type'];
   if (!contentType || !contentType.includes('application/json')) {
-    console.warn('⚠️ Invalid Content-Type:', contentType);
     return false;
   }
+  return true;
+}
+
+function verifyCsrfToken(req: NextApiRequest): boolean {
+  const referer = req.headers.referer || req.headers.referrer;
+  
+  const refererString = Array.isArray(referer) ? referer[0] : referer;
+  
+  if (process.env.NODE_ENV === 'production') {
+    const allowedDomains = [
+      process.env.NEXT_PUBLIC_APP_URL,
+      'https://trustterms.vercel.app',
+    ].filter(Boolean);
+    
+    if (!refererString || !allowedDomains.some(domain => refererString.startsWith(domain))) {
+      return false;
+    }
+  }
+  
   return true;
 }
 
@@ -99,7 +124,9 @@ async function analyzeWithRetry(
   
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
-      console.log(`🤖 OpenAI API attempt ${attempt + 1}/${maxRetries}`);
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`🤖 OpenAI API attempt ${attempt + 1}/${maxRetries}`);
+      }
       
       const completion = await openai.chat.completions.create({
         model: "gpt-4o",
@@ -192,25 +219,35 @@ STYLE RULES:
       });
 
       const analysis = completion.choices[0].message.content || "Analysis failed";
-      console.log(`✅ OpenAI API success on attempt ${attempt + 1}`);
+      
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`✅ OpenAI API success on attempt ${attempt + 1}`);
+      }
       
       return analysis;
       
     } catch (err: any) {
       lastError = err;
-      console.error(`❌ OpenAI API attempt ${attempt + 1} failed:`, err.message);
+      
+      if (process.env.NODE_ENV !== 'production') {
+        console.error(`❌ OpenAI API attempt ${attempt + 1} failed:`, err.message);
+      }
       
       if (attempt === maxRetries - 1) {
         break;
       }
       
       if (err.status === 401 || err.status === 403 || err.status === 400) {
-        console.error("🔴 Non-retryable error, stopping retries");
+        if (process.env.NODE_ENV !== 'production') {
+          console.error("🔴 Non-retryable error, stopping retries");
+        }
         break;
       }
       
       const delay = INITIAL_RETRY_DELAY * Math.pow(2, attempt);
-      console.log(`⏳ Retrying in ${delay}ms...`);
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`⏳ Retrying in ${delay}ms...`);
+      }
       await new Promise(resolve => setTimeout(resolve, delay));
     }
   }
@@ -226,18 +263,32 @@ export default async function handler(
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  // Content-Type check
   if (!verifyContentType(req)) {
     return res.status(400).json({ error: "Invalid Content-Type. Must be application/json" });
   }
 
-  // Origin check
   if (!verifyOrigin(req)) {
-    console.warn('⚠️ Request from unauthorized origin:', req.headers.origin);
     return res.status(403).json({ error: "Unauthorized origin" });
   }
 
-  const { contractText, accessToken, isSample } = req.body;
+  if (!verifyCsrfToken(req)) {
+    Sentry.captureMessage('CSRF token validation failed', {
+      level: 'warning',
+      tags: { security: 'csrf_failed' },
+      extra: { 
+        origin: req.headers.origin,
+        referer: req.headers.referer
+      }
+    });
+    return res.status(403).json({ error: "Invalid request origin" });
+  }
+
+  const { contractText, accessToken, isSample, website } = req.body;
+
+  if (website) {
+    console.log('🍯 Honeypot triggered - potential bot detected');
+    return res.status(400).json({ error: "Invalid request" });
+  }
 
   if (!contractText || typeof contractText !== 'string') {
     return res.status(400).json({ error: "Contract text is required" });
@@ -253,7 +304,12 @@ export default async function handler(
     });
   }
 
-  const sanitizedContract = sanitizeInput(contractText);
+  let sanitizedContract: string;
+  try {
+    sanitizedContract = sanitizeInput(contractText);
+  } catch (err: any) {
+    return res.status(400).json({ error: err.message });
+  }
 
   const clientIp = getClientIp(req);
   
@@ -295,7 +351,9 @@ export default async function handler(
 
   if (isSample && sanitizedContract.trim() === SAMPLE_CONTRACT_TEXT.trim()) {
     if (cachedSampleAnalysis) {
-      console.log('📦 Returning cached sample analysis');
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('📦 Returning cached sample analysis');
+      }
       
       res.setHeader('X-RateLimit-Limit', rateLimitConfig.limit.toString());
       res.setHeader('X-RateLimit-Remaining', rateLimitResult.remaining.toString());
@@ -313,7 +371,9 @@ export default async function handler(
 
     if (isSample && sanitizedContract.trim() === SAMPLE_CONTRACT_TEXT.trim()) {
       cachedSampleAnalysis = analysis;
-      console.log('💾 Cached sample analysis for future requests');
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('💾 Cached sample analysis for future requests');
+      }
     }
 
     res.setHeader('X-RateLimit-Limit', rateLimitConfig.limit.toString());
@@ -326,7 +386,13 @@ export default async function handler(
     });
 
   } catch (err: any) {
-    console.error("❌ OpenAI analysis error (after all retries):", err);
+    if (process.env.NODE_ENV !== 'production') {
+      console.error("❌ OpenAI analysis error (after all retries):", err);
+    }
+    
+    if (err.message) {
+      err.message = err.message.replace(/sk-[a-zA-Z0-9]{48}/g, 'sk-***REDACTED***');
+    }
     
     const isTechnicalError =
       err.status === 429 ||
@@ -339,18 +405,20 @@ export default async function handler(
       err.code === 'ECONNRESET';
     
     if (!isSample && accessToken && isTechnicalError) {
-      console.log('🔄 Technical error detected - reactivating token for user');
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('🔄 Technical error detected - reactivating token for user');
+      }
       try {
         const { reactivateAccessToken } = await import("../../lib/accessTokens");
         const reactivated = await reactivateAccessToken(accessToken);
         
-        if (reactivated) {
+        if (reactivated && process.env.NODE_ENV !== 'production') {
           console.log('✅ Token successfully reactivated - user can retry');
-        } else {
-          console.error('❌ Failed to reactivate token');
         }
       } catch (reactivateErr) {
-        console.error('❌ Error during token reactivation:', reactivateErr);
+        if (process.env.NODE_ENV !== 'production') {
+          console.error('❌ Error during token reactivation:', reactivateErr);
+        }
       }
     }
     
@@ -367,7 +435,6 @@ export default async function handler(
         error_status: err.status,
         error_code: err.code,
         attempts: MAX_RETRIES,
-        access_token_prefix: accessToken ? accessToken.substring(0, 8) : 'none'
       },
     });
     
@@ -380,7 +447,6 @@ export default async function handler(
     }
     
     if (err.status === 401 || err.status === 403) {
-      console.error("🔴 CRITICAL: OpenAI API key issue!");
       Sentry.captureMessage("OpenAI API authentication failed", {
         level: "fatal",
         tags: { critical: true }

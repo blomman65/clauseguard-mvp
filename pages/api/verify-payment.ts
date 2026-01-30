@@ -1,6 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import Stripe from "stripe";
 import { kv } from '@vercel/kv';
+import { randomUUID } from 'crypto';
+import { createAccessToken } from "../../lib/accessTokens";
 import { rateLimit, getClientIp } from "../../lib/rateLimit";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
@@ -75,13 +77,22 @@ export default async function handler(
       });
     }
 
-    // Om vi kommer hit betyder det att webhook inte körts än
-    // Detta kan hända om webhook är långsam eller om det är development
-    console.log('⚠️ Payment verified but webhook not processed yet. Waiting for webhook...');
+    // Betalning verifierad men webhook inte körts än - skapa token som fallback
+    console.log('⚠️ Webhook delayed, creating token as fallback');
     
-    return res.status(202).json({
-      message: "Payment verified. Please wait a few seconds and try again.",
-      status: "processing"
+    const newToken = randomUUID();
+    
+    // Skapa access token
+    await createAccessToken(newToken);
+    
+    // Spara session mapping
+    await kv.set(`session:${session_id}`, newToken, { ex: 86400 });
+    
+    console.log(`✅ Fallback token created successfully: ${newToken.substring(0, 8)}...`);
+    
+    return res.status(200).json({
+      accessToken: newToken,
+      expiresIn: 86400
     });
 
   } catch (err: any) {

@@ -4,7 +4,11 @@ import { analytics } from "../lib/analytics";
 import Meta from "../components/Meta";
 
 
+
+
 const MAX_CONTRACT_LENGTH = 50000;
+
+
 
 
 export default function Home() {
@@ -19,32 +23,45 @@ export default function Home() {
   const [loadingMessage, setLoadingMessage] = useState("");
 
 
+
+
   const sampleContract = `SAAS SERVICE AGREEMENT
 
+
 This Software as a Service Agreement ("Agreement") is entered into between CloudTech Solutions Inc. ("Vendor") and the subscribing customer ("Customer").
+
 
 1. TERM AND RENEWAL
 This Agreement shall commence on the date of Customer's first payment and continue for an initial term of twelve (12) months. This Agreement shall automatically renew for successive twelve (12) month terms unless either party provides written notice of non-renewal at least ninety (90) days prior to the end of the current term. Vendor may modify pricing and terms upon renewal with thirty (30) days written notice.
 
+
 2. FEES AND PAYMENT
 Customer agrees to pay the subscription fees as set forth in the applicable order form. All fees are non-refundable except as expressly set forth herein. Vendor reserves the right to modify pricing upon renewal or with sixty (60) days notice during the subscription term. Late payments will accrue interest at 1.5% per month or the maximum rate permitted by law, whichever is less.
+
 
 3. LIABILITY AND INDEMNIFICATION
 Vendor's total liability under this Agreement is limited to the amount of fees paid by Customer in the three (3) months immediately preceding the claim. Vendor shall not be liable for any indirect, incidental, consequential, or punitive damages. Customer agrees to indemnify Vendor against any third-party claims arising from Customer's use of the Service.
 
+
 4. TERMINATION
 Either party may terminate this Agreement for convenience upon thirty (30) days written notice. Vendor may terminate immediately upon Customer's breach of payment obligations or violation of acceptable use policies. Upon termination, Customer shall immediately cease use of the Service and all fees paid are non-refundable.
+
 
 5. DATA AND PRIVACY
 Customer data will be stored on Vendor's servers in the United States. Vendor may use Customer data to improve the Service and for marketing purposes. Upon termination, Vendor will retain Customer data for ninety (90) days, after which it may be permanently deleted at Vendor's discretion.
 
+
 6. WARRANTIES AND DISCLAIMERS
 THE SERVICE IS PROVIDED "AS IS" WITHOUT WARRANTIES OF ANY KIND. Vendor does not warrant that the Service will be uninterrupted or error-free. Vendor disclaims all warranties, express or implied, including merchantability and fitness for a particular purpose.
+
 
 7. CHANGES TO SERVICE
 Vendor reserves the right to modify or discontinue any feature of the Service at any time without notice or liability to Customer.
 
+
 By clicking "I Accept" or using the Service, Customer agrees to be bound by these terms.`;
+
+
 
 
   const loadingMessages = [
@@ -56,6 +73,8 @@ By clicking "I Accept" or using the Service, Customer agrees to be bound by thes
   ];
 
 
+
+
   useEffect(() => {
     const timer = setTimeout(() => {
       analytics.conversionFunnelStep("landed");
@@ -63,6 +82,8 @@ By clicking "I Accept" or using the Service, Customer agrees to be bound by thes
    
     return () => clearTimeout(timer);
   }, []);
+
+
 
 
   useEffect(() => {
@@ -78,6 +99,8 @@ By clicking "I Accept" or using the Service, Customer agrees to be bound by thes
   }, []);
 
 
+
+
   useEffect(() => {
     if (loading) {
       let index = 0;
@@ -88,6 +111,8 @@ By clicking "I Accept" or using the Service, Customer agrees to be bound by thes
       return () => clearInterval(interval);
     }
   }, [loading]);
+
+
 
 
   const pay = async () => {
@@ -120,6 +145,8 @@ By clicking "I Accept" or using the Service, Customer agrees to be bound by thes
   };
 
 
+
+
   const extractRiskLevel = (text: string) => {
     const firstLines = text.slice(0, 200).toUpperCase();
     if (firstLines.includes("HIGH")) return "HIGH";
@@ -127,6 +154,8 @@ By clicking "I Accept" or using the Service, Customer agrees to be bound by thes
     if (firstLines.includes("LOW")) return "LOW";
     return null;
   };
+
+
 
 
   const analyze = async () => {
@@ -139,6 +168,8 @@ By clicking "I Accept" or using the Service, Customer agrees to be bound by thes
     setLoadingMessage(loadingMessages[0]);
 
 
+
+
     if (!accessToken && !isSample) {
       setError("You need to pay before analyzing your own contract.");
       setLoading(false);
@@ -146,7 +177,11 @@ By clicking "I Accept" or using the Service, Customer agrees to be bound by thes
     }
 
 
+
+
     analytics.analysisStarted(isSample, contractText.length);
+
+
 
 
     try {
@@ -157,7 +192,11 @@ By clicking "I Accept" or using the Service, Customer agrees to be bound by thes
       });
 
 
+
+
       const data = await res.json();
+
+
 
 
       if (!res.ok) {
@@ -165,13 +204,19 @@ By clicking "I Accept" or using the Service, Customer agrees to be bound by thes
       }
 
 
+
+
       const risk = extractRiskLevel(data.analysis);
       setRiskLevel(risk);
       setAnalysis(data.analysis);
 
 
+
+
       const timeElapsed = Date.now() - startTime;
       analytics.analysisCompleted(isSample, risk || "UNKNOWN", timeElapsed);
+
+
 
 
       if (isSample) {
@@ -201,8 +246,12 @@ By clicking "I Accept" or using the Service, Customer agrees to be bound by thes
     }
 
 
+
+
     setLoading(false);
   };
+
+
 
 
   const downloadPdf = async () => {
@@ -216,9 +265,13 @@ By clicking "I Accept" or using the Service, Customer agrees to be bound by thes
       });
 
 
+
+
       if (!res.ok) {
         throw new Error("PDF export failed");
       }
+
+
 
 
       const blob = await res.blob();
@@ -244,6 +297,8 @@ By clicking "I Accept" or using the Service, Customer agrees to be bound by thes
   };
 
 
+
+
   const handleSampleClick = () => {
     analytics.sampleClicked();
     setContractText(sampleContract);
@@ -254,16 +309,20 @@ By clicking "I Accept" or using the Service, Customer agrees to be bound by thes
   };
 
 
+
+
   const charCount = contractText.length;
   const isOverLimit = charCount > MAX_CONTRACT_LENGTH;
   const canAnalyze = contractText.length >= 50 && !isOverLimit;
+
+
 
 
   return (
     <>
       <Meta />
       <main style={{
-        background: "linear-gradient(180deg, #050810 0%, #0a0e1a 50%, #0f172a 100%)",
+        background: "linear-gradient(180deg, #03050e 0%, #070b15 50%, #0c1221 100%)",
         minHeight: "100vh",
         color: "white",
         position: "relative",
@@ -286,21 +345,13 @@ By clicking "I Accept" or using the Service, Customer agrees to be bound by thes
         }} />
 
 
-        {/* Refined grid pattern */}
-        <div style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundImage: `
-            linear-gradient(rgba(148, 163, 184, 0.04) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(148, 163, 184, 0.04) 1px, transparent 1px)
-          `,
-          backgroundSize: "60px 60px",
-          pointerEvents: "none",
-          maskImage: "radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%)"
-        }} />
+
+
+        
+        
+        
+
+
 
 
         {/* Floating orbs for depth */}
@@ -331,6 +382,8 @@ By clicking "I Accept" or using the Service, Customer agrees to be bound by thes
         }} />
 
 
+
+
         <div style={{
           maxWidth: 920,
           margin: "auto",
@@ -338,6 +391,20 @@ By clicking "I Accept" or using the Service, Customer agrees to be bound by thes
           position: "relative",
           zIndex: 1
         }}>
+          {/* Legal Disclaimer Banner */}
+<div style={{
+  background: 'rgba(245, 158, 11, 0.1)',
+  border: '1px solid rgba(245, 158, 11, 0.3)',
+  padding: 16,
+  borderRadius: 12,
+  marginBottom: 32,
+  textAlign: 'center'
+}}>
+  <p style={{ fontSize: 13, color: '#fbbf24', margin: 0, lineHeight: 1.6 }}>
+    ⚠️ <strong>Not Legal Advice:</strong> This tool provides general information only.
+    Always consult a qualified lawyer before signing contracts.
+  </p>
+</div>
          
           {/* Premium Header */}
           <div style={{ textAlign: "center", marginBottom: 80 }}>
@@ -369,6 +436,8 @@ By clicking "I Accept" or using the Service, Customer agrees to be bound by thes
             </div>
 
 
+
+
             {/* Main Title with premium gradient */}
             <h1 style={{
               fontSize: 80,
@@ -384,6 +453,8 @@ By clicking "I Accept" or using the Service, Customer agrees to be bound by thes
             }}>
               TrustTerms
             </h1>
+
+
 
 
             {/* Subtitle with better hierarchy */}
@@ -410,6 +481,8 @@ By clicking "I Accept" or using the Service, Customer agrees to be bound by thes
             }}>
               Built for founders who value their time and money
             </p>
+
+
 
 
             {/* Feature badges with icons */}
@@ -443,6 +516,8 @@ By clicking "I Accept" or using the Service, Customer agrees to be bound by thes
               ))}
             </div>
           </div>
+
+
 
 
           {/* Premium Value Props Cards */}
@@ -566,6 +641,8 @@ By clicking "I Accept" or using the Service, Customer agrees to be bound by thes
             }} />
 
 
+
+
             {/* Try Sample Button - Premium style */}
             <div style={{ marginBottom: 32 }}>
               <button
@@ -607,10 +684,14 @@ By clicking "I Accept" or using the Service, Customer agrees to be bound by thes
             </div>
 
 
+
+
             {/* Premium Textarea */}
             <div style={{ position: "relative", marginBottom: 20 }}>
               <textarea
                 placeholder="Paste your SaaS agreement here...
+
+
 
 
 Or click above to try a sample contract first (completely free, no payment needed)."
@@ -655,6 +736,8 @@ Or click above to try a sample contract first (completely free, no payment neede
                 }}
               />
             </div>
+
+
 
 
             {/* Character Count - Enhanced */}
@@ -718,6 +801,8 @@ Or click above to try a sample contract first (completely free, no payment neede
             </div>
 
 
+
+
             {/* Premium Action Buttons */}
             <div style={{ display: "flex", gap: 16, flexDirection: "column" }}>
              
@@ -772,6 +857,8 @@ Or click above to try a sample contract first (completely free, no payment neede
               )}
 
 
+
+
               {/* Pay Button - Premium design */}
               {!accessToken && !isSample && (
                 <>
@@ -823,6 +910,8 @@ Or click above to try a sample contract first (completely free, no payment neede
                   </button>
 
 
+
+
                   {/* Info box */}
                   <div style={{
                     padding: "24px",
@@ -853,6 +942,8 @@ Or click above to try a sample contract first (completely free, no payment neede
               )}
             </div>
           </div>
+
+
 
 
           {/* Premium Loading State */}
@@ -901,6 +992,8 @@ Or click above to try a sample contract first (completely free, no payment neede
               </p>
             </div>
           )}
+
+
 
 
           {/* Premium Error State */}
@@ -954,6 +1047,8 @@ Or click above to try a sample contract first (completely free, no payment neede
           )}
 
 
+
+
           {/* Premium Analysis Results */}
           {analysis && (
             <div style={{
@@ -980,6 +1075,8 @@ Or click above to try a sample contract first (completely free, no payment neede
                   ? "linear-gradient(90deg, transparent 0%, #f59e0b 50%, transparent 100%)"
                   : "linear-gradient(90deg, transparent 0%, #22c55e 50%, transparent 100%)"
               }} />
+
+
 
 
               {/* Premium Risk Badge */}
@@ -1022,6 +1119,8 @@ Or click above to try a sample contract first (completely free, no payment neede
               )}
 
 
+
+
               {/* Sample badge */}
               {isSample && (
                 <div style={{
@@ -1043,6 +1142,8 @@ Or click above to try a sample contract first (completely free, no payment neede
               )}
 
 
+
+
               {/* Analysis content with better typography */}
               {/* Analysis content with better typography */}
 <div style={{
@@ -1055,6 +1156,7 @@ Or click above to try a sample contract first (completely free, no payment neede
 }}>
   {analysis.split('\n').map((line, index) => {
     const trimmedLine = line.trim();
+
 
     // --- SPECIAL: Overall Risk Line ---
     if (index === 0 && trimmedLine.startsWith("Overall risk level:")) {
@@ -1075,6 +1177,7 @@ Or click above to try a sample contract first (completely free, no payment neede
         </h2>
       );
     }
+
 
     // --- HEADINGS ---
     if (trimmedLine.startsWith('##')) {
@@ -1110,8 +1213,10 @@ Or click above to try a sample contract first (completely free, no payment neede
       );
     }
 
+
     // --- BULLETS / DASHES ---
     let normalizedLine = trimmedLine.replace(/^•\s*/, '- ').replace(/^\*\s*/, '- ');
+
 
     if (normalizedLine.startsWith('-')) {
       return (
@@ -1122,14 +1227,14 @@ Or click above to try a sample contract first (completely free, no payment neede
           paddingLeft: 4,
           position: 'relative'
         }}>
-          <span style={{ 
-            color: "#6366f1", 
+          <span style={{
+            color: "#6366f1",
             fontWeight: 600,
             fontSize: 24,
             lineHeight: 1.7,
             marginTop: -2
           }}>•</span>
-          <span style={{ 
+          <span style={{
             flex: 1,
             color: "#e2e8f0"
           }}>
@@ -1138,6 +1243,7 @@ Or click above to try a sample contract first (completely free, no payment neede
         </div>
       );
     }
+
 
     // --- NUMRERADE LISTOR ---
     if (/^\d+\./.test(trimmedLine)) {
@@ -1150,15 +1256,15 @@ Or click above to try a sample contract first (completely free, no payment neede
           marginBottom: 14,
           paddingLeft: 4
         }}>
-          <span style={{ 
-            color: "#8b5cf6", 
+          <span style={{
+            color: "#8b5cf6",
             fontWeight: 700,
             fontSize: 16,
             lineHeight: 1.7,
             minWidth: 28,
             textAlign: 'right'
           }}>{number}.</span>
-          <span style={{ 
+          <span style={{
             flex: 1,
             color: "#e2e8f0"
           }}>
@@ -1168,6 +1274,7 @@ Or click above to try a sample contract first (completely free, no payment neede
       );
     }
 
+
     // --- FETSTIL ---
     let processedLine = line;
     const boldRegex = /\*\*(.+?)\*\*/g;
@@ -1175,13 +1282,14 @@ Or click above to try a sample contract first (completely free, no payment neede
     let lastIndex = 0;
     let match;
 
+
     while ((match = boldRegex.exec(line)) !== null) {
       if (match.index > lastIndex) {
         parts.push(line.substring(lastIndex, match.index));
       }
       parts.push(
-        <strong key={`bold-${index}-${match.index}`} style={{ 
-          color: "#f1f5f9", 
+        <strong key={`bold-${index}-${match.index}`} style={{
+          color: "#f1f5f9",
           fontWeight: 650
         }}>
           {match[1]}
@@ -1190,18 +1298,21 @@ Or click above to try a sample contract first (completely free, no payment neede
       lastIndex = match.index + match[0].length;
     }
 
+
     if (lastIndex < line.length) {
       parts.push(line.substring(lastIndex));
     }
+
 
     // --- TOM RAD ---
     if (trimmedLine === '') {
       return <div key={index} style={{ height: 20 }} />;
     }
 
+
     // --- VANLIG TEXT ---
     return (
-      <p key={index} style={{ 
+      <p key={index} style={{
         marginBottom: 14,
         lineHeight: 1.7,
         color: "#cbd5e1"
@@ -1211,6 +1322,9 @@ Or click above to try a sample contract first (completely free, no payment neede
     );
   })}
 </div>
+
+
+
 
 
 
@@ -1249,6 +1363,8 @@ Or click above to try a sample contract first (completely free, no payment neede
                   <span style={{ fontSize: 22 }}>📄</span> Download PDF Report
                 </button>
               </div>
+
+
 
 
               {/* Premium Upgrade CTA for sample */}
@@ -1346,6 +1462,8 @@ Or click above to try a sample contract first (completely free, no payment neede
           )}
 
 
+
+
           {/* Premium FAQ Section */}
           <div style={{ marginTop: 120 }}>
             <div style={{ textAlign: "center", marginBottom: 56 }}>
@@ -1375,19 +1493,19 @@ Or click above to try a sample contract first (completely free, no payment neede
               {[
                 {
                   q: "Are my contracts safe?",
-                  a: "Yes. Contracts are processed in memory only and immediately deleted. Never stored, never used for AI training. We take your privacy seriously."
+                  a: "Yes. We do not store your contracts or use them to train our models. Your contract is processed solely to generate the analysis and is not retained by oursystem. We use a trusted AI provider (OpenAI), which may temporarily retain data for up to 30 days for abuse monitoring, in line with their security and compliance policies. We take privacy and confidentiality seriously."
                 },
                 {
                   q: "Is this legal advice?",
-                  a: "No. This is general information to help you spot risks. Always consult a qualified lawyer for binding legal decisions."
+                  a: "No. The analysis provides general information and risk indicators, not legal advice. Always consult a qualified lawyer before making legally binding decisions."
                 },
                 {
                   q: "How accurate is the AI analysis?",
-                  a: "Our AI is specifically trained on SaaS contracts and compares clauses to market standards. Use it as a first pass before legal review to save time and money."
+                  a: "Our AI is trained to analyze SaaS contracts and benchmark clauses against common market standards. It is designed as a first-pass review to help you identify potential risks and save time before a full legal review."
                 },
                 {
                   q: "What happens after I pay?",
-                  a: "You get instant access to analyze your contract. Paste it in the box above and click 'Analyze'. Results in under 60 seconds."
+                  a: "You get instant access to analyze your contract. Paste it in the box above and click 'Analyze'. Results are typically delivered in under 60 seconds."
                 }
               ].map((item, i) => (
                 <div key={i} style={{
@@ -1435,6 +1553,8 @@ Or click above to try a sample contract first (completely free, no payment neede
           </div>
 
 
+
+
           {/* Premium Footer */}
           <div style={{
             marginTop: 120,
@@ -1472,53 +1592,33 @@ Or click above to try a sample contract first (completely free, no payment neede
             </div>
 
 
+
+
             {/* Links */}
-            <div style={{ marginBottom: 32 }}>
-              <a
-                href="/privacy"
-                style={{
-                  color: "#818cf8",
-                  marginRight: 32,
-                  textDecoration: "none",
-                  fontWeight: 600,
-                  fontSize: 15,
-                  transition: "color 0.3s"
-                }}
-                onMouseEnter={e => e.currentTarget.style.color = "#a5b4fc"}
-                onMouseLeave={e => e.currentTarget.style.color = "#818cf8"}
-              >
-                Privacy Policy
-              </a>
-              <a
-                href="/terms"
-                style={{
-                  color: "#818cf8",
-                  textDecoration: "none",
-                  fontWeight: 600,
-                  fontSize: 15,
-                  transition: "color 0.3s"
-                }}
-                onMouseEnter={e => e.currentTarget.style.color = "#a5b4fc"}
-                onMouseLeave={e => e.currentTarget.style.color = "#818cf8"}
-              >
-                Terms of Service
-              </a>
-              <a
-              href="/contact"
-    style={{
-      color: "#818cf8",
-      marginLeft: 32,
-      textDecoration: "none",
-      fontWeight: 600,
-      fontSize: 15,
-      transition: "color 0.3s"
-    }}
-    onMouseEnter={e => e.currentTarget.style.color = "#a5b4fc"}
-    onMouseLeave={e => e.currentTarget.style.color = "#818cf8"}
-  >
+<div style={{ marginBottom: 32, display: 'flex', gap: 24, flexWrap: 'wrap', justifyContent: 'center' }}>
+  <a href="/about" style={{ color: '#818cf8', textDecoration: 'none', fontWeight: 600, fontSize: 15, transition: 'color 0.3s' }}
+    onMouseEnter={e => e.currentTarget.style.color = '#a5b4fc'}
+    onMouseLeave={e => e.currentTarget.style.color = '#818cf8'}>
+    About
+  </a>
+  <a href="/privacy" style={{ color: '#818cf8', textDecoration: 'none', fontWeight: 600, fontSize: 15, transition: 'color 0.3s' }}
+    onMouseEnter={e => e.currentTarget.style.color = '#a5b4fc'}
+    onMouseLeave={e => e.currentTarget.style.color = '#818cf8'}>
+    Privacy Policy
+  </a>
+  <a href="/terms" style={{ color: '#818cf8', textDecoration: 'none', fontWeight: 600, fontSize: 15, transition: 'color 0.3s' }}
+    onMouseEnter={e => e.currentTarget.style.color = '#a5b4fc'}
+    onMouseLeave={e => e.currentTarget.style.color = '#818cf8'}>
+    Terms of Service
+  </a>
+  <a href="/contact" style={{ color: '#818cf8', textDecoration: 'none', fontWeight: 600, fontSize: 15, transition: 'color 0.3s' }}
+    onMouseEnter={e => e.currentTarget.style.color = '#a5b4fc'}
+    onMouseLeave={e => e.currentTarget.style.color = '#818cf8'}>
     Contact & Support
   </a>
 </div>
+
+
 
 
             {/* Copyright */}
@@ -1532,6 +1632,8 @@ Or click above to try a sample contract first (completely free, no payment neede
           </div>
         </div>
       </main>
+
+
 
 
       <style jsx>{`
@@ -1553,3 +1655,5 @@ Or click above to try a sample contract first (completely free, no payment neede
     </>
   );
 }
+
+
