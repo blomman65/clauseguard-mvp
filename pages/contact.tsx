@@ -2,36 +2,12 @@ import Meta from '../components/Meta';
 
 export default function Contact() {
   const helpItems = [
-    {
-      icon: '🔧',
-      title: 'Technical Issues',
-      desc: 'Analysis failed, payment problems, PDF download issues, or any technical errors'
-    },
-    {
-      icon: '💰',
-      title: 'Billing & Refunds',
-      desc: 'Refund requests, duplicate charges, or payment questions'
-    },
-    {
-      icon: '❓',
-      title: 'General Questions',
-      desc: 'How the service works, pricing, data privacy, or usage questions'
-    },
-    {
-      icon: '🐛',
-      title: 'Bug Reports',
-      desc: 'Found a bug? Let us know so we can fix it'
-    },
-    {
-      icon: '💡',
-      title: 'Feature Requests',
-      desc: 'Have ideas for improving TrustTerms? We\'d love to hear them'
-    },
-    {
-      icon: '🔒',
-      title: 'Privacy & GDPR',
-      desc: 'Data deletion requests, privacy concerns, or GDPR-related inquiries'
-    }
+    { icon: "🔧", title: "Technical Issues", desc: "Analysis failed, payment problems, PDF download issues, or any technical errors." },
+    { icon: "💰", title: "Billing & Refunds", desc: "Refund requests, duplicate charges, or payment questions." },
+    { icon: "❓", title: "General Questions", desc: "How the service works, pricing, data privacy, or usage questions." },
+    { icon: "🐛", title: "Bug Reports", desc: "Found a bug? Let us know so we can fix it." },
+    { icon: "💡", title: "Feature Requests", desc: "Have ideas for improving TrustTerms? We'd love to hear them." },
+    { icon: "🔒", title: "Privacy & GDPR", desc: "Data deletion requests, privacy concerns, or GDPR-related inquiries." },
   ];
 
   return (
@@ -40,215 +16,201 @@ export default function Contact() {
         title="Contact & Support - TrustTerms"
         description="Get help with TrustTerms or contact our support team"
       />
-      
-      <main style={{ background: "#0f172a", minHeight: "100vh", color: "white" }}>
-        <div style={{ maxWidth: 800, margin: "auto", padding: "60px 20px" }}>
-          <a href="/" style={{ color: '#6366f1', fontSize: 14, textDecoration: 'none' }}>
-            ← Back to TrustTerms
+      <div className="ip-root">
+        <nav className="ip-nav">
+          <a href="/" className="ip-nav-logo">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+              <path d="M10 2L18 6V14L10 18L2 14V6L10 2Z" stroke="#3B82F6" strokeWidth="1.5" fill="none"/>
+              <path d="M10 6L14 8V12L10 14L6 12V8L10 6Z" fill="#3B82F6" opacity="0.4"/>
+            </svg>
+            TrustTerms
           </a>
-          
-          <h1 style={{ fontSize: 36, fontWeight: 800, marginTop: 24, marginBottom: 16 }}>
-            Contact & Support
-          </h1>
-          
-          <p style={{ fontSize: 16, color: '#cbd5e1', marginBottom: 48, lineHeight: 1.7 }}>
-            We're here to help! Get in touch with any questions, issues, or feedback.
-          </p>
+          <a href="/" className="ip-back">← Back to home</a>
+        </nav>
 
-          <section style={{
-            marginBottom: 48,
-            padding: 32,
-            background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
-            border: '1px solid rgba(99, 102, 241, 0.3)',
-            borderRadius: 16
-          }}>
-            <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 16, color: '#f8fafc' }}>
-              📧 Email Support
-            </h2>
-            <p style={{ fontSize: 17, color: '#cbd5e1', marginBottom: 12, lineHeight: 1.7 }}>
-              <strong>Email:</strong>{' '}
-              <a
-                href="mailto:trustterms.help@outlook.com"
-                style={{ color: '#818cf8', textDecoration: 'none', fontWeight: 600 }}
-              >
+        <main className="ip-main">
+          <div className="ip-page-header">
+            <div className="ip-page-tag">Support</div>
+            <h1 className="ip-page-title">Contact & Support</h1>
+            <p className="ip-page-lead">We're here to help. Reach out for any questions, issues, or feedback.</p>
+          </div>
+
+          {/* Email card */}
+          <div className="ct-email-card">
+            <div className="ct-email-icon">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <rect x="2" y="5" width="16" height="12" rx="2" stroke="#60A5FA" strokeWidth="1.4"/>
+                <path d="M2 7l8 5 8-5" stroke="#60A5FA" strokeWidth="1.4" strokeLinecap="round"/>
+              </svg>
+            </div>
+            <div className="ct-email-content">
+              <div className="ct-email-label">Email Support</div>
+              <a href="mailto:trustterms.help@outlook.com" className="ct-email-addr">
                 trustterms.help@outlook.com
               </a>
-            </p>
-            <p style={{ fontSize: 15, color: '#94a3b8', margin: 0 }}>
-              We respond to all inquiries within 48 hours (usually much faster).
-            </p>
-          </section>
+              <div className="ct-email-note">We respond within 48 hours (usually much faster).</div>
+            </div>
+          </div>
 
-          <section style={{ marginBottom: 48 }}>
-            <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 20, color: '#f8fafc' }}>
-              What We Can Help With
-            </h2>
-            
-            <div style={{ display: 'grid', gap: 16 }}>
+          {/* Help items */}
+          <div className="ip-section">
+            <h2 className="ip-section-title">What We Can Help With</h2>
+            <div className="ct-help-grid">
               {helpItems.map((item, i) => (
-                <div key={i} style={{
-                  padding: 24,
-                  background: 'rgba(30, 41, 59, 0.5)',
-                  border: '1px solid rgba(148, 163, 184, 0.2)',
-                  borderRadius: 12,
-                  display: 'flex',
-                  gap: 16,
-                  alignItems: 'start'
-                }}>
-                  <span style={{ fontSize: 28, flexShrink: 0 }}>{item.icon}</span>
+                <div key={i} className="ct-help-card">
+                  <span className="ct-help-icon">{item.icon}</span>
                   <div>
-                    <h3 style={{ fontSize: 17, fontWeight: 700, marginBottom: 6, color: '#f1f5f9' }}>
-                      {item.title}
-                    </h3>
-                    <p style={{ fontSize: 15, color: '#cbd5e1', margin: 0, lineHeight: 1.6 }}>
-                      {item.desc}
-                    </p>
+                    <div className="ct-help-title">{item.title}</div>
+                    <div className="ct-help-desc">{item.desc}</div>
                   </div>
                 </div>
               ))}
             </div>
-          </section>
-
-          <section style={{ marginBottom: 48 }}>
-            <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 20, color: '#f8fafc' }}>
-              Quick Answers
-            </h2>
-            
-            <div style={{
-              padding: 24,
-              background: 'rgba(30, 41, 59, 0.5)',
-              border: '1px solid rgba(148, 163, 184, 0.2)',
-              borderRadius: 12
-            }}>
-              <div style={{ marginBottom: 20 }}>
-                <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 8, color: '#f1f5f9' }}>
-                  How do I get a refund?
-                </h3>
-                <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.6, margin: 0 }}>
-                  Email us at trustterms.help@outlook.com with your Stripe session ID within 48 hours.
-                  Refunds are provided for technical failures, duplicate payments, or service unavailability.
-                  See our <a href="/terms" style={{ color: '#818cf8' }}>Terms of Service</a> for details.
-                </p>
-              </div>
-
-              <div style={{ marginBottom: 20, paddingTop: 20, borderTop: '1px solid rgba(148, 163, 184, 0.2)' }}>
-                <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 8, color: '#f1f5f9' }}>
-                  The analysis failed. What should I do?
-                </h3>
-                <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.6, margin: 0 }}>
-                  Email us immediately with details of the error. We'll either reactivate your access
-                  token or provide a full refund. Technical failures on our end are always refunded.
-                </p>
-              </div>
-
-              <div style={{ marginBottom: 20, paddingTop: 20, borderTop: '1px solid rgba(148, 163, 184, 0.2)' }}>
-                <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 8, color: '#f1f5f9' }}>
-                  How do I delete my data?
-                </h3>
-                <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.6, margin: 0 }}>
-                  We don't store your contract text on our servers. It's processed via OpenAI's API,
-                  which retains data for 30 days before permanent deletion. For analytics data deletion,
-                  email us. See our <a href="/privacy" style={{ color: '#818cf8' }}>Privacy Policy</a>.
-                </p>
-              </div>
-
-              <div style={{ paddingTop: 20, borderTop: '1px solid rgba(148, 163, 184, 0.2)' }}>
-                <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 8, color: '#f1f5f9' }}>
-                  Can I get a receipt or invoice?
-                </h3>
-                <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.6, margin: 0 }}>
-                  Yes! Check your email for the Stripe receipt, or contact us and we'll send you one.
-                </p>
-              </div>
-            </div>
-          </section>
-
-          <section style={{ marginBottom: 48 }}>
-            <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 20, color: '#f8fafc' }}>
-              Response Times
-            </h2>
-            
-            <div style={{
-              padding: 24,
-              background: 'rgba(34, 197, 94, 0.1)',
-              border: '1px solid rgba(34, 197, 94, 0.3)',
-              borderRadius: 12
-            }}>
-              <ul style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.8, paddingLeft: 20, margin: 0 }}>
-                <li><strong>Technical issues & refunds:</strong> Within 24 hours</li>
-                <li><strong>General questions:</strong> Within 48 hours</li>
-                <li><strong>GDPR requests:</strong> Within 30 days (as required by law)</li>
-              </ul>
-            </div>
-          </section>
-
-          <section style={{ marginBottom: 48 }}>
-            <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 20, color: '#f8fafc' }}>
-              About TrustTerms
-            </h2>
-            
-            <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7, marginBottom: 16 }}>
-              TrustTerms is an AI-powered contract analysis tool designed to help startups and
-              small businesses identify risks in SaaS and commercial agreements before signing.
-            </p>
-            
-            <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7, marginBottom: 16 }}>
-              We built this tool because we believe legal protection shouldn't only be accessible
-              to those who can afford expensive lawyers. Our AI analysis gives you the insights
-              you need to negotiate better deals and avoid costly mistakes.
-            </p>
-            
-            <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7, marginBottom: 0 }}>
-              <strong>Privacy-first:</strong> We never store your contracts on our servers.
-              Your data is processed securely via OpenAI's API, which retains it for 30 days
-              for abuse monitoring before permanent deletion.
-            </p>
-          </section>
-
-          <section style={{ marginBottom: 48 }}>
-            <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 16, color: '#f8fafc' }}>
-              Company Information
-            </h2>
-            <div style={{
-              padding: 24,
-              background: 'rgba(30, 41, 59, 0.5)',
-              border: '1px solid rgba(148, 163, 184, 0.2)',
-              borderRadius: 12
-            }}>
-              <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.7, margin: 0 }}>
-                <strong style={{ color: '#f1f5f9' }}>Business Name:</strong> TrustTerms<br />
-                <strong style={{ color: '#f1f5f9' }}>Legal Entity:</strong> Enskild Firma (Sole Proprietorship)<br />
-                <strong style={{ color: '#f1f5f9' }}>Organization Number:</strong> [Lägg till efter registrering]<br />
-                <strong style={{ color: '#f1f5f9' }}>Contact Email:</strong>{' '}
-                <a href="mailto:trustterms.help@outlook.com" style={{ color: '#818cf8' }}>
-                  trustterms.help@outlook.com
-                </a>
-              </p>
-            </div>
-          </section>
-
-          <div style={{
-            paddingTop: 32,
-            borderTop: '1px solid rgba(148, 163, 184, 0.2)',
-            display: 'flex',
-            gap: 24,
-            flexWrap: 'wrap'
-          }}>
-            <a href="/about" style={{ color: '#818cf8', fontSize: 15, fontWeight: 600, textDecoration: 'none' }}>
-              About
-            </a>
-            <a href="/privacy" style={{ color: '#818cf8', fontSize: 15, fontWeight: 600, textDecoration: 'none' }}>
-              Privacy Policy
-            </a>
-            <a href="/terms" style={{ color: '#818cf8', fontSize: 15, fontWeight: 600, textDecoration: 'none' }}>
-              Terms of Service
-            </a>
-            <a href="/" style={{ color: '#818cf8', fontSize: 15, fontWeight: 600, textDecoration: 'none' }}>
-              Back to Home
-            </a>
           </div>
-        </div>
-      </main>
+
+          {/* Quick answers */}
+          <div className="ip-section">
+            <h2 className="ip-section-title">Quick Answers</h2>
+            <div className="ct-qa-list">
+              {[
+                {
+                  q: "How do I get a refund?",
+                  a: "Email us at trustterms.help@outlook.com with your Stripe session ID within 48 hours. Refunds are provided for technical failures, duplicate payments, or service unavailability. See our Terms of Service for details.",
+                },
+                {
+                  q: "The analysis failed. What should I do?",
+                  a: "Email us immediately with details of the error. We'll either reactivate your access token or provide a full refund. Technical failures on our end are always remedied.",
+                },
+                {
+                  q: "How do I delete my data?",
+                  a: "We don't store your contract text on our servers. It's processed via OpenAI's API, which retains data for 30 days before permanent deletion. For analytics data deletion, email us.",
+                },
+                {
+                  q: "Can I get a receipt or invoice?",
+                  a: "Yes! Check your email for the Stripe receipt, or contact us and we'll send you one.",
+                },
+              ].map((item, i) => (
+                <div key={i} className="ct-qa-item">
+                  <div className="ct-qa-q">{item.q}</div>
+                  <div className="ct-qa-a">{item.a}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Response times */}
+          <div className="ip-section">
+            <h2 className="ip-section-title">Response Times</h2>
+            <div className="ct-times">
+              {[
+                { type: "Technical issues & refunds", time: "Within 24 hours" },
+                { type: "General questions", time: "Within 48 hours" },
+                { type: "GDPR requests", time: "Within 30 days (required by law)" },
+              ].map((t, i) => (
+                <div key={i} className="ct-time-row">
+                  <span className="ct-time-type">{t.type}</span>
+                  <span className="ct-time-val">{t.time}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Company info */}
+          <div className="ip-section">
+            <h2 className="ip-section-title">Company Information</h2>
+            <div className="ip-card">
+              <table className="ip-table">
+                <tbody>
+                  {[
+                    ["Business Name", "TrustTerms"],
+                    ["Legal Entity", "Enskild Firma (Sole Proprietorship)"],
+                    ["Organization Number", "[To be added after registration]"],
+                    ["Contact Email", "trustterms.help@outlook.com"],
+                  ].map(([k, v], i) => (
+                    <tr key={i}>
+                      <td className="ip-table-key">{k}</td>
+                      <td className="ip-table-val">
+                        {k === "Contact Email" ? <a href={`mailto:${v}`}>{v}</a> : v}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </main>
+
+        <footer className="ip-footer">
+          <div className="ip-footer-links">
+            <a href="/about">About</a>
+            <a href="/privacy">Privacy Policy</a>
+            <a href="/terms">Terms of Service</a>
+            <a href="/">Home</a>
+          </div>
+        </footer>
+      </div>
+
+      <style jsx>{`
+        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #030B18; color: #F1F5F9; font-family: 'DM Sans', system-ui, sans-serif; font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+        .ip-root { min-height: 100vh; background: #030B18; }
+        .ip-nav { position: sticky; top: 0; z-index: 50; background: rgba(3,11,24,0.9); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255,255,255,0.05); padding: 0 24px; height: 52px; display: flex; align-items: center; justify-content: space-between; }
+        .ip-nav-logo { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: #F1F5F9; text-decoration: none; letter-spacing: -0.01em; }
+        .ip-back { font-size: 13px; color: #475569; text-decoration: none; transition: color 0.15s; }
+        .ip-back:hover { color: #94A3B8; }
+        .ip-main { max-width: 720px; margin: 0 auto; padding: 56px 24px 80px; }
+        .ip-page-header { margin-bottom: 44px; }
+        .ip-page-tag { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #60A5FA; background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.18); padding: 4px 10px; border-radius: 4px; margin-bottom: 14px; }
+        .ip-page-title { font-family: 'Sora', system-ui, sans-serif; font-size: clamp(26px, 4vw, 34px); font-weight: 800; color: #F1F5F9; letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 12px; }
+        .ip-page-lead { font-size: 15px; color: #64748B; line-height: 1.7; }
+        .ip-section { margin-bottom: 40px; }
+        .ip-section-title { font-family: 'Sora', system-ui, sans-serif; font-size: 14.5px; font-weight: 700; color: #E2E8F0; letter-spacing: -0.02em; margin-bottom: 14px; padding-bottom: 9px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .ip-card { background: #0A1628; border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 20px 22px; }
+        .ip-table { width: 100%; border-collapse: collapse; }
+        .ip-table tr { border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .ip-table tr:last-child { border-bottom: none; }
+        .ip-table-key { font-size: 12px; font-weight: 600; color: #475569; padding: 10px 0; width: 160px; vertical-align: top; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.02em; }
+        .ip-table-val { font-size: 13.5px; color: #CBD5E1; padding: 10px 0 10px 16px; }
+        .ip-table-val a { color: #60A5FA; text-decoration: none; }
+        .ip-table-val a:hover { text-decoration: underline; }
+
+        /* Email card */
+        .ct-email-card { display: flex; gap: 18px; align-items: flex-start; background: rgba(37,99,235,0.06); border: 1px solid rgba(59,130,246,0.15); border-radius: 16px; padding: 22px 24px; margin-bottom: 40px; }
+        .ct-email-icon { width: 40px; height: 40px; background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.15); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .ct-email-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #60A5FA; margin-bottom: 6px; }
+        .ct-email-addr { display: block; font-size: 16px; font-weight: 700; color: #F1F5F9; text-decoration: none; margin-bottom: 6px; letter-spacing: -0.01em; }
+        .ct-email-addr:hover { color: #60A5FA; }
+        .ct-email-note { font-size: 12.5px; color: #475569; }
+
+        /* Help grid */
+        .ct-help-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        @media (max-width: 580px) { .ct-help-grid { grid-template-columns: 1fr; } }
+        .ct-help-card { display: flex; gap: 14px; align-items: flex-start; background: #0A1628; border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 16px 18px; transition: border-color 0.15s; }
+        .ct-help-card:hover { border-color: rgba(255,255,255,0.12); }
+        .ct-help-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+        .ct-help-title { font-size: 13.5px; font-weight: 600; color: #E2E8F0; margin-bottom: 4px; }
+        .ct-help-desc { font-size: 12.5px; color: #64748B; line-height: 1.55; }
+
+        /* QA */
+        .ct-qa-list { display: flex; flex-direction: column; gap: 0; background: #0A1628; border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; overflow: hidden; }
+        .ct-qa-item { padding: 18px 22px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .ct-qa-item:last-child { border-bottom: none; }
+        .ct-qa-q { font-size: 13.5px; font-weight: 600; color: #E2E8F0; margin-bottom: 7px; }
+        .ct-qa-a { font-size: 13px; color: #64748B; line-height: 1.65; }
+
+        /* Times */
+        .ct-times { background: rgba(16,185,129,0.04); border: 1px solid rgba(16,185,129,0.12); border-radius: 14px; overflow: hidden; }
+        .ct-time-row { display: flex; justify-content: space-between; align-items: center; padding: 13px 20px; border-bottom: 1px solid rgba(255,255,255,0.03); flex-wrap: wrap; gap: 8px; }
+        .ct-time-row:last-child { border-bottom: none; }
+        .ct-time-type { font-size: 13.5px; color: #94A3B8; }
+        .ct-time-val { font-size: 12.5px; font-weight: 600; color: #10B981; font-family: 'JetBrains Mono', monospace; }
+
+        .ip-footer { border-top: 1px solid rgba(255,255,255,0.05); padding: 24px; text-align: center; }
+        .ip-footer-links { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; }
+        .ip-footer-links a { font-size: 13px; color: #475569; text-decoration: none; transition: color 0.15s; }
+        .ip-footer-links a:hover { color: #94A3B8; }
+      `}</style>
     </>
   );
 }
