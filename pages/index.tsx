@@ -1,11 +1,10 @@
+import RedlinePanel from "../components/RedlinePanel";
 import { useEffect, useState, useRef } from "react";
 import * as Sentry from "@sentry/nextjs";
 import { analytics } from "../lib/analytics";
 import Meta from "../components/Meta";
 
-
 const MAX_CONTRACT_LENGTH = 50000;
-
 
 export default function Home() {
   const [contractText, setContractText] = useState("");
@@ -21,43 +20,32 @@ export default function Home() {
   const [pdfError, setPdfError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-
   const sampleContract = `SAAS SERVICE AGREEMENT
 
-
 This Software as a Service Agreement ("Agreement") is entered into between CloudTech Solutions Inc. ("Vendor") and the subscribing customer ("Customer").
-
 
 1. TERM AND RENEWAL
 This Agreement shall commence on the date of Customer's first payment and continue for an initial term of twelve (12) months. This Agreement shall automatically renew for successive twelve (12) month terms unless either party provides written notice of non-renewal at least ninety (90) days prior to the end of the current term. Vendor may modify pricing and terms upon renewal with thirty (30) days written notice.
 
-
 2. FEES AND PAYMENT
 Customer agrees to pay the subscription fees as set forth in the applicable order form. All fees are non-refundable except as expressly set forth herein. Vendor reserves the right to modify pricing upon renewal or with sixty (60) days notice during the subscription term. Late payments will accrue interest at 1.5% per month or the maximum rate permitted by law, whichever is less.
-
 
 3. LIABILITY AND INDEMNIFICATION
 Vendor's total liability under this Agreement is limited to the amount of fees paid by Customer in the three (3) months immediately preceding the claim. Vendor shall not be liable for any indirect, incidental, consequential, or punitive damages. Customer agrees to indemnify Vendor against any third-party claims arising from Customer's use of the Service.
 
-
 4. TERMINATION
 Either party may terminate this Agreement for convenience upon thirty (30) days written notice. Vendor may terminate immediately upon Customer's breach of payment obligations or violation of acceptable use policies. Upon termination, Customer shall immediately cease use of the Service and all fees paid are non-refundable.
-
 
 5. DATA AND PRIVACY
 Customer data will be stored on Vendor's servers in the United States. Vendor may use Customer data to improve the Service and for marketing purposes. Upon termination, Vendor will retain Customer data for ninety (90) days, after which it may be permanently deleted at Vendor's discretion.
 
-
 6. WARRANTIES AND DISCLAIMERS
 THE SERVICE IS PROVIDED "AS IS" WITHOUT WARRANTIES OF ANY KIND. Vendor does not warrant that the Service will be uninterrupted or error-free. Vendor disclaims all warranties, express or implied, including merchantability and fitness for a particular purpose.
-
 
 7. CHANGES TO SERVICE
 Vendor reserves the right to modify or discontinue any feature of the Service at any time without notice or liability to Customer.
 
-
 By clicking "I Accept" or using the Service, Customer agrees to be bound by these terms.`;
-
 
   const loadingMessages = [
     "Scanning for auto-renewal clauses...",
@@ -67,12 +55,10 @@ By clicking "I Accept" or using the Service, Customer agrees to be bound by thes
     "Identifying non-standard clauses...",
   ];
 
-
   useEffect(() => {
     const timer = setTimeout(() => { analytics.conversionFunnelStep("landed"); }, 500);
     return () => clearTimeout(timer);
   }, []);
-
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -86,7 +72,6 @@ By clicking "I Accept" or using the Service, Customer agrees to be bound by thes
     }
   }, []);
 
-
   useEffect(() => {
     if (loading) {
       let index = 0;
@@ -97,7 +82,6 @@ By clicking "I Accept" or using the Service, Customer agrees to be bound by thes
       return () => clearInterval(interval);
     }
   }, [loading]);
-
 
   const pay = async () => {
     setError(null);
@@ -116,7 +100,6 @@ By clicking "I Accept" or using the Service, Customer agrees to be bound by thes
     }
   };
 
-
   const extractRiskLevel = (text: string) => {
     const firstLines = text.slice(0, 200).toUpperCase();
     if (firstLines.includes("HIGH")) return "HIGH";
@@ -124,7 +107,6 @@ By clicking "I Accept" or using the Service, Customer agrees to be bound by thes
     if (firstLines.includes("LOW")) return "LOW";
     return null;
   };
-
 
   const analyze = async () => {
     const startTime = Date.now();
@@ -134,14 +116,12 @@ By clicking "I Accept" or using the Service, Customer agrees to be bound by thes
     setRiskLevel(null);
     setLoadingMessage(loadingMessages[0]);
 
-
     if (!accessToken && !isSample) {
       setError("You need to pay before analyzing your own contract.");
       setLoading(false);
       return;
     }
     analytics.analysisStarted(isSample, contractText.length);
-
 
     try {
       const res = await fetch("/api/analyze", {
@@ -174,7 +154,6 @@ By clicking "I Accept" or using the Service, Customer agrees to be bound by thes
     setLoading(false);
   };
 
-
   const downloadPdf = async () => {
     analytics.pdfDownloaded(riskLevel || "UNKNOWN");
     try {
@@ -199,7 +178,6 @@ By clicking "I Accept" or using the Service, Customer agrees to be bound by thes
     }
   };
 
-
   const handleSampleClick = () => {
     analytics.sampleClicked();
     setContractText(sampleContract);
@@ -208,38 +186,21 @@ By clicking "I Accept" or using the Service, Customer agrees to be bound by thes
     setRiskLevel(null);
     setError(null);
   };
+
   const handlePdfUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    if (file.type !== "application/pdf") {
-      setPdfError("Only PDF files are accepted.");
-      return;
-    }
-
-    if (file.size > 10 * 1024 * 1024) {
-      setPdfError("File too large. Maximum size is 10 MB.");
-      return;
-    }
-
-    setPdfLoading(true);
-    setPdfError(null);
-    setError(null);
-
+    if (file.type !== "application/pdf") { setPdfError("Only PDF files are accepted."); return; }
+    if (file.size > 10 * 1024 * 1024) { setPdfError("File too large. Maximum size is 10 MB."); return; }
+    setPdfLoading(true); setPdfError(null); setError(null);
     const formData = new FormData();
     formData.append("pdf", file);
-
     try {
-      const res = await fetch("/api/parse-pdf", {
-        method: "POST",
-        body: formData,
-      });
+      const res = await fetch("/api/parse-pdf", { method: "POST", body: formData });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to parse PDF.");
       setContractText(data.text);
-      setIsSample(false);
-      setAnalysis("");
-      setRiskLevel(null);
+      setIsSample(false); setAnalysis(""); setRiskLevel(null);
     } catch (err: any) {
       setPdfError(err.message || "Failed to read PDF. Please paste the text manually instead.");
     } finally {
@@ -248,1531 +209,953 @@ By clicking "I Accept" or using the Service, Customer agrees to be bound by thes
     }
   };
 
-
   const charCount = contractText.length;
   const isOverLimit = charCount > MAX_CONTRACT_LENGTH;
   const canAnalyze = contractText.length >= 50 && !isOverLimit;
 
-
-  const riskColors = {
-    HIGH: { bg: "rgba(220,38,38,0.08)", border: "rgba(220,38,38,0.3)", text: "#ef4444", dot: "#ef4444" },
-    MEDIUM: { bg: "rgba(217,119,6,0.08)", border: "rgba(217,119,6,0.3)", text: "#f59e0b", dot: "#f59e0b" },
-    LOW: { bg: "rgba(5,150,105,0.08)", border: "rgba(5,150,105,0.3)", text: "#10b981", dot: "#10b981" },
+  const riskConfig: Record<string, { bg: string; border: string; text: string; dot: string; glow: string }> = {
+    HIGH:   { bg: "rgba(239,68,68,0.07)",    border: "rgba(239,68,68,0.25)",    text: "#f87171", dot: "#ef4444", glow: "rgba(239,68,68,0.15)" },
+    MEDIUM: { bg: "rgba(245,158,11,0.07)",   border: "rgba(245,158,11,0.25)",   text: "#fbbf24", dot: "#f59e0b", glow: "rgba(245,158,11,0.15)" },
+    LOW:    { bg: "rgba(16,185,129,0.07)",   border: "rgba(16,185,129,0.25)",   text: "#34d399", dot: "#10b981", glow: "rgba(16,185,129,0.15)" },
   };
 
+  const parseBold = (text: string): React.ReactNode[] => {
+    const parts: React.ReactNode[] = [];
+    const rx = /\*\*(.+?)\*\*/g;
+    let last = 0, m;
+    while ((m = rx.exec(text)) !== null) {
+      if (m.index > last) parts.push(text.substring(last, m.index));
+      parts.push(<strong key={m.index} style={{ color: "#f1f5f9", fontWeight: 600 }}>{m[1]}</strong>);
+      last = m.index + m[0].length;
+    }
+    if (last < text.length) parts.push(text.substring(last));
+    return parts.length > 0 ? parts : [text];
+  };
+
+  const renderLine = (line: string, index: number): React.ReactNode => {
+    const t = line.trim();
+    if (index === 0 && t.toUpperCase().startsWith("OVERALL RISK LEVEL:")) return null;
+    if (index === 1 && t === "") return null;
+    if (t.startsWith("### ")) return <h4 key={index} className="r-h3">{t.replace(/^###\s*/, "")}</h4>;
+    if (t.startsWith("## "))  return <h3 key={index} className="r-h2">{t.replace(/^##\s*/, "")}</h3>;
+    if (t.startsWith("# "))   return <h2 key={index} className="r-h1">{t.replace(/^#\s*/, "")}</h2>;
+    const norm = t.replace(/^[•*]\s*/, "- ");
+    if (norm.startsWith("- ")) return (
+      <div key={index} className="r-bullet">
+        <span className="r-dash">—</span>
+        <span>{parseBold(norm.replace(/^-\s*/, ""))}</span>
+      </div>
+    );
+    if (/^\d+\./.test(t)) {
+      const match = t.match(/^(\d+)\./);
+      return (
+        <div key={index} className="r-num">
+          <span className="r-num-label">{match?.[1]}</span>
+          <span>{parseBold(t.replace(/^\d+\.\s*/, ""))}</span>
+        </div>
+      );
+    }
+    if (t === "") return <div key={index} style={{ height: 14 }} />;
+    return <p key={index} className="r-p">{parseBold(line)}</p>;
+  };
 
   return (
     <>
       <Meta />
-      <main className="tt-main">
 
-
-        {/* ── HEADER ── */}
-        <header className="tt-header">
-          <div className="tt-header-inner">
-            <div className="tt-logo">
-              <div className="tt-logo-mark">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                  <path d="M10 2L18 6V14L10 18L2 14V6L10 2Z" stroke="#3B82F6" strokeWidth="1.5" fill="none"/>
-                  <path d="M10 6L14 8V12L10 14L6 12V8L10 6Z" fill="#3B82F6" opacity="0.4"/>
-                </svg>
-              </div>
-              <span className="tt-logo-text">TrustTerms</span>
-            </div>
-            <nav className="tt-nav">
-              <a href="/about" className="tt-nav-link">About</a>
-              <a href="/contact" className="tt-nav-link">Support</a>
-            </nav>
-          </div>
-        </header>
-
-
-        {/* ── DISCLAIMER BANNER ── */}
-        <div className="tt-disclaimer">
-          <div className="tt-disclaimer-inner">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{flexShrink:0}}>
-              <circle cx="7" cy="7" r="6" stroke="#60A5FA" strokeWidth="1.2"/>
-              <path d="M7 6v4M7 4.5v.5" stroke="#60A5FA" strokeWidth="1.2" strokeLinecap="round"/>
+      {/* ── NAV ── */}
+      <nav className="nav">
+        <div className="nav-inner">
+          <a href="/" className="logo">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2L22 7V17L12 22L2 17V7L12 2Z" stroke="#3B82F6" strokeWidth="1.6" fill="none"/>
+              <path d="M12 7L17 9.5V14.5L12 17L7 14.5V9.5L12 7Z" fill="#3B82F6" fillOpacity="0.3"/>
             </svg>
-            <span><strong>Not legal advice.</strong> This tool provides general information only. Always consult a qualified lawyer before signing contracts.</span>
+            <span className="logo-text">TrustTerms</span>
+          </a>
+          <div className="nav-right">
+            <a href="/about" className="nav-link">About</a>
+            <a href="/contact" className="nav-link">Support</a>
           </div>
         </div>
+      </nav>
 
+      {/* ── DISCLAIMER ── */}
+      <div className="disclaimer">
+        <div className="disclaimer-inner">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style={{flexShrink:0}}>
+            <circle cx="6.5" cy="6.5" r="5.5" stroke="#60A5FA" strokeWidth="1.1"/>
+            <path d="M6.5 5.5v3.5M6.5 4v.3" stroke="#60A5FA" strokeWidth="1.1" strokeLinecap="round"/>
+          </svg>
+          <span><strong>Not legal advice.</strong> This tool provides general information only. Always consult a qualified lawyer before signing contracts.</span>
+        </div>
+      </div>
 
-        <div className="tt-container">
+      <main className="main">
 
-
-          {/* ── HERO ── */}
-          <section className="tt-hero">
-            <div className="tt-hero-badge">
-              <span className="tt-badge-dot" />
-              AI-Powered Contract Intelligence
-            </div>
-            <h1 className="tt-hero-title">
-              Spot hidden risks<br />
-              <span className="tt-hero-accent">before you sign</span>
-            </h1>
-            <p className="tt-hero-sub">
-              Enterprise-grade SaaS contract analysis in under 60 seconds.<br />
-              Built for founders and CFOs who can't afford costly surprises.
-            </p>
-            <div className="tt-hero-stats">
-              {[
-                { value: "60s", label: "Average analysis time" },
-                { value: "5+", label: "Risk categories checked" },
-                { value: "100%", label: "Privacy-first processing" },
-              ].map((s, i) => (
-                <div key={i} className="tt-stat">
-                  <div className="tt-stat-value">{s.value}</div>
-                  <div className="tt-stat-label">{s.label}</div>
-                </div>
-              ))}
-            </div>
-          </section>
-
-
-          {/* ── FEATURE CARDS ── */}
-          <div className="tt-features">
+        {/* ── HERO ── */}
+        <section className="hero">
+          <div className="hero-badge">
+            <span className="pulse-dot" />
+            AI-Powered Contract Intelligence
+          </div>
+          <h1 className="hero-h1">
+            Spot hidden risks<br />
+            <span className="hero-gradient">before you sign</span>
+          </h1>
+          <p className="hero-sub">
+            Enterprise-grade SaaS contract analysis in under 60 seconds.<br />
+            Built for founders and CFOs who can't afford costly surprises.
+          </p>
+          <div className="stats-row">
             {[
-              {
-                icon: (
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                    <circle cx="9" cy="9" r="6" stroke="#EF4444" strokeWidth="1.5"/>
-                    <path d="M14 14L18 18" stroke="#EF4444" strokeWidth="1.5" strokeLinecap="round"/>
-                    <path d="M9 6v3l2 2" stroke="#EF4444" strokeWidth="1.2" strokeLinecap="round"/>
-                  </svg>
-                ),
-                color: "#EF4444",
-                title: "Hidden Risk Detection",
-                desc: "Auto-renewals, liability caps, and termination traps — flagged before they cost you."
-              },
-              {
-                icon: (
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                    <path d="M4 10h12M4 6h8M4 14h6" stroke="#3B82F6" strokeWidth="1.5" strokeLinecap="round"/>
-                    <rect x="13" y="11" width="5" height="6" rx="1" stroke="#3B82F6" strokeWidth="1.2"/>
-                    <path d="M14 11V9a1 1 0 012 0v2" stroke="#3B82F6" strokeWidth="1.2"/>
-                  </svg>
-                ),
-                color: "#3B82F6",
-                title: "Financial Impact Analysis",
-                desc: "Quantified dollar exposure — not legal jargon, but business consequences."
-              },
-              {
-                icon: (
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                    <path d="M10 3l2 5h5l-4 3 1.5 5L10 13l-4.5 3L7 11 3 8h5z" stroke="#10B981" strokeWidth="1.4" fill="none" strokeLinejoin="round"/>
-                  </svg>
-                ),
-                color: "#10B981",
-                title: "Negotiation Playbook",
-                desc: "Ranked priorities with exact language to push back on — not just 'negotiate this'."
-              },
-            ].map((f, i) => (
-              <div key={i} className="tt-feature-card">
-                <div className="tt-feature-icon" style={{ "--fcolor": f.color } as any}>
-                  {f.icon}
-                </div>
-                <h3 className="tt-feature-title">{f.title}</h3>
-                <p className="tt-feature-desc">{f.desc}</p>
+              { val: "60s",  lbl: "Average analysis time" },
+              { val: "5+",   lbl: "Risk categories checked" },
+              { val: "100%", lbl: "Privacy-first processing" },
+            ].map((s, i) => (
+              <div key={i} className="stat">
+                <div className="stat-val">{s.val}</div>
+                <div className="stat-lbl">{s.lbl}</div>
               </div>
             ))}
           </div>
+        </section>
 
-
-          {/* ── MAIN ANALYSIS PANEL ── */}
-          <div className="tt-panel">
-            {/* Panel header */}
-            <div className="tt-panel-header">
-              <div className="tt-panel-title-group">
-                <h2 className="tt-panel-title">Contract Analysis</h2>
-                <p className="tt-panel-subtitle">Paste your SaaS agreement or upload a PDF below.</p>
-              </div>
-              <div className="tt-panel-actions">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="application/pdf"
-                  onChange={handlePdfUpload}
-                  style={{ display: "none" }}
-                />
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={loading || pdfLoading}
-                  className="tt-upload-btn"
-                >
-                  {pdfLoading ? (
-                    <><span className="tt-spinner tt-spinner--sm" /> Reading PDF...</>
-                  ) : (
-                    <>
-                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                        <path d="M7 9V2M4 5l3-3 3 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M2 10v1a1 1 0 001 1h8a1 1 0 001-1v-1" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
-                      </svg>
-                      Upload PDF
-                    </>
-                  )}
-                </button>
-                <button
-                  onClick={handleSampleClick}
-                  disabled={loading || pdfLoading}
-                  className="tt-sample-btn"
-                >
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                    <rect x="2" y="2" width="10" height="10" rx="1.5" stroke="currentColor" strokeWidth="1.2"/>
-                    <path d="M5 5h4M5 7h4M5 9h2" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round"/>
-                  </svg>
-                  Try sample contract (free)
-                </button>
-              </div>
-            </div>
-            {pdfError && (
-              <div className="tt-pdf-error">
-                <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-                  <circle cx="6.5" cy="6.5" r="5.5" stroke="#EF4444" strokeWidth="1.2"/>
-                  <path d="M6.5 4.5v3M6.5 9v.2" stroke="#EF4444" strokeWidth="1.2" strokeLinecap="round"/>
+        {/* ── FEATURE CARDS ── */}
+        <div className="features">
+          {[
+            {
+              color: "#ef4444",
+              icon: (
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <circle cx="9" cy="9" r="5.5" stroke="#f87171" strokeWidth="1.4"/>
+                  <path d="M13.5 13.5L17 17" stroke="#f87171" strokeWidth="1.4" strokeLinecap="round"/>
+                  <path d="M9 6.5V9.5l1.5 1.5" stroke="#f87171" strokeWidth="1.3" strokeLinecap="round"/>
                 </svg>
-                {pdfError}
+              ),
+              title: "Hidden Risk Detection",
+              desc: "Auto-renewals, liability caps, and termination traps — flagged before they cost you.",
+            },
+            {
+              color: "#3B82F6",
+              icon: (
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M3 10h14M3 6h9M3 14h6" stroke="#60A5FA" strokeWidth="1.4" strokeLinecap="round"/>
+                  <rect x="13" y="11" width="5" height="6" rx="1" stroke="#60A5FA" strokeWidth="1.3"/>
+                  <path d="M14 11V9a1.5 1.5 0 013 0v2" stroke="#60A5FA" strokeWidth="1.3"/>
+                </svg>
+              ),
+              title: "Financial Impact Analysis",
+              desc: "Quantified dollar exposure — business consequences, not legal jargon.",
+            },
+            {
+              color: "#10B981",
+              icon: (
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M10 3l2.5 5h5.5L14 11.5l1.5 5.5L10 14l-5.5 3 1.5-5.5L2 8h5.5z" stroke="#34d399" strokeWidth="1.4" fill="none" strokeLinejoin="round"/>
+                </svg>
+              ),
+              title: "Negotiation Playbook",
+              desc: "Ranked priorities with exact language to push back — not just 'negotiate this'.",
+            },
+          ].map((f, i) => (
+            <div key={i} className="feature-card">
+              <div className="feature-icon" style={{ background: `${f.color}18`, border: `1px solid ${f.color}30` }}>
+                {f.icon}
               </div>
-            )}
-
-
-            {/* Token status bar */}
-            {accessToken && (
-              <div className="tt-token-bar">
-                <div className="tt-token-dot" />
-                <span>Access token active — ready to analyze your contract</span>
-              </div>
-            )}
-
-
-            {/* Textarea */}
-            <div className="tt-textarea-wrap">
-              <textarea
-                placeholder={`Paste your SaaS agreement here...\n\nOr click "Try sample contract" above to see a demo analysis.`}
-                value={contractText}
-                onChange={(e) => {
-                  setContractText(e.target.value);
-                  setIsSample(false);
-                  if (error) setError(null);
-                  if (pdfError) setPdfError(null);
-                }}
-                disabled={loading || pdfLoading}
-                className={`tt-textarea${isOverLimit ? " tt-textarea--error" : ""}`}
-              />
-              {isSample && (
-                <div className="tt-textarea-badge">SAMPLE</div>
-              )}
-              {pdfLoading && (
-                <div className="tt-textarea-overlay">
-                  <span className="tt-spinner" />
-                  <span>Extracting text from PDF…</span>
-                </div>
-              )}
+              <h3 className="feature-title">{f.title}</h3>
+              <p className="feature-desc">{f.desc}</p>
             </div>
+          ))}
+        </div>
 
+        {/* ── ANALYSIS PANEL ── */}
+        <div className="panel">
+          <div className="panel-glow-line" />
 
-            {/* Character count row */}
-            <div className="tt-char-row">
-              <div className={`tt-char-status${canAnalyze ? " tt-char-status--ready" : isOverLimit ? " tt-char-status--error" : ""}`}>
-                {canAnalyze && (
-                  <><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg> Ready to analyze</>
+          <div className="panel-head">
+            <div>
+              <h2 className="panel-title">Contract Analysis</h2>
+              <p className="panel-sub">Paste your SaaS agreement or upload a PDF below.</p>
+            </div>
+            <div className="panel-actions">
+              <input ref={fileInputRef} type="file" accept="application/pdf" onChange={handlePdfUpload} style={{ display: "none" }} />
+              <button onClick={() => fileInputRef.current?.click()} disabled={loading || pdfLoading} className="btn-outline btn-outline--green">
+                {pdfLoading ? (
+                  <><span className="spinner spinner--sm" /> Reading…</>
+                ) : (
+                  <>
+                    <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+                      <path d="M6.5 8.5V2M4 4.5l2.5-2.5L9 4.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M1.5 10v.5a1 1 0 001 1h9a1 1 0 001-1V10" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
+                    </svg>
+                    Upload PDF
+                  </>
                 )}
-                {contractText.length > 0 && contractText.length < 50 && "Minimum 50 characters required"}
-                {!contractText.length && "Paste your contract to get started"}
-                {isOverLimit && <><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="currentColor" strokeWidth="1.2"/><path d="M6 4v3M6 8.5v.1" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg> Contract too long</>}
-              </div>
-              <div className={`tt-char-count${isOverLimit ? " tt-char-count--error" : charCount > MAX_CONTRACT_LENGTH * 0.9 ? " tt-char-count--warn" : ""}`}>
-                {charCount.toLocaleString()} / {MAX_CONTRACT_LENGTH.toLocaleString()}
-              </div>
-            </div>
-
-
-            {/* Action buttons */}
-            <div className="tt-actions">
-              {(accessToken || isSample) ? (
-                <button
-                  onClick={analyze}
-                  disabled={loading || !canAnalyze}
-                  className="tt-btn tt-btn--primary tt-btn--full"
-                >
-                  {loading ? (
-                    <><span className="tt-spinner" /> Analyzing contract...</>
-                  ) : (
-                    <><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" strokeWidth="1.5"/><path d="M11 11l3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg> Analyze Contract</>
-                  )}
-                </button>
-              ) : (
-                <div className="tt-pay-group">
-                  <button
-                    onClick={pay}
-                    disabled={checkoutLoading}
-                    className="tt-btn tt-btn--primary tt-btn--full"
-                  >
-                    {checkoutLoading ? (
-                      <><span className="tt-spinner" /> Loading checkout...</>
-                    ) : (
-                      <><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="5" width="12" height="9" rx="1.5" stroke="currentColor" strokeWidth="1.4"/><path d="M5 5V4a3 3 0 016 0v1" stroke="currentColor" strokeWidth="1.4"/><path d="M2 9h12" stroke="currentColor" strokeWidth="1.2"/></svg> Pay 149 kr — Analyze My Contract</>
-                    )}
-                  </button>
-                  <div className="tt-pay-meta">
-                    <span>One-time payment</span>
-                    <span className="tt-meta-dot">·</span>
-                    <span>No subscription</span>
-                    <span className="tt-meta-dot">·</span>
-                    <span>Instant access</span>
-                  </div>
-                </div>
-              )}
+              </button>
+              <button onClick={handleSampleClick} disabled={loading || pdfLoading} className="btn-outline btn-outline--blue">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+                  <rect x="1.5" y="1.5" width="10" height="10" rx="1.5" stroke="currentColor" strokeWidth="1.2"/>
+                  <path d="M4 4.5h5M4 6.5h5M4 8.5h3" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round"/>
+                </svg>
+                Try sample (free)
+              </button>
             </div>
           </div>
 
-
-          {/* ── LOADING STATE ── */}
-          {loading && (
-            <div className="tt-loading-panel">
-              <div className="tt-loading-pulse">
-                <div className="tt-loading-ring" />
-                <div className="tt-loading-ring tt-loading-ring--2" />
-              </div>
-              <div className="tt-loading-text">
-                <h3>Analyzing {isSample ? "sample" : "your"} contract</h3>
-                <p className="tt-loading-msg">{loadingMessage}</p>
-              </div>
-              <div className="tt-loading-steps">
-                {loadingMessages.map((msg, i) => (
-                  <div key={i} className={`tt-loading-step${loadingMessage === msg ? " active" : ""}`} />
-                ))}
-              </div>
+          {pdfError && (
+            <div className="inline-alert inline-alert--red">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="currentColor" strokeWidth="1.1"/><path d="M6 4v3M6 8.2v.1" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round"/></svg>
+              {pdfError}
             </div>
           )}
 
-
-          {/* ── ERROR STATE ── */}
-          {error && (
-            <div className="tt-error-panel">
-              <div className="tt-error-icon">
-                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                  <circle cx="9" cy="9" r="7.5" stroke="#EF4444" strokeWidth="1.5"/>
-                  <path d="M9 6v4M9 11.5v.5" stroke="#EF4444" strokeWidth="1.5" strokeLinecap="round"/>
-                </svg>
-              </div>
-              <div>
-                <div className="tt-error-title">Analysis Error</div>
-                <div className="tt-error-msg">{error}</div>
-              </div>
+          {accessToken && (
+            <div className="token-active">
+              <span className="token-dot" />
+              Access token active — ready to analyze your contract
             </div>
           )}
 
+          <div className="textarea-wrap">
+            <textarea
+              className={`contract-input${isOverLimit ? " contract-input--over" : ""}`}
+              placeholder={"Paste your SaaS agreement here…\n\nOr click \"Try sample\" above to see a free demo analysis."}
+              value={contractText}
+              onChange={(e) => {
+                setContractText(e.target.value);
+                setIsSample(false);
+                if (error) setError(null);
+                if (pdfError) setPdfError(null);
+              }}
+              disabled={loading || pdfLoading}
+            />
+            {isSample && <div className="sample-tag">SAMPLE</div>}
+            {pdfLoading && (
+              <div className="textarea-overlay">
+                <span className="spinner" />
+                <span>Extracting text from PDF…</span>
+              </div>
+            )}
+          </div>
 
-          {/* ── ANALYSIS RESULTS ── */}
-          {analysis && (
-            <div className="tt-results">
+          <div className="char-row">
+            <div className={`char-status${canAnalyze ? " char-status--ok" : isOverLimit ? " char-status--err" : ""}`}>
+              {canAnalyze && (
+                <><svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M2 5.5l2.5 2.5 4.5-4.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>Ready to analyze</>
+              )}
+              {contractText.length > 0 && contractText.length < 50 && "Minimum 50 characters required"}
+              {!contractText.length && "Paste your contract to get started"}
+              {isOverLimit && "Contract too long — please shorten it"}
+            </div>
+            <div className={`char-count${isOverLimit ? " char-count--err" : charCount > MAX_CONTRACT_LENGTH * 0.9 ? " char-count--warn" : ""}`}>
+              {charCount.toLocaleString()} / {MAX_CONTRACT_LENGTH.toLocaleString()}
+            </div>
+          </div>
 
-
-              {/* Results header */}
-              <div className="tt-results-header">
-                <div className="tt-results-title-row">
-                  <h2 className="tt-results-title">Analysis Report</h2>
-                  {isSample && <div className="tt-sample-badge">SAMPLE</div>}
-                </div>
-
-
-                {/* Risk level badge */}
-                {riskLevel && (
-                  <div
-                    className="tt-risk-badge"
-                    style={{
-                      background: riskColors[riskLevel].bg,
-                      borderColor: riskColors[riskLevel].border,
-                      color: riskColors[riskLevel].text,
-                    } as any}
-                  >
-                    <div className="tt-risk-dot" style={{ background: riskColors[riskLevel].dot }} />
-                    <span className="tt-risk-label">Overall Risk</span>
-                    <span className="tt-risk-level">{riskLevel}</span>
-                  </div>
+          {/* CTA */}
+          {(accessToken || isSample) ? (
+            <button onClick={analyze} disabled={loading || !canAnalyze} className="btn-primary">
+              {loading ? (
+                <><span className="spinner" />Analyzing contract…</>
+              ) : (
+                <>
+                  <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" strokeWidth="1.5"/><path d="M10.5 10.5l3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                  Analyze Contract
+                </>
+              )}
+            </button>
+          ) : (
+            <div className="pay-wrap">
+              <button onClick={pay} disabled={checkoutLoading} className="btn-primary">
+                {checkoutLoading ? (
+                  <><span className="spinner" />Loading checkout…</>
+                ) : (
+                  <>
+                    <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="2" y="5" width="11" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.4"/><path d="M5 5V4a2.5 2.5 0 015 0v1" stroke="currentColor" strokeWidth="1.4"/><path d="M2 8.5h11" stroke="currentColor" strokeWidth="1.2"/></svg>
+                    Pay 149 kr — Analyze My Contract
+                  </>
                 )}
+              </button>
+              <p className="pay-meta">One-time payment · No subscription · Instant access</p>
+            </div>
+          )}
+        </div>
+
+        {/* ── LOADING ── */}
+        {loading && (
+          <div className="loading-panel">
+            <div className="loading-rings">
+              <div className="ring ring-1" />
+              <div className="ring ring-2" />
+            </div>
+            <h3 className="loading-title">Analyzing {isSample ? "sample" : "your"} contract</h3>
+            <p className="loading-msg">{loadingMessage}</p>
+            <div className="loading-dots">
+              {loadingMessages.map((m, i) => (
+                <span key={i} className={`dot${loadingMessage === m ? " dot--active" : ""}`} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── ERROR ── */}
+        {error && (
+          <div className="error-panel">
+            <div className="error-icon">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <circle cx="9" cy="9" r="7.5" stroke="#f87171" strokeWidth="1.5"/>
+                <path d="M9 6v4M9 11.5v.5" stroke="#f87171" strokeWidth="1.5" strokeLinecap="round"/>
+              </svg>
+            </div>
+            <div>
+              <div className="error-title">Analysis Error</div>
+              <div className="error-msg">{error}</div>
+            </div>
+          </div>
+        )}
+
+        {/* ── RESULTS ── */}
+        {analysis && (
+          <div className="results">
+            <div className="results-head">
+              <div className="results-head-left">
+                <h2 className="results-title">Analysis Report</h2>
+                {isSample && <span className="badge-sample">SAMPLE</span>}
               </div>
-
-
-              {/* Analysis content */}
-              <div className="tt-analysis-body">
-                {analysis.split("\n").map((line, index) => {
-                  const trimmedLine = line.trim();
-
-
-                  if (index === 0 && trimmedLine.startsWith("Overall risk level:")) {
-                    return null; // shown in badge above
-                  }
-                  if (index === 1 && trimmedLine === "") return null;
-
-
-                  if (trimmedLine.startsWith("### ")) {
-                    return (
-                      <h4 key={index} className="tt-analysis-h3">
-                        {trimmedLine.replace(/^###\s*/, "")}
-                      </h4>
-                    );
-                  }
-                  if (trimmedLine.startsWith("## ")) {
-                    return (
-                      <h3 key={index} className="tt-analysis-h2">
-                        {trimmedLine.replace(/^##\s*/, "")}
-                      </h3>
-                    );
-                  }
-                  if (trimmedLine.startsWith("# ")) {
-                    return (
-                      <h2 key={index} className="tt-analysis-h1">
-                        {trimmedLine.replace(/^#\s*/, "")}
-                      </h2>
-                    );
-                  }
-
-
-                  let normalizedLine = trimmedLine.replace(/^[•*]\s*/, "- ");
-                  if (normalizedLine.startsWith("- ")) {
-                    return (
-                      <div key={index} className="tt-analysis-bullet">
-                        <span className="tt-bullet-mark">—</span>
-                        <span>{normalizedLine.replace(/^-\s*/, "")}</span>
-                      </div>
-                    );
-                  }
-
-
-                  if (/^\d+\./.test(trimmedLine)) {
-                    const match = trimmedLine.match(/^(\d+)\./);
-                    const num = match ? match[1] : "";
-                    return (
-                      <div key={index} className="tt-analysis-numbered">
-                        <span className="tt-num-mark">{num}</span>
-                        <span>{trimmedLine.replace(/^\d+\.\s*/, "")}</span>
-                      </div>
-                    );
-                  }
-
-
-                  if (trimmedLine === "") return <div key={index} className="tt-analysis-spacer" />;
-
-
-                  // Process bold
-                  const parts: any[] = [];
-                  const boldRegex = /\*\*(.+?)\*\*/g;
-                  let lastIndex = 0;
-                  let match;
-                  while ((match = boldRegex.exec(line)) !== null) {
-                    if (match.index > lastIndex) parts.push(line.substring(lastIndex, match.index));
-                    parts.push(<strong key={`b${index}-${match.index}`} className="tt-bold">{match[1]}</strong>);
-                    lastIndex = match.index + match[0].length;
-                  }
-                  if (lastIndex < line.length) parts.push(line.substring(lastIndex));
-
-
-                  return (
-                    <p key={index} className="tt-analysis-p">
-                      {parts.length > 0 ? parts : line}
-                    </p>
-                  );
-                })}
-              </div>
-
-
-              {/* Results actions */}
-              <div className="tt-results-actions">
-                <button onClick={downloadPdf} className="tt-btn tt-btn--secondary">
-                  <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-                    <path d="M7.5 2v7M4.5 6l3 3 3-3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M2 11v1a1 1 0 001 1h9a1 1 0 001-1v-1" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
-                  </svg>
-                  Download PDF Report
-                </button>
-              </div>
-
-
-              {/* Upgrade CTA for sample */}
-              {isSample && (
-                <div className="tt-upgrade-cta">
-                  <div className="tt-upgrade-content">
-                    <div className="tt-upgrade-left">
-                      <h3 className="tt-upgrade-title">Ready to analyze your real contract?</h3>
-                      <p className="tt-upgrade-desc">Get the same depth of analysis on your actual agreements — one-time payment, instant access.</p>
-                    </div>
-                    <button
-                      onClick={pay}
-                      disabled={checkoutLoading}
-                      className="tt-btn tt-btn--upgrade"
-                    >
-                      {checkoutLoading ? "Loading..." : "Analyze My Contract — 149 kr"}
-                    </button>
-                  </div>
+              {riskLevel && (
+                <div
+                  className="risk-badge"
+                  style={{
+                    background: riskConfig[riskLevel].bg,
+                    border: `1px solid ${riskConfig[riskLevel].border}`,
+                    color: riskConfig[riskLevel].text,
+                    boxShadow: `0 0 20px ${riskConfig[riskLevel].glow}`,
+                  }}
+                >
+                  <span className="risk-dot" style={{ background: riskConfig[riskLevel].dot }} />
+                  <span className="risk-label-txt">Overall Risk</span>
+                  <span className="risk-level-txt">{riskLevel}</span>
                 </div>
               )}
             </div>
-          )}
 
-
-          {/* ── FAQ ── */}
-          <section className="tt-faq">
-            <div className="tt-section-header">
-              <h2 className="tt-section-title">Frequently Asked Questions</h2>
-              <p className="tt-section-sub">Everything you need to know</p>
+            <div className="results-body">
+              {analysis.split("\n").map((line, i) => renderLine(line, i))}
             </div>
-            <div className="tt-faq-grid">
-              {[
-                {
-                  q: "Are my contracts safe?",
-                  a: "We do not store your contracts or use them to train AI models. Your contract is processed via OpenAI's API, which retains data for up to 30 days for abuse monitoring before permanent deletion."
-                },
-                {
-                  q: "Is this legal advice?",
-                  a: "No. The analysis provides general information and risk indicators only — not legal advice. Always consult a qualified lawyer before making legally binding decisions."
-                },
-                {
-                  q: "How accurate is the AI analysis?",
-                  a: "Our AI benchmarks clauses against common market standards for SaaS agreements. It is designed as a first-pass review to identify potential risks before a full legal review."
-                },
-                {
-                  q: "What happens after I pay?",
-                  a: "You get instant access. Paste your contract above and click Analyze. Results are typically delivered in under 60 seconds."
-                },
-              ].map((item, i) => (
-                <div key={i} className="tt-faq-card">
-                  <h3 className="tt-faq-q">{item.q}</h3>
-                  <p className="tt-faq-a">{item.a}</p>
+
+            <div className="results-foot">
+              <button onClick={downloadPdf} className="btn-secondary">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path d="M7 9.5V2M4.5 7L7 9.5 9.5 7" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M1.5 11v.5a1 1 0 001 1h9a1 1 0 001-1V11" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
+                </svg>
+                Download PDF Report
+              </button>
+            </div>
+
+            <div style={{ padding: "0 32px 24px" }}>
+  <RedlinePanel
+    contractText={contractText}
+    analysis={analysis}
+    isSample={isSample}
+  />
+</div>
+            {isSample && (
+              <div className="upgrade-cta">
+                <div className="upgrade-left">
+                  <h3 className="upgrade-title">Ready to analyze your real contract?</h3>
+                  <p className="upgrade-desc">Get the same depth of analysis on your actual agreements — one-time payment, instant access.</p>
                 </div>
-              ))}
-            </div>
-          </section>
+                <button onClick={pay} disabled={checkoutLoading} className="btn-primary btn-primary--auto">
+                  {checkoutLoading ? "Loading…" : "Analyze My Contract — 149 kr"}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
 
+        {/* ── FAQ ── */}
+        <section className="faq">
+          <div className="section-head">
+            <h2 className="section-title">Frequently Asked Questions</h2>
+            <p className="section-sub">Everything you need to know</p>
+          </div>
+          <div className="faq-grid">
+            {[
+              {
+                q: "Are my contracts safe?",
+                a: "We do not store your contracts or use them to train AI models. Your contract is processed via OpenAI's API, which retains data for up to 30 days for abuse monitoring before permanent deletion.",
+              },
+              {
+                q: "Is this legal advice?",
+                a: "No. The analysis provides general information and risk indicators only — not legal advice. Always consult a qualified lawyer before making legally binding decisions.",
+              },
+              {
+                q: "How accurate is the AI analysis?",
+                a: "Our AI benchmarks clauses against common market standards for SaaS agreements. It is designed as a first-pass review to identify potential risks before a full legal review.",
+              },
+              {
+                q: "What happens after I pay?",
+                a: "You get instant access. Paste your contract above and click Analyze. Results are typically delivered in under 60 seconds.",
+              },
+            ].map((item, i) => (
+              <div key={i} className="faq-card">
+                <h3 className="faq-q">{item.q}</h3>
+                <p className="faq-a">{item.a}</p>
+              </div>
+            ))}
+          </div>
+        </section>
 
-          {/* ── FOOTER ── */}
-          <footer className="tt-footer">
-            <div className="tt-footer-trust">
-              {[
-                { icon: "🔒", text: "Processed securely via HTTPS" },
-                { icon: "🗑", text: "Never stored on our servers" },
-                { icon: "🇪🇺", text: "GDPR compliant" },
-              ].map((t, i) => (
-                <div key={i} className="tt-trust-item">
-                  <span>{t.icon}</span>
-                  <span>{t.text}</span>
-                </div>
-              ))}
-            </div>
-            <div className="tt-footer-links">
-              <a href="/about">About</a>
-              <a href="/privacy">Privacy Policy</a>
-              <a href="/terms">Terms of Service</a>
-              <a href="/contact">Contact</a>
-            </div>
-            <p className="tt-footer-copy">© {new Date().getFullYear()} TrustTerms. All rights reserved.</p>
-          </footer>
+        {/* ── FOOTER ── */}
+        <footer className="footer">
+          <div className="footer-trust">
+            {[
+              { icon: "🔒", text: "Processed securely via HTTPS" },
+              { icon: "🗑", text: "Never stored on our servers" },
+              { icon: "🇪🇺", text: "GDPR compliant" },
+            ].map((t, i) => (
+              <div key={i} className="trust-item">
+                <span>{t.icon}</span>
+                <span>{t.text}</span>
+              </div>
+            ))}
+          </div>
+          <div className="footer-links">
+            <a href="/about">About</a>
+            <a href="/privacy">Privacy Policy</a>
+            <a href="/terms">Terms of Service</a>
+            <a href="/contact">Contact</a>
+          </div>
+          <p className="footer-copy">© {new Date().getFullYear()} TrustTerms. All rights reserved.</p>
+        </footer>
 
-
-        </div>
       </main>
 
-
-      {/* ── ALL STYLES ── */}
       <style jsx global>{`
-        /* ─────────────────────────────
-           DESIGN TOKENS
-        ───────────────────────────── */
-        :root {
-          --bg-base:        #030B18;
-          --bg-surface:     #060F1E;
-          --bg-elevated:    #0A1628;
-          --bg-card:        #0D1B30;
-          --bg-card-hover:  #102038;
-
-
-          --border-subtle:  rgba(255,255,255,0.05);
-          --border-default: rgba(255,255,255,0.08);
-          --border-strong:  rgba(255,255,255,0.14);
-          --border-focus:   rgba(59,130,246,0.6);
-
-
-          --blue-500: #3B82F6;
-          --blue-400: #60A5FA;
-          --blue-300: #93C5FD;
-          --blue-600: #2563EB;
-          --blue-900: rgba(37,99,235,0.12);
-
-
-          --text-primary:   #F1F5F9;
-          --text-secondary: #94A3B8;
-          --text-muted:     #475569;
-          --text-accent:    #60A5FA;
-
-
-          --radius-sm:  6px;
-          --radius-md:  10px;
-          --radius-lg:  16px;
-          --radius-xl:  20px;
-          --radius-2xl: 28px;
-
-
-          --shadow-card: 0 1px 3px rgba(0,0,0,0.4), 0 8px 24px rgba(0,0,0,0.3);
-          --shadow-panel: 0 2px 8px rgba(0,0,0,0.5), 0 16px 48px rgba(0,0,0,0.4);
-
-
-          --font-display: 'Sora', system-ui, sans-serif;
-          --font-body: 'DM Sans', system-ui, sans-serif;
-          --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
-        }
-
-
-        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
-
-
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+        :root {
+          --bg:       #030B18;
+          --surface:  #060F1E;
+          --card:     #0A1628;
+          --card-2:   #0D1B30;
+          --b-subtle: rgba(255,255,255,0.05);
+          --b-def:    rgba(255,255,255,0.08);
+          --b-strong: rgba(255,255,255,0.14);
+          --blue:     #3B82F6;
+          --blue-lt:  #60A5FA;
+          --blue-dk:  #2563EB;
+          --green:    #10B981;
+          --text-1:   #F1F5F9;
+          --text-2:   #94A3B8;
+          --text-3:   #475569;
+          --font-h: 'Sora', system-ui, sans-serif;
+          --font-b: 'DM Sans', system-ui, sans-serif;
+          --font-m: 'JetBrains Mono', monospace;
+        }
 
         html { scroll-behavior: smooth; }
 
-
         body {
-          background: var(--bg-base);
-          color: var(--text-primary);
-          font-family: var(--font-body);
+          background: var(--bg);
+          color: var(--text-1);
+          font-family: var(--font-b);
           font-size: 15px;
           line-height: 1.6;
           -webkit-font-smoothing: antialiased;
+          background-image:
+            radial-gradient(ellipse 80% 40% at 50% -5%, rgba(37,99,235,0.13) 0%, transparent 65%);
         }
 
-
-        /* ─────────────────────────────
-           LAYOUT
-        ───────────────────────────── */
-        .tt-main {
-          min-height: 100vh;
-          background:
-            radial-gradient(ellipse 80% 50% at 50% -10%, rgba(37,99,235,0.12) 0%, transparent 60%),
-            var(--bg-base);
-        }
-
-
-        .tt-container {
-          max-width: 860px;
-          margin: 0 auto;
-          padding: 0 24px 80px;
-        }
-
-
-        /* ─────────────────────────────
-           HEADER
-        ───────────────────────────── */
-        .tt-header {
-          position: sticky;
-          top: 0;
-          z-index: 100;
-          background: rgba(3,11,24,0.85);
+        /* ── NAV ── */
+        .nav {
+          position: sticky; top: 0; z-index: 100;
+          background: rgba(3,11,24,0.88);
           backdrop-filter: blur(20px);
-          border-bottom: 1px solid var(--border-subtle);
+          border-bottom: 1px solid var(--b-subtle);
         }
-        .tt-header-inner {
-          max-width: 860px;
-          margin: 0 auto;
-          padding: 0 24px;
-          height: 56px;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
+        .nav-inner {
+          max-width: 880px; margin: 0 auto; padding: 0 24px;
+          height: 58px; display: flex; align-items: center; justify-content: space-between;
         }
-        .tt-logo {
-          display: flex;
-          align-items: center;
-          gap: 10px;
+        .logo {
+          display: flex; align-items: center; gap: 10px;
           text-decoration: none;
         }
-        .tt-logo-mark {
-          display: flex;
-          align-items: center;
-          justify-content: center;
+        .logo-text {
+          font-family: var(--font-h); font-size: 16px; font-weight: 700;
+          color: var(--text-1); letter-spacing: -0.02em;
         }
-        .tt-logo-text {
-          font-family: var(--font-display);
-          font-size: 16px;
-          font-weight: 700;
-          color: var(--text-primary);
-          letter-spacing: -0.02em;
-        }
-        .tt-nav {
-          display: flex;
-          gap: 4px;
-        }
-        .tt-nav-link {
-          font-size: 13px;
-          font-weight: 500;
-          color: var(--text-secondary);
-          text-decoration: none;
-          padding: 6px 12px;
-          border-radius: var(--radius-sm);
+        .nav-right { display: flex; gap: 2px; }
+        .nav-link {
+          font-size: 13.5px; font-weight: 500; color: var(--text-2);
+          text-decoration: none; padding: 6px 13px; border-radius: 8px;
           transition: color 0.15s, background 0.15s;
         }
-        .tt-nav-link:hover {
-          color: var(--text-primary);
-          background: var(--bg-elevated);
-        }
+        .nav-link:hover { color: var(--text-1); background: var(--card); }
 
-
-        /* ─────────────────────────────
-           DISCLAIMER
-        ───────────────────────────── */
-        .tt-disclaimer {
-          background: rgba(37,99,235,0.06);
+        /* ── DISCLAIMER ── */
+        .disclaimer {
+          background: rgba(37,99,235,0.055);
           border-bottom: 1px solid rgba(59,130,246,0.12);
         }
-        .tt-disclaimer-inner {
-          max-width: 860px;
-          margin: 0 auto;
-          padding: 10px 24px;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          font-size: 12.5px;
-          color: var(--text-secondary);
-          line-height: 1.5;
+        .disclaimer-inner {
+          max-width: 880px; margin: 0 auto; padding: 9px 24px;
+          display: flex; align-items: center; gap: 8px;
+          font-size: 12.5px; color: var(--text-2);
         }
-        .tt-disclaimer-inner strong { color: var(--blue-400); }
+        .disclaimer-inner strong { color: var(--blue-lt); }
 
+        /* ── MAIN ── */
+        .main { max-width: 880px; margin: 0 auto; padding: 0 24px 80px; }
 
-        /* ─────────────────────────────
-           HERO
-        ───────────────────────────── */
-        .tt-hero {
+        /* ── HERO ── */
+        .hero {
           padding: 72px 0 56px;
           text-align: center;
         }
-        .tt-hero-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          font-family: var(--font-mono);
-          font-size: 11px;
-          font-weight: 500;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-          color: var(--blue-400);
-          background: rgba(59,130,246,0.08);
+        .hero-badge {
+          display: inline-flex; align-items: center; gap: 8px;
+          font-family: var(--font-m); font-size: 11px; font-weight: 500;
+          letter-spacing: 0.08em; text-transform: uppercase;
+          color: var(--blue-lt);
+          background: rgba(59,130,246,0.09);
           border: 1px solid rgba(59,130,246,0.2);
-          padding: 6px 14px;
-          border-radius: 100px;
-          margin-bottom: 28px;
+          padding: 6px 15px; border-radius: 100px; margin-bottom: 28px;
         }
-        .tt-badge-dot {
-          width: 6px;
-          height: 6px;
-          background: var(--blue-400);
-          border-radius: 50%;
-          box-shadow: 0 0 8px var(--blue-500);
-          animation: pulse-dot 2s ease infinite;
+        .pulse-dot {
+          width: 7px; height: 7px; border-radius: 50%;
+          background: var(--blue-lt);
+          box-shadow: 0 0 10px var(--blue);
+          animation: pulse 2.2s ease infinite;
         }
-        @keyframes pulse-dot {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.5; }
-        }
-        .tt-hero-title {
-          font-family: var(--font-display);
-          font-size: clamp(38px, 6vw, 58px);
-          font-weight: 800;
-          line-height: 1.1;
-          letter-spacing: -0.04em;
-          color: var(--text-primary);
+        @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.45;transform:scale(0.85)} }
+
+        .hero-h1 {
+          font-family: var(--font-h);
+          font-size: clamp(38px, 5.5vw, 58px);
+          font-weight: 800; line-height: 1.08;
+          letter-spacing: -0.04em; color: var(--text-1);
           margin-bottom: 20px;
         }
-        .tt-hero-accent {
-          background: linear-gradient(135deg, var(--blue-400) 0%, var(--blue-300) 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
+        .hero-gradient {
+          background: linear-gradient(130deg, #60A5FA 0%, #93C5FD 100%);
+          -webkit-background-clip: text; -webkit-text-fill-color: transparent;
           background-clip: text;
         }
-        .tt-hero-sub {
-          font-size: 16px;
-          color: var(--text-secondary);
-          max-width: 520px;
-          margin: 0 auto 40px;
-          line-height: 1.7;
-        }
-        .tt-hero-stats {
-          display: flex;
-          justify-content: center;
-          gap: 0;
-          border: 1px solid var(--border-default);
-          border-radius: var(--radius-lg);
-          overflow: hidden;
-          background: var(--bg-card);
-          max-width: 480px;
-          margin: 0 auto;
-        }
-        .tt-stat {
-          flex: 1;
-          padding: 20px 16px;
-          text-align: center;
-          border-right: 1px solid var(--border-default);
-        }
-        .tt-stat:last-child { border-right: none; }
-        .tt-stat-value {
-          font-family: var(--font-display);
-          font-size: 22px;
-          font-weight: 800;
-          color: var(--blue-400);
-          letter-spacing: -0.02em;
-        }
-        .tt-stat-label {
-          font-size: 11px;
-          color: var(--text-muted);
-          margin-top: 3px;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
+        .hero-sub {
+          font-size: 16px; color: var(--text-2); max-width: 500px;
+          margin: 0 auto 44px; line-height: 1.7;
         }
 
-
-        /* ─────────────────────────────
-           FEATURE CARDS
-        ───────────────────────────── */
-        .tt-features {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 12px;
-          margin-bottom: 40px;
-        }
-        @media (max-width: 640px) {
-          .tt-features { grid-template-columns: 1fr; }
-        }
-        .tt-feature-card {
-          background: var(--bg-card);
-          border: 1px solid var(--border-default);
-          border-radius: var(--radius-lg);
-          padding: 24px 20px;
-          transition: border-color 0.2s, background 0.2s, transform 0.2s;
-        }
-        .tt-feature-card:hover {
-          border-color: var(--border-strong);
-          background: var(--bg-card-hover);
-          transform: translateY(-2px);
-        }
-        .tt-feature-icon {
-          width: 36px;
-          height: 36px;
-          border-radius: var(--radius-sm);
-          background: rgba(var(--fcolor), 0.08);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin-bottom: 14px;
-          background: color-mix(in srgb, var(--fcolor, #3B82F6) 10%, transparent);
-        }
-        .tt-feature-title {
-          font-family: var(--font-display);
-          font-size: 14px;
-          font-weight: 700;
-          color: var(--text-primary);
-          margin-bottom: 8px;
-          letter-spacing: -0.01em;
-        }
-        .tt-feature-desc {
-          font-size: 13px;
-          color: var(--text-secondary);
-          line-height: 1.6;
-        }
-
-
-        /* ─────────────────────────────
-           MAIN PANEL
-        ───────────────────────────── */
-        .tt-panel {
-          background: var(--bg-card);
-          border: 1px solid var(--border-default);
-          border-radius: var(--radius-2xl);
-          padding: 32px;
-          box-shadow: var(--shadow-panel);
-          margin-bottom: 24px;
-          position: relative;
-          overflow: hidden;
-        }
-        .tt-panel::before {
-          content: '';
-          position: absolute;
-          top: 0; left: 0; right: 0;
-          height: 1px;
-          background: linear-gradient(90deg, transparent, rgba(59,130,246,0.4), transparent);
-        }
-        .tt-panel-header {
-          display: flex;
-          align-items: flex-start;
-          justify-content: space-between;
-          gap: 16px;
-          margin-bottom: 24px;
-          flex-wrap: wrap;
-        }
-        .tt-panel-title {
-          font-family: var(--font-display);
-          font-size: 18px;
-          font-weight: 700;
-          color: var(--text-primary);
-          letter-spacing: -0.02em;
-        }
-        .tt-panel-subtitle {
-          font-size: 13px;
-          color: var(--text-muted);
-          margin-top: 3px;
-        }
-        .tt-sample-btn {
+        .stats-row {
           display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          font-size: 12.5px;
-          font-weight: 600;
-          color: var(--blue-400);
-          background: rgba(59,130,246,0.08);
-          border: 1px solid rgba(59,130,246,0.2);
-          border-radius: var(--radius-md);
-          padding: 7px 13px;
-          cursor: pointer;
-          transition: background 0.15s, border-color 0.15s;
-          white-space: nowrap;
-          font-family: var(--font-body);
+          border: 1px solid var(--b-def);
+          border-radius: 16px; overflow: hidden;
+          background: var(--card-2);
         }
-        .tt-sample-btn:hover {
-          background: rgba(59,130,246,0.14);
-          border-color: rgba(59,130,246,0.35);
+        .stat {
+          padding: 20px 28px; text-align: center;
+          border-right: 1px solid var(--b-def);
         }
-        .tt-sample-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-        .tt-upload-btn {
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          font-size: 12.5px;
-          font-weight: 600;
-          color: #10B981;
-          background: rgba(16,185,129,0.08);
-          border: 1px solid rgba(16,185,129,0.2);
-          border-radius: var(--radius-md);
-          padding: 7px 13px;
-          cursor: pointer;
-          transition: background 0.15s, border-color 0.15s;
-          white-space: nowrap;
-          font-family: var(--font-body);
+        .stat:last-child { border-right: none; }
+        .stat-val {
+          font-family: var(--font-h); font-size: 24px; font-weight: 800;
+          color: var(--blue-lt); letter-spacing: -0.03em;
         }
-        .tt-upload-btn:hover { background: rgba(16,185,129,0.14); border-color: rgba(16,185,129,0.35); }
-        .tt-upload-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .stat-lbl {
+          font-size: 11px; color: var(--text-3); margin-top: 4px;
+          text-transform: uppercase; letter-spacing: 0.05em;
+        }
 
-        .tt-pdf-error {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          background: rgba(239,68,68,0.06);
-          border: 1px solid rgba(239,68,68,0.2);
-          border-radius: var(--radius-md);
-          padding: 10px 14px;
-          font-size: 12.5px;
-          color: #FCA5A5;
+        /* ── FEATURES ── */
+        .features {
+          display: grid; grid-template-columns: repeat(3,1fr);
+          gap: 12px; margin-bottom: 36px;
+        }
+        @media(max-width:640px){ .features { grid-template-columns: 1fr; } }
+
+        .feature-card {
+          background: var(--card-2); border: 1px solid var(--b-def);
+          border-radius: 16px; padding: 24px 22px;
+          transition: border-color 0.2s, transform 0.2s;
+        }
+        .feature-card:hover { border-color: var(--b-strong); transform: translateY(-2px); }
+        .feature-icon {
+          width: 38px; height: 38px; border-radius: 10px;
+          display: flex; align-items: center; justify-content: center;
           margin-bottom: 14px;
         }
+        .feature-title {
+          font-family: var(--font-h); font-size: 14px; font-weight: 700;
+          color: var(--text-1); margin-bottom: 8px; letter-spacing: -0.01em;
+        }
+        .feature-desc { font-size: 13px; color: var(--text-2); line-height: 1.6; }
 
-        .tt-spinner--sm { width: 11px; height: 11px; }
+        /* ── PANEL ── */
+        .panel {
+          background: var(--card-2); border: 1px solid var(--b-def);
+          border-radius: 24px; padding: 32px;
+          position: relative; overflow: hidden;
+          box-shadow: 0 4px 32px rgba(0,0,0,0.35);
+          margin-bottom: 20px;
+        }
+        .panel-glow-line {
+          position: absolute; top: 0; left: 0; right: 0; height: 1px;
+          background: linear-gradient(90deg, transparent 0%, rgba(59,130,246,0.5) 50%, transparent 100%);
+        }
+        .panel-head {
+          display: flex; align-items: flex-start;
+          justify-content: space-between; gap: 16px;
+          margin-bottom: 22px; flex-wrap: wrap;
+        }
+        .panel-title {
+          font-family: var(--font-h); font-size: 18px; font-weight: 700;
+          color: var(--text-1); letter-spacing: -0.02em;
+        }
+        .panel-sub { font-size: 13px; color: var(--text-3); margin-top: 3px; }
+        .panel-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
-        .tt-panel-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .btn-outline {
+          display: inline-flex; align-items: center; gap: 6px;
+          font-family: var(--font-b); font-size: 12.5px; font-weight: 600;
+          padding: 7px 13px; border-radius: 9px; cursor: pointer;
+          border: 1px solid; transition: all 0.15s; white-space: nowrap;
+        }
+        .btn-outline:disabled { opacity: 0.4; cursor: not-allowed; }
+        .btn-outline--green {
+          color: #34d399; background: rgba(16,185,129,0.07);
+          border-color: rgba(16,185,129,0.22);
+        }
+        .btn-outline--green:hover:not(:disabled) { background: rgba(16,185,129,0.13); }
+        .btn-outline--blue {
+          color: var(--blue-lt); background: rgba(59,130,246,0.07);
+          border-color: rgba(59,130,246,0.22);
+        }
+        .btn-outline--blue:hover:not(:disabled) { background: rgba(59,130,246,0.13); }
 
-        .tt-textarea-overlay {
-          position: absolute;
-          inset: 0;
-          background: rgba(6,15,30,0.75);
-          border-radius: var(--radius-lg);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 12px;
-          font-size: 14px;
-          color: var(--text-secondary);
-          font-weight: 500;
+        .inline-alert {
+          display: flex; align-items: center; gap: 8px;
+          padding: 10px 14px; border-radius: 9px;
+          font-size: 12.5px; margin-bottom: 14px; border: 1px solid;
+        }
+        .inline-alert--red {
+          color: #fca5a5; background: rgba(239,68,68,0.07);
+          border-color: rgba(239,68,68,0.2);
         }
 
-
-        /* Token bar */
-        .tt-token-bar {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          background: rgba(16,185,129,0.06);
-          border: 1px solid rgba(16,185,129,0.2);
-          border-radius: var(--radius-md);
-          padding: 10px 14px;
-          font-size: 12.5px;
-          color: #10B981;
-          font-weight: 500;
+        .token-active {
+          display: flex; align-items: center; gap: 8px;
+          background: rgba(16,185,129,0.07); border: 1px solid rgba(16,185,129,0.22);
+          border-radius: 9px; padding: 10px 14px;
+          font-size: 12.5px; color: #34d399; font-weight: 500;
           margin-bottom: 16px;
         }
-        .tt-token-dot {
-          width: 6px; height: 6px;
-          background: #10B981;
-          border-radius: 50%;
-          flex-shrink: 0;
-          animation: pulse-dot 2s ease infinite;
+        .token-dot {
+          width: 7px; height: 7px; border-radius: 50%;
+          background: #10b981; flex-shrink: 0;
+          animation: pulse 2s ease infinite;
         }
 
-
-        /* Textarea */
-        .tt-textarea-wrap {
-          position: relative;
-          margin-bottom: 12px;
-        }
-        .tt-textarea {
-          width: 100%;
-          height: 280px;
-          padding: 18px;
-          font-family: var(--font-mono);
-          font-size: 13px;
-          line-height: 1.65;
-          color: #CBD5E1;
-          background: var(--bg-surface);
-          border: 1px solid var(--border-default);
-          border-radius: var(--radius-lg);
-          resize: vertical;
-          outline: none;
+        .textarea-wrap { position: relative; margin-bottom: 12px; }
+        .contract-input {
+          width: 100%; height: 280px;
+          padding: 18px 20px;
+          font-family: var(--font-m); font-size: 13px; line-height: 1.65;
+          color: #CBD5E1; background: var(--surface);
+          border: 1px solid var(--b-def); border-radius: 14px;
+          resize: vertical; outline: none;
           transition: border-color 0.2s, box-shadow 0.2s;
         }
-        .tt-textarea::placeholder { color: var(--text-muted); }
-        .tt-textarea:focus {
-          border-color: var(--border-focus);
+        .contract-input::placeholder { color: var(--text-3); }
+        .contract-input:focus {
+          border-color: rgba(59,130,246,0.55);
           box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
         }
-        .tt-textarea--error {
+        .contract-input--over {
           border-color: rgba(239,68,68,0.5) !important;
           box-shadow: 0 0 0 3px rgba(239,68,68,0.08) !important;
         }
-        .tt-textarea:disabled { opacity: 0.5; cursor: not-allowed; }
-        .tt-textarea-badge {
-          position: absolute;
-          top: 12px;
-          right: 12px;
-          font-family: var(--font-mono);
-          font-size: 10px;
-          font-weight: 500;
-          letter-spacing: 0.1em;
-          color: var(--blue-400);
-          background: rgba(59,130,246,0.1);
-          border: 1px solid rgba(59,130,246,0.2);
-          padding: 3px 8px;
-          border-radius: 4px;
+        .contract-input:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .sample-tag {
+          position: absolute; top: 12px; right: 12px;
+          font-family: var(--font-m); font-size: 10px; font-weight: 500;
+          letter-spacing: 0.1em; color: var(--blue-lt);
+          background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.22);
+          padding: 3px 8px; border-radius: 5px;
+        }
+        .textarea-overlay {
+          position: absolute; inset: 0;
+          background: rgba(6,15,30,0.75); border-radius: 14px;
+          display: flex; align-items: center; justify-content: center;
+          gap: 12px; font-size: 14px; color: var(--text-2);
         }
 
-
-        /* Char count */
-        .tt-char-row {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
+        .char-row {
+          display: flex; justify-content: space-between; align-items: center;
           margin-bottom: 20px;
         }
-        .tt-char-status {
-          display: flex;
-          align-items: center;
-          gap: 5px;
-          font-size: 12px;
-          color: var(--text-muted);
+        .char-status {
+          display: flex; align-items: center; gap: 5px;
+          font-size: 12px; color: var(--text-3);
         }
-        .tt-char-status--ready { color: #10B981; }
-        .tt-char-status--error { color: #EF4444; }
-        .tt-char-count {
-          font-family: var(--font-mono);
-          font-size: 11.5px;
-          color: var(--text-muted);
-        }
-        .tt-char-count--error { color: #EF4444; }
-        .tt-char-count--warn  { color: #F59E0B; }
+        .char-status--ok { color: #34d399; }
+        .char-status--err { color: #f87171; }
+        .char-count { font-family: var(--font-m); font-size: 11.5px; color: var(--text-3); }
+        .char-count--err { color: #f87171; }
+        .char-count--warn { color: #fbbf24; }
 
+        /* ── BUTTONS ── */
+        .btn-primary {
+          width: 100%; display: inline-flex; align-items: center;
+          justify-content: center; gap: 8px;
+          font-family: var(--font-b); font-size: 15px; font-weight: 600;
+          padding: 14px 24px; border-radius: 12px; border: none;
+          background: var(--blue-dk); color: #fff; cursor: pointer;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 6px 20px rgba(37,99,235,0.32);
+          transition: all 0.18s;
+        }
+        .btn-primary:hover:not(:disabled) {
+          background: var(--blue); transform: translateY(-1px);
+          box-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 8px 28px rgba(37,99,235,0.45);
+        }
+        .btn-primary:active:not(:disabled) { transform: translateY(0); }
+        .btn-primary:disabled {
+          background: var(--card); color: var(--text-3);
+          box-shadow: none; cursor: not-allowed;
+        }
+        .btn-primary--auto { width: auto; flex-shrink: 0; font-size: 14px; }
 
-        /* ─────────────────────────────
-           BUTTONS
-        ───────────────────────────── */
-        .tt-btn {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-          font-family: var(--font-body);
-          font-weight: 600;
-          border-radius: var(--radius-md);
-          border: none;
-          cursor: pointer;
-          transition: all 0.2s;
-          text-decoration: none;
-          white-space: nowrap;
+        .btn-secondary {
+          display: inline-flex; align-items: center; gap: 7px;
+          font-family: var(--font-b); font-size: 13.5px; font-weight: 600;
+          padding: 10px 18px; border-radius: 10px; cursor: pointer;
+          background: var(--card); color: var(--text-2);
+          border: 1px solid var(--b-def); transition: all 0.15s;
         }
-        .tt-btn--full { width: 100%; }
-        .tt-btn--primary {
-          padding: 14px 24px;
-          font-size: 15px;
-          background: var(--blue-600);
-          color: #fff;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 4px 12px rgba(37,99,235,0.3);
-        }
-        .tt-btn--primary:hover:not(:disabled) {
-          background: var(--blue-500);
-          box-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 6px 20px rgba(37,99,235,0.45);
-          transform: translateY(-1px);
-        }
-        .tt-btn--primary:active:not(:disabled) { transform: translateY(0); }
-        .tt-btn--primary:disabled {
-          background: var(--bg-elevated);
-          color: var(--text-muted);
-          box-shadow: none;
-          cursor: not-allowed;
-        }
-        .tt-btn--secondary {
-          padding: 11px 20px;
-          font-size: 13.5px;
-          background: var(--bg-elevated);
-          color: var(--text-secondary);
-          border: 1px solid var(--border-default);
-        }
-        .tt-btn--secondary:hover {
-          background: var(--bg-card-hover);
-          color: var(--text-primary);
-          border-color: var(--border-strong);
-        }
-        .tt-btn--upgrade {
-          padding: 13px 24px;
-          font-size: 14px;
-          background: var(--blue-600);
-          color: #fff;
-          box-shadow: 0 4px 16px rgba(37,99,235,0.35);
-          white-space: nowrap;
-          flex-shrink: 0;
-        }
-        .tt-btn--upgrade:hover:not(:disabled) {
-          background: var(--blue-500);
-          transform: translateY(-1px);
-        }
+        .btn-secondary:hover { background: var(--card-2); color: var(--text-1); border-color: var(--b-strong); }
 
+        .pay-wrap { display: flex; flex-direction: column; gap: 12px; }
+        .pay-meta { text-align: center; font-size: 12px; color: var(--text-3); }
 
-        /* Pay group */
-        .tt-pay-group { display: flex; flex-direction: column; gap: 12px; }
-        .tt-pay-meta {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          gap: 8px;
-          font-size: 12px;
-          color: var(--text-muted);
-        }
-        .tt-meta-dot { color: var(--border-strong); }
-
-
-        /* Spinner */
-        .tt-spinner {
-          width: 14px; height: 14px;
+        /* ── SPINNER ── */
+        .spinner {
+          width: 15px; height: 15px; border-radius: 50;
           border: 2px solid rgba(255,255,255,0.2);
           border-top-color: #fff;
           border-radius: 50%;
-          animation: spin 0.7s linear infinite;
-          flex-shrink: 0;
+          animation: spin 0.7s linear infinite; flex-shrink: 0;
         }
+        .spinner--sm { width: 11px; height: 11px; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-
-        /* ─────────────────────────────
-           LOADING PANEL
-        ───────────────────────────── */
-        .tt-loading-panel {
-          background: var(--bg-card);
-          border: 1px solid var(--border-default);
-          border-radius: var(--radius-2xl);
-          padding: 48px 32px;
-          text-align: center;
-          margin-bottom: 24px;
+        /* ── LOADING ── */
+        .loading-panel {
+          background: var(--card-2); border: 1px solid var(--b-def);
+          border-radius: 24px; padding: 52px 32px;
+          text-align: center; margin-bottom: 20px;
         }
-        .tt-loading-pulse {
-          position: relative;
-          width: 56px;
-          height: 56px;
+        .loading-rings {
+          position: relative; width: 56px; height: 56px;
           margin: 0 auto 28px;
         }
-        .tt-loading-ring {
-          position: absolute;
-          inset: 0;
+        .ring {
+          position: absolute; inset: 0; border-radius: 50%;
           border: 2px solid transparent;
-          border-top-color: var(--blue-500);
-          border-radius: 50%;
+        }
+        .ring-1 {
+          border-top-color: var(--blue);
           animation: spin 1s linear infinite;
         }
-        .tt-loading-ring--2 {
-          inset: 8px;
-          border-top-color: var(--blue-300);
-          animation-duration: 0.7s;
-          animation-direction: reverse;
+        .ring-2 {
+          inset: 9px; border-top-color: var(--blue-lt);
+          animation: spin 0.65s linear infinite reverse;
         }
-        .tt-loading-text h3 {
-          font-family: var(--font-display);
-          font-size: 18px;
-          font-weight: 700;
-          color: var(--text-primary);
-          margin-bottom: 8px;
-          letter-spacing: -0.02em;
+        .loading-title {
+          font-family: var(--font-h); font-size: 18px; font-weight: 700;
+          color: var(--text-1); margin-bottom: 10px; letter-spacing: -0.02em;
         }
-        .tt-loading-msg {
-          font-family: var(--font-mono);
-          font-size: 13px;
-          color: var(--blue-400);
-          margin-bottom: 24px;
+        .loading-msg {
+          font-family: var(--font-m); font-size: 13px;
+          color: var(--blue-lt); margin-bottom: 26px;
         }
-        .tt-loading-steps {
-          display: flex;
-          justify-content: center;
-          gap: 6px;
+        .loading-dots { display: flex; justify-content: center; gap: 6px; }
+        .dot {
+          width: 26px; height: 3px; border-radius: 2px;
+          background: var(--b-def); transition: background 0.3s;
         }
-        .tt-loading-step {
-          width: 24px; height: 3px;
-          background: var(--border-default);
-          border-radius: 2px;
-          transition: background 0.3s;
-        }
-        .tt-loading-step.active {
-          background: var(--blue-500);
-        }
+        .dot--active { background: var(--blue); }
 
+        /* ── ERROR ── */
+        .error-panel {
+          display: flex; align-items: flex-start; gap: 14px;
+          background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.2);
+          border-radius: 14px; padding: 18px 20px; margin-bottom: 20px;
+        }
+        .error-icon { flex-shrink: 0; padding-top: 1px; }
+        .error-title { font-size: 13.5px; font-weight: 700; color: #f87171; margin-bottom: 3px; }
+        .error-msg { font-size: 13px; color: #fca5a5; line-height: 1.5; }
 
-        /* ─────────────────────────────
-           ERROR PANEL
-        ───────────────────────────── */
-        .tt-error-panel {
-          display: flex;
-          align-items: flex-start;
-          gap: 14px;
-          background: rgba(239,68,68,0.06);
-          border: 1px solid rgba(239,68,68,0.2);
-          border-radius: var(--radius-lg);
-          padding: 18px 20px;
-          margin-bottom: 24px;
-        }
-        .tt-error-icon { flex-shrink: 0; padding-top: 2px; }
-        .tt-error-title {
-          font-size: 13.5px;
-          font-weight: 700;
-          color: #EF4444;
-          margin-bottom: 3px;
-        }
-        .tt-error-msg {
-          font-size: 13px;
-          color: #FCA5A5;
-          line-height: 1.5;
-        }
-
-
-        /* ─────────────────────────────
-           RESULTS
-        ───────────────────────────── */
-        .tt-results {
-          background: var(--bg-card);
-          border: 1px solid var(--border-default);
-          border-radius: var(--radius-2xl);
-          overflow: hidden;
-          margin-bottom: 24px;
-          box-shadow: var(--shadow-panel);
-        }
-        .tt-results-header {
-          padding: 28px 32px 24px;
-          border-bottom: 1px solid var(--border-subtle);
-          display: flex;
-          align-items: flex-start;
-          justify-content: space-between;
-          gap: 16px;
-          flex-wrap: wrap;
-          background: var(--bg-elevated);
-        }
-        .tt-results-title-row {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        }
-        .tt-results-title {
-          font-family: var(--font-display);
-          font-size: 18px;
-          font-weight: 700;
-          color: var(--text-primary);
-          letter-spacing: -0.02em;
-        }
-        .tt-sample-badge {
-          font-family: var(--font-mono);
-          font-size: 10px;
-          font-weight: 500;
-          letter-spacing: 0.1em;
-          color: #F59E0B;
-          background: rgba(245,158,11,0.1);
-          border: 1px solid rgba(245,158,11,0.2);
-          padding: 3px 8px;
-          border-radius: 4px;
-        }
-        .tt-risk-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 10px;
-          padding: 10px 18px;
-          border: 1px solid;
-          border-radius: var(--radius-md);
-          font-size: 13px;
-          font-weight: 700;
-        }
-        .tt-risk-dot {
-          width: 8px; height: 8px;
-          border-radius: 50%;
-          flex-shrink: 0;
-        }
-        .tt-risk-label {
-          font-size: 11px;
-          font-weight: 500;
-          letter-spacing: 0.06em;
-          text-transform: uppercase;
-          opacity: 0.7;
-        }
-        .tt-risk-level {
-          font-family: var(--font-mono);
-          font-size: 13px;
-          font-weight: 700;
-          letter-spacing: 0.08em;
-        }
-
-
-        /* Analysis body */
-        .tt-analysis-body {
-          padding: 32px;
-        }
-        .tt-analysis-h1 {
-          font-family: var(--font-display);
-          font-size: 20px;
-          font-weight: 800;
-          color: var(--text-primary);
-          letter-spacing: -0.025em;
-          margin: 36px 0 14px;
-        }
-        .tt-analysis-h1:first-child { margin-top: 0; }
-        .tt-analysis-h2 {
-          font-family: var(--font-display);
-          font-size: 16px;
-          font-weight: 700;
-          color: var(--text-primary);
-          letter-spacing: -0.02em;
-          margin: 28px 0 10px;
-          padding-bottom: 8px;
-          border-bottom: 1px solid var(--border-subtle);
-        }
-        .tt-analysis-h3 {
-          font-size: 14px;
-          font-weight: 700;
-          color: var(--blue-400);
-          letter-spacing: -0.01em;
-          margin: 20px 0 8px;
-          font-family: var(--font-body);
-        }
-        .tt-analysis-p {
-          font-size: 14px;
-          color: #94A3B8;
-          line-height: 1.75;
-          margin-bottom: 10px;
-        }
-        .tt-bold {
-          color: var(--text-primary);
-          font-weight: 600;
-        }
-        .tt-analysis-bullet {
-          display: flex;
-          gap: 12px;
-          margin-bottom: 8px;
-          font-size: 14px;
-          color: #94A3B8;
-          line-height: 1.65;
-        }
-        .tt-bullet-mark {
-          color: var(--blue-500);
-          font-weight: 600;
-          flex-shrink: 0;
-          margin-top: 1px;
-        }
-        .tt-analysis-numbered {
-          display: flex;
-          gap: 12px;
-          margin-bottom: 8px;
-          font-size: 14px;
-          color: #94A3B8;
-          line-height: 1.65;
-        }
-        .tt-num-mark {
-          font-family: var(--font-mono);
-          font-size: 12px;
-          font-weight: 600;
-          color: var(--blue-400);
-          min-width: 20px;
-          flex-shrink: 0;
-          margin-top: 2px;
-        }
-        .tt-analysis-spacer { height: 12px; }
-
-
-        /* Results actions */
-        .tt-results-actions {
-          padding: 20px 32px;
-          border-top: 1px solid var(--border-subtle);
-          background: var(--bg-elevated);
-          display: flex;
-          gap: 12px;
-        }
-
-
-        /* Upgrade CTA */
-        .tt-upgrade-cta {
-          margin: 0 32px 32px;
-          background: linear-gradient(135deg, rgba(37,99,235,0.12) 0%, rgba(59,130,246,0.06) 100%);
-          border: 1px solid rgba(59,130,246,0.2);
-          border-radius: var(--radius-xl);
-          padding: 28px 28px;
-        }
-        .tt-upgrade-content {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 24px;
-          flex-wrap: wrap;
-        }
-        .tt-upgrade-title {
-          font-family: var(--font-display);
-          font-size: 17px;
-          font-weight: 700;
-          color: var(--text-primary);
-          letter-spacing: -0.02em;
-          margin-bottom: 6px;
-        }
-        .tt-upgrade-desc {
-          font-size: 13.5px;
-          color: var(--text-secondary);
-          line-height: 1.55;
-        }
-
-
-        /* ─────────────────────────────
-           ACTIONS
-        ───────────────────────────── */
-        .tt-actions { display: flex; flex-direction: column; gap: 0; }
-
-
-        /* ─────────────────────────────
-           FAQ
-        ───────────────────────────── */
-        .tt-faq {
-          margin: 64px 0 48px;
-        }
-        .tt-section-header {
-          text-align: center;
-          margin-bottom: 40px;
-        }
-        .tt-section-title {
-          font-family: var(--font-display);
-          font-size: 28px;
-          font-weight: 800;
-          color: var(--text-primary);
-          letter-spacing: -0.03em;
-          margin-bottom: 8px;
-        }
-        .tt-section-sub {
-          font-size: 14px;
-          color: var(--text-muted);
-        }
-        .tt-faq-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 12px;
-        }
-        @media (max-width: 640px) {
-          .tt-faq-grid { grid-template-columns: 1fr; }
-        }
-        .tt-faq-card {
-          background: var(--bg-card);
-          border: 1px solid var(--border-default);
-          border-radius: var(--radius-lg);
-          padding: 22px 22px;
-          transition: border-color 0.2s, background 0.2s;
-        }
-        .tt-faq-card:hover {
-          border-color: var(--border-strong);
-          background: var(--bg-card-hover);
-        }
-        .tt-faq-q {
-          font-family: var(--font-display);
-          font-size: 14px;
-          font-weight: 700;
-          color: var(--text-primary);
-          margin-bottom: 10px;
-          letter-spacing: -0.01em;
-        }
-        .tt-faq-a {
-          font-size: 13.5px;
-          color: var(--text-secondary);
-          line-height: 1.65;
-        }
-
-
-        /* ─────────────────────────────
-           FOOTER
-        ───────────────────────────── */
-        .tt-footer {
-          padding: 40px 0 0;
-          border-top: 1px solid var(--border-subtle);
-          text-align: center;
-        }
-        .tt-footer-trust {
-          display: flex;
-          justify-content: center;
-          gap: 32px;
-          flex-wrap: wrap;
-          margin-bottom: 24px;
-        }
-        .tt-trust-item {
-          display: flex;
-          align-items: center;
-          gap: 7px;
-          font-size: 12.5px;
-          color: var(--text-muted);
-        }
-        .tt-footer-links {
-          display: flex;
-          justify-content: center;
-          gap: 24px;
-          flex-wrap: wrap;
+        /* ── RESULTS ── */
+        .results {
+          background: var(--card-2); border: 1px solid var(--b-def);
+          border-radius: 24px; overflow: hidden;
+          box-shadow: 0 4px 32px rgba(0,0,0,0.3);
           margin-bottom: 20px;
         }
-        .tt-footer-links a {
-          font-size: 13px;
-          color: var(--text-secondary);
-          text-decoration: none;
-          transition: color 0.15s;
+        .results-head {
+          padding: 26px 32px 22px;
+          background: var(--card);
+          border-bottom: 1px solid var(--b-subtle);
+          display: flex; align-items: flex-start;
+          justify-content: space-between; gap: 16px; flex-wrap: wrap;
         }
-        .tt-footer-links a:hover { color: var(--text-primary); }
-        .tt-footer-copy {
-          font-size: 12px;
-          color: var(--text-muted);
-          padding-bottom: 32px;
+        .results-head-left { display: flex; align-items: center; gap: 12px; }
+        .results-title {
+          font-family: var(--font-h); font-size: 18px; font-weight: 700;
+          color: var(--text-1); letter-spacing: -0.02em;
+        }
+        .badge-sample {
+          font-family: var(--font-m); font-size: 10px; letter-spacing: 0.1em;
+          color: #fbbf24; background: rgba(245,158,11,0.1);
+          border: 1px solid rgba(245,158,11,0.22);
+          padding: 3px 8px; border-radius: 5px;
+        }
+        .risk-badge {
+          display: inline-flex; align-items: center; gap: 10px;
+          padding: 10px 18px; border-radius: 10px;
+          font-size: 13px; font-weight: 700;
+          transition: box-shadow 0.3s;
+        }
+        .risk-dot {
+          width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+          animation: pulse 2s ease infinite;
+        }
+        .risk-label-txt {
+          font-family: var(--font-m); font-size: 10px;
+          letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.7;
+        }
+        .risk-level-txt {
+          font-family: var(--font-m); font-size: 13px; font-weight: 700;
+          letter-spacing: 0.06em;
         }
 
+        .results-body { padding: 30px 32px; }
 
-        /* ─────────────────────────────
-           RESPONSIVE
-        ───────────────────────────── */
-        @media (max-width: 640px) {
-          .tt-panel { padding: 20px; }
-          .tt-panel-header { flex-direction: column; gap: 12px; }
-          .tt-results-header { padding: 20px 20px 16px; }
-          .tt-analysis-body { padding: 20px; }
-          .tt-results-actions { padding: 16px 20px; }
-          .tt-upgrade-cta { margin: 0 16px 20px; }
-          .tt-upgrade-content { flex-direction: column; }
-          .tt-hero { padding: 48px 0 40px; }
-          .tt-footer-trust { gap: 16px; }
+        /* Analysis typography */
+        .r-h1 {
+          font-family: var(--font-h); font-size: 20px; font-weight: 800;
+          color: var(--text-1); margin: 36px 0 14px; letter-spacing: -0.025em;
+        }
+        .r-h2 {
+          font-family: var(--font-h); font-size: 16px; font-weight: 700;
+          color: var(--text-1); margin: 32px 0 12px; padding-bottom: 10px;
+          border-bottom: 1px solid var(--b-subtle); letter-spacing: -0.02em;
+        }
+        .r-h3 {
+          font-family: var(--font-b); font-size: 14px; font-weight: 700;
+          color: var(--blue-lt); margin: 22px 0 8px;
+        }
+        .r-p { font-size: 14px; color: var(--text-2); line-height: 1.75; margin-bottom: 10px; }
+        .r-bullet {
+          display: flex; gap: 12px; margin-bottom: 8px;
+          font-size: 14px; color: var(--text-2); line-height: 1.65;
+        }
+        .r-dash { color: var(--blue); font-weight: 700; flex-shrink: 0; }
+        .r-num {
+          display: flex; gap: 12px; margin-bottom: 8px;
+          font-size: 14px; color: var(--text-2); line-height: 1.65;
+        }
+        .r-num-label {
+          font-family: var(--font-m); font-size: 12px; font-weight: 600;
+          color: var(--blue-lt); min-width: 20px; flex-shrink: 0; margin-top: 2px;
+        }
+
+        .results-foot {
+          padding: 18px 32px;
+          background: var(--card); border-top: 1px solid var(--b-subtle);
+        }
+
+        .upgrade-cta {
+          margin: 0 32px 32px;
+          background: linear-gradient(135deg, rgba(37,99,235,0.1) 0%, rgba(59,130,246,0.05) 100%);
+          border: 1px solid rgba(59,130,246,0.2);
+          border-radius: 18px; padding: 26px 28px;
+          display: flex; align-items: center; justify-content: space-between;
+          gap: 24px; flex-wrap: wrap;
+        }
+        .upgrade-title {
+          font-family: var(--font-h); font-size: 17px; font-weight: 700;
+          color: var(--text-1); margin-bottom: 6px; letter-spacing: -0.02em;
+        }
+        .upgrade-desc { font-size: 13.5px; color: var(--text-2); line-height: 1.55; }
+
+        /* ── FAQ ── */
+        .faq { margin: 64px 0 48px; }
+        .section-head { text-align: center; margin-bottom: 40px; }
+        .section-title {
+          font-family: var(--font-h); font-size: 28px; font-weight: 800;
+          color: var(--text-1); letter-spacing: -0.03em; margin-bottom: 8px;
+        }
+        .section-sub { font-size: 14px; color: var(--text-3); }
+        .faq-grid {
+          display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+        }
+        @media(max-width:640px){ .faq-grid { grid-template-columns: 1fr; } }
+        .faq-card {
+          background: var(--card-2); border: 1px solid var(--b-def);
+          border-radius: 16px; padding: 24px;
+          transition: border-color 0.2s, background 0.2s;
+        }
+        .faq-card:hover { border-color: var(--b-strong); background: #0f1e35; }
+        .faq-q {
+          font-family: var(--font-h); font-size: 14px; font-weight: 700;
+          color: var(--text-1); margin-bottom: 10px; letter-spacing: -0.01em;
+        }
+        .faq-a { font-size: 13.5px; color: var(--text-2); line-height: 1.65; }
+
+        /* ── FOOTER ── */
+        .footer {
+          padding: 40px 0 0; border-top: 1px solid var(--b-subtle);
+          text-align: center;
+        }
+        .footer-trust {
+          display: flex; justify-content: center; gap: 32px;
+          flex-wrap: wrap; margin-bottom: 24px;
+        }
+        .trust-item {
+          display: flex; align-items: center; gap: 7px;
+          font-size: 12.5px; color: var(--text-3);
+        }
+        .footer-links {
+          display: flex; justify-content: center; gap: 24px;
+          flex-wrap: wrap; margin-bottom: 20px;
+        }
+        .footer-links a {
+          font-size: 13px; color: var(--text-2);
+          text-decoration: none; transition: color 0.15s;
+        }
+        .footer-links a:hover { color: var(--text-1); }
+        .footer-copy { font-size: 12px; color: var(--text-3); padding-bottom: 32px; }
+
+        /* ── RESPONSIVE ── */
+        @media(max-width:640px){
+          .hero { padding: 48px 0 36px; }
+          .panel { padding: 20px; }
+          .panel-head { flex-direction: column; }
+          .results-head { padding: 20px; }
+          .results-body { padding: 20px; }
+          .results-foot { padding: 16px 20px; }
+          .upgrade-cta { margin: 0 16px 20px; flex-direction: column; }
+          .footer-trust { gap: 14px; }
+          .stats-row { flex-direction: column; }
+          .stat { border-right: none; border-bottom: 1px solid var(--b-def); }
+          .stat:last-child { border-bottom: none; }
         }
       `}</style>
     </>
   );
 }
-

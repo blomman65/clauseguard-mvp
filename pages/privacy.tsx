@@ -1,9 +1,5 @@
 import Meta from '../components/Meta';
 
-// Import shared styles from about.tsx — in practice, move SHARED_STYLES to a shared file
-// For now, redeclare here (same content)
-declare const SHARED_STYLES: string;
-
 export default function Privacy() {
   return (
     <>
@@ -11,29 +7,31 @@ export default function Privacy() {
         title="Privacy Policy - TrustTerms"
         description="How TrustTerms handles your data and protects your privacy"
       />
-      <div className="ip-root">
-        <nav className="ip-nav">
-          <a href="/" className="ip-nav-logo">
-            <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
-              <path d="M10 2L18 6V14L10 18L2 14V6L10 2Z" stroke="#3B82F6" strokeWidth="1.5" fill="none"/>
-              <path d="M10 6L14 8V12L10 14L6 12V8L10 6Z" fill="#3B82F6" opacity="0.4"/>
+      <div className="root">
+
+        <nav className="nav">
+          <a href="/" className="logo">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2L22 7V17L12 22L2 17V7L12 2Z" stroke="#3B82F6" strokeWidth="1.6" fill="none"/>
+              <path d="M12 7L17 9.5V14.5L12 17L7 14.5V9.5L12 7Z" fill="#3B82F6" fillOpacity="0.3"/>
             </svg>
             TrustTerms
           </a>
-          <a href="/" className="ip-back">← Back to home</a>
+          <a href="/" className="back-link">← Back to home</a>
         </nav>
 
-        <main className="ip-main">
-          <div className="ip-page-header">
-            <div className="ip-page-tag">Legal</div>
-            <h1 className="ip-page-title">Privacy Policy</h1>
-            <p className="ip-meta">Last updated: January 26, 2025</p>
+        <main className="main">
+          <div className="page-header">
+            <div className="tag">Legal</div>
+            <h1 className="page-title">Privacy Policy</h1>
+            <p className="meta-date">Last updated: January 26, 2025</p>
           </div>
 
-          <div className="ip-prose">
+          <div className="prose">
+
             <h2>1. Data Controller</h2>
             <p><strong>Legal Entity:</strong> TrustTerms, Enskild Firma<br/>
-            <strong>Organization Number:</strong> [To be added after registration]<br/>
+            <strong>Organization Number:</strong> 20080117-1372<br/>
             <strong>Contact Email:</strong> trustterms.help@outlook.com<br/>
             <strong>Response Time:</strong> Within 30 days for GDPR requests</p>
             <p>For official company records, see <a href="https://www.bolagsverket.se" target="_blank" rel="noopener noreferrer">Bolagsverket</a>.</p>
@@ -53,7 +51,7 @@ export default function Privacy() {
               <li>To comply with legal obligations</li>
             </ul>
 
-            <h2>4. Data Sharing & Third Parties</h2>
+            <h2>4. Data Sharing &amp; Third Parties</h2>
             <p>We share data only with:</p>
             <ul>
               <li><strong>OpenAI:</strong> Contract text sent to OpenAI's API for analysis. Retained 30 days for abuse monitoring, then permanently deleted. Not used to train models. <a href="https://openai.com/policies/api-data-usage-policies" target="_blank" rel="noopener noreferrer">Learn more</a></li>
@@ -101,7 +99,7 @@ export default function Privacy() {
               <li>Input sanitization to prevent injection attacks</li>
             </ul>
 
-            <h2>10. Cookies & Tracking</h2>
+            <h2>10. Cookies &amp; Tracking</h2>
             <ul>
               <li><strong>Essential:</strong> Cookie consent preferences (localStorage only)</li>
               <li><strong>Analytics (optional):</strong> PostHog — requires explicit consent</li>
@@ -121,15 +119,16 @@ export default function Privacy() {
             <h2>13. Changes to This Policy</h2>
             <p>Material changes will be notified via email or a prominent notice on our website. The "Last updated" date at the top reflects the most recent changes.</p>
 
-            <h2>14. Contact & Supervisory Authority</h2>
+            <h2>14. Contact &amp; Supervisory Authority</h2>
             <p><strong>Email:</strong> trustterms.help@outlook.com<br/>
             <strong>Response time:</strong> Within 30 days for GDPR requests</p>
             <p>If not satisfied, you may lodge a complaint with the <a href="https://www.imy.se" target="_blank" rel="noopener noreferrer">Swedish Data Protection Authority (IMY)</a> or your local authority.</p>
+
           </div>
         </main>
 
-        <footer className="ip-footer">
-          <div className="ip-footer-links">
+        <footer className="footer">
+          <div className="footer-links">
             <a href="/about">About</a>
             <a href="/terms">Terms of Service</a>
             <a href="/contact">Contact</a>
@@ -137,36 +136,77 @@ export default function Privacy() {
           </div>
         </footer>
       </div>
-      <style jsx>{INNER_STYLES}</style>
+
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@700;800&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+          background: #030B18; color: #F1F5F9;
+          font-family: 'DM Sans', system-ui, sans-serif;
+          font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased;
+          background-image: radial-gradient(ellipse 80% 40% at 50% -5%, rgba(37,99,235,0.1) 0%, transparent 65%);
+        }
+        .root { min-height: 100vh; }
+        .nav {
+          position: sticky; top: 0; z-index: 50;
+          background: rgba(3,11,24,0.88); backdrop-filter: blur(20px);
+          border-bottom: 1px solid rgba(255,255,255,0.05);
+          padding: 0 24px; height: 54px;
+          display: flex; align-items: center; justify-content: space-between;
+        }
+        .logo {
+          display: flex; align-items: center; gap: 9px;
+          font-family: 'Sora', system-ui, sans-serif;
+          font-size: 15px; font-weight: 700; color: #F1F5F9;
+          text-decoration: none; letter-spacing: -0.02em;
+        }
+        .back-link { font-size: 13px; color: #475569; text-decoration: none; transition: color 0.15s; }
+        .back-link:hover { color: #94A3B8; }
+        .main { max-width: 720px; margin: 0 auto; padding: 56px 24px 80px; }
+        .page-header { margin-bottom: 44px; }
+        .tag {
+          display: inline-block; font-family: 'JetBrains Mono', monospace;
+          font-size: 10.5px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+          color: #60A5FA; background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.18);
+          padding: 4px 10px; border-radius: 5px; margin-bottom: 14px;
+        }
+        .page-title {
+          font-family: 'Sora', system-ui, sans-serif;
+          font-size: clamp(26px, 4vw, 34px); font-weight: 800;
+          color: #F1F5F9; letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 10px;
+        }
+        .meta-date { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #475569; }
+
+        /* PROSE */
+        .prose h2 {
+          font-family: 'Sora', system-ui, sans-serif;
+          font-size: 14px; font-weight: 700; color: #E2E8F0;
+          margin: 36px 0 12px; padding-bottom: 10px;
+          border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .prose h2:first-child { margin-top: 0; }
+        .prose p { font-size: 14px; color: #94A3B8; line-height: 1.75; margin-bottom: 12px; }
+        .prose ul {
+          list-style: none; padding-left: 0; margin-bottom: 12px;
+          display: flex; flex-direction: column; gap: 8px;
+        }
+        .prose li {
+          font-size: 14px; color: #94A3B8; line-height: 1.65;
+          padding-left: 22px; position: relative;
+        }
+        .prose li::before {
+          content: '—'; position: absolute; left: 0;
+          color: #3B82F6; font-weight: 700;
+        }
+        .prose strong { color: #CBD5E1; font-weight: 600; }
+        .prose a { color: #60A5FA; text-decoration: none; }
+        .prose a:hover { text-decoration: underline; }
+
+        .footer { border-top: 1px solid rgba(255,255,255,0.05); padding: 24px; text-align: center; }
+        .footer-links { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; }
+        .footer-links a { font-size: 13px; color: #475569; text-decoration: none; transition: color 0.15s; }
+        .footer-links a:hover { color: #94A3B8; }
+      `}</style>
     </>
   );
 }
-
-const INNER_STYLES = `
-  @import url('https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #030B18; color: #F1F5F9; font-family: 'DM Sans', system-ui, sans-serif; font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
-  .ip-root { min-height: 100vh; background: #030B18; }
-  .ip-nav { position: sticky; top: 0; z-index: 50; background: rgba(3,11,24,0.9); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255,255,255,0.05); padding: 0 24px; height: 52px; display: flex; align-items: center; justify-content: space-between; }
-  .ip-nav-logo { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: #F1F5F9; text-decoration: none; letter-spacing: -0.01em; }
-  .ip-back { font-size: 13px; color: #475569; text-decoration: none; transition: color 0.15s; }
-  .ip-back:hover { color: #94A3B8; }
-  .ip-main { max-width: 720px; margin: 0 auto; padding: 56px 24px 80px; }
-  .ip-page-header { margin-bottom: 44px; }
-  .ip-page-tag { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #60A5FA; background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.18); padding: 4px 10px; border-radius: 4px; margin-bottom: 14px; }
-  .ip-page-title { font-family: 'Sora', system-ui, sans-serif; font-size: clamp(26px, 4vw, 34px); font-weight: 800; color: #F1F5F9; letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 12px; }
-  .ip-meta { font-size: 12px; color: #475569; font-family: 'JetBrains Mono', monospace; }
-  .ip-prose h2 { font-family: 'Sora', system-ui, sans-serif; font-size: 14.5px; font-weight: 700; color: #E2E8F0; letter-spacing: -0.02em; margin: 34px 0 12px; padding-bottom: 9px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-  .ip-prose h2:first-child { margin-top: 0; }
-  .ip-prose p { font-size: 14px; color: #94A3B8; line-height: 1.75; margin-bottom: 12px; }
-  .ip-prose ul { padding-left: 0; list-style: none; margin-bottom: 12px; display: flex; flex-direction: column; gap: 7px; }
-  .ip-prose li { font-size: 14px; color: #94A3B8; line-height: 1.65; padding-left: 20px; position: relative; }
-  .ip-prose li::before { content: '—'; position: absolute; left: 0; color: #3B82F6; font-weight: 600; }
-  .ip-prose strong { color: #CBD5E1; font-weight: 600; }
-  .ip-prose a { color: #60A5FA; text-decoration: none; }
-  .ip-prose a:hover { text-decoration: underline; }
-  .ip-footer { border-top: 1px solid rgba(255,255,255,0.05); padding: 24px; text-align: center; }
-  .ip-footer-links { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; }
-  .ip-footer-links a { font-size: 13px; color: #475569; text-decoration: none; transition: color 0.15s; }
-  .ip-footer-links a:hover { color: #94A3B8; }
-`;

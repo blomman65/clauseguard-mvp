@@ -53,124 +53,119 @@ export default function Success() {
     verifyPayment();
   }, [retryCount]);
 
-  const states = {
-    verifying: {
-      icon: (
-        <div className="sc-spinner-wrap">
-          <div className="sc-ring" />
-          <div className="sc-ring sc-ring--2" />
-        </div>
-      ),
-      title: "Verifying payment",
-      desc: "Please wait while we confirm your purchase…",
-      sub: null,
-      color: "#3B82F6",
-    },
-    processing: {
-      icon: (
-        <div className="sc-spinner-wrap">
-          <div className="sc-ring sc-ring--amber" />
-          <div className="sc-ring sc-ring--amber sc-ring--2" />
-        </div>
-      ),
-      title: "Setting up access",
-      desc: "Payment confirmed. Preparing your analysis token…",
-      sub: `Attempt ${retryCount + 1} of ${MAX_RETRIES}`,
-      color: "#F59E0B",
-    },
-    success: {
-      icon: (
-        <div className="sc-icon sc-icon--green">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M5 13l4 4L19 7" stroke="#10B981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </div>
-      ),
-      title: "Payment verified",
-      desc: "Redirecting you to analyze your contract…",
-      sub: null,
-      color: "#10B981",
-    },
-    error: {
-      icon: (
-        <div className="sc-icon sc-icon--red">
-          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-            <path d="M11 8v5M11 14.5v.5" stroke="#EF4444" strokeWidth="1.8" strokeLinecap="round"/>
-          </svg>
-        </div>
-      ),
-      title: "Verification issue",
-      desc: errorMessage || "We couldn't verify your payment.",
-      sub: null,
-      color: "#EF4444",
-    },
-  };
+  const isSpinning = status === 'verifying' || status === 'processing';
+  const spinColor = status === 'processing' ? '#f59e0b' : '#3B82F6';
+  const spinColor2 = status === 'processing' ? '#fcd34d' : '#60A5FA';
 
-  const current = states[status];
+  const accentColor =
+    status === 'verifying'   ? '#3B82F6' :
+    status === 'processing'  ? '#f59e0b' :
+    status === 'success'     ? '#10B981' : '#ef4444';
 
   return (
     <>
-      <div className="sc-bg">
-        {/* Grid pattern */}
-        <div className="sc-grid" />
+      <div className="bg">
+        <div className="grid-texture" />
 
-        <div className="sc-card">
+        <div className="card">
           {/* Top accent bar */}
-          <div className="sc-accent" style={{ background: current.color }} />
+          <div className="accent-bar" style={{ background: accentColor }} />
 
-          <div className="sc-body">
+          <div className="card-body">
+
             {/* Logo */}
-            <div className="sc-logo">
-              <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-                <path d="M10 2L18 6V14L10 18L2 14V6L10 2Z" stroke="#3B82F6" strokeWidth="1.5" fill="none"/>
-                <path d="M10 6L14 8V12L10 14L6 12V8L10 6Z" fill="#3B82F6" opacity="0.4"/>
+            <div className="logo">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2L22 7V17L12 22L2 17V7L12 2Z" stroke="#3B82F6" strokeWidth="1.6" fill="none"/>
+                <path d="M12 7L17 9.5V14.5L12 17L7 14.5V9.5L12 7Z" fill="#3B82F6" fillOpacity="0.3"/>
               </svg>
               <span>TrustTerms</span>
             </div>
 
-            {/* Icon */}
-            <div className="sc-icon-wrap">
-              {current.icon}
+            {/* Icon area */}
+            <div className="icon-wrap">
+              {isSpinning && (
+                <div className="rings">
+                  <div className="ring ring-1" style={{ borderTopColor: spinColor }} />
+                  <div className="ring ring-2" style={{ borderTopColor: spinColor2 }} />
+                </div>
+              )}
+
+              {status === 'success' && (
+                <div className="status-icon status-icon--green">
+                  <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+                    <path d="M5 13l5.5 5.5L21 8" stroke="#10B981" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+              )}
+
+              {status === 'error' && (
+                <div className="status-icon status-icon--red">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 8v6M12 15.5v.5" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                </div>
+              )}
             </div>
 
             {/* Text */}
-            <h1 className="sc-title">{current.title}</h1>
-            <p className="sc-desc">{current.desc}</p>
-            {current.sub && <p className="sc-sub">{current.sub}</p>}
+            <h1 className="title">
+              {status === 'verifying'  && 'Verifying payment'}
+              {status === 'processing' && 'Setting up access'}
+              {status === 'success'    && 'Payment verified'}
+              {status === 'error'      && 'Verification issue'}
+            </h1>
 
-            {/* Progress bar for verifying/processing */}
-            {(status === 'verifying' || status === 'processing') && (
-              <div className="sc-progress">
-                <div className="sc-progress-bar" />
+            <p className="desc">
+              {status === 'verifying'  && 'Please wait while we confirm your purchase…'}
+              {status === 'processing' && 'Payment confirmed. Preparing your analysis token…'}
+              {status === 'success'    && 'Redirecting you to analyze your contract…'}
+              {status === 'error'      && (errorMessage || 'We couldn\'t verify your payment.')}
+            </p>
+
+            {status === 'processing' && (
+              <p className="attempt-label">Attempt {retryCount + 1} of {MAX_RETRIES}</p>
+            )}
+
+            {/* Progress bar */}
+            {isSpinning && (
+              <div className="progress-wrap">
+                <div className="progress-bar" style={{ background: `linear-gradient(90deg, ${spinColor}, ${spinColor2})` }} />
               </div>
             )}
 
             {/* Error actions */}
             {status === 'error' && (
-              <div className="sc-error-actions">
-                <button
-                  onClick={() => window.location.reload()}
-                  className="sc-btn sc-btn--primary"
-                >
+              <div className="error-actions">
+                <button onClick={() => window.location.reload()} className="btn-primary">
                   Try Again
                 </button>
-                <a href="/" className="sc-btn sc-btn--ghost">
+                <a href="/" className="btn-ghost">
                   Back to Home
                 </a>
-                <p className="sc-support">
-                  Contact <a href="mailto:trustterms.help@outlook.com">trustterms.help@outlook.com</a> with your payment confirmation
+                <p className="support-note">
+                  Contact{' '}
+                  <a href="mailto:trustterms.help@outlook.com">
+                    trustterms.help@outlook.com
+                  </a>
+                  {' '}with your payment confirmation
                 </p>
               </div>
             )}
+
           </div>
         </div>
       </div>
 
       <style jsx>{`
-        .sc-bg {
+        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@700;800&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        .bg {
           min-height: 100vh;
           background:
-            radial-gradient(ellipse 70% 50% at 50% 0%, rgba(37,99,235,0.1) 0%, transparent 60%),
+            radial-gradient(ellipse 70% 50% at 50% 0%, rgba(37,99,235,0.11) 0%, transparent 65%),
             #030B18;
           display: flex;
           align-items: center;
@@ -178,168 +173,227 @@ export default function Success() {
           padding: 24px;
           position: relative;
           overflow: hidden;
+          font-family: 'DM Sans', system-ui, sans-serif;
+          -webkit-font-smoothing: antialiased;
         }
-        .sc-grid {
+
+        .grid-texture {
           position: absolute;
           inset: 0;
           background-image:
-            linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-          background-size: 48px 48px;
-          mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, black 0%, transparent 100%);
+            linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+          background-size: 52px 52px;
+          mask-image: radial-gradient(ellipse 65% 65% at 50% 50%, black 0%, transparent 100%);
           pointer-events: none;
         }
-        .sc-card {
+
+        .card {
           position: relative;
           background: #0A1628;
           border: 1px solid rgba(255,255,255,0.08);
-          border-radius: 20px;
+          border-radius: 22px;
           width: 100%;
           max-width: 420px;
           overflow: hidden;
-          box-shadow: 0 4px 24px rgba(0,0,0,0.5), 0 32px 64px rgba(0,0,0,0.3);
+          box-shadow:
+            0 4px 24px rgba(0,0,0,0.5),
+            0 32px 80px rgba(0,0,0,0.35);
         }
-        .sc-accent {
+
+        .accent-bar {
           height: 3px;
           width: 100%;
-          opacity: 0.7;
-          transition: background 0.4s;
+          opacity: 0.8;
+          transition: background 0.5s ease;
         }
-        .sc-body {
-          padding: 36px 32px 32px;
+
+        .card-body {
+          padding: 38px 32px 34px;
           text-align: center;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
         }
-        .sc-logo {
+
+        .logo {
           display: inline-flex;
           align-items: center;
           gap: 8px;
           font-size: 14px;
           font-weight: 700;
-          color: #94A3B8;
+          color: #64748b;
           letter-spacing: -0.01em;
-          margin-bottom: 32px;
+          margin-bottom: 36px;
+          font-family: 'Sora', system-ui, sans-serif;
         }
-        .sc-icon-wrap {
+
+        .icon-wrap {
           display: flex;
+          align-items: center;
           justify-content: center;
-          margin-bottom: 24px;
+          width: 64px;
+          height: 64px;
+          margin-bottom: 26px;
         }
-        .sc-spinner-wrap {
+
+        /* Spinner rings */
+        .rings {
           position: relative;
-          width: 52px;
-          height: 52px;
+          width: 64px;
+          height: 64px;
         }
-        .sc-ring {
+        .ring {
           position: absolute;
           inset: 0;
           border: 2px solid transparent;
-          border-top-color: #3B82F6;
           border-radius: 50%;
+        }
+        .ring-1 {
           animation: spin 1s linear infinite;
         }
-        .sc-ring--amber { border-top-color: #F59E0B; }
-        .sc-ring--2 {
-          inset: 10px;
-          border-top-color: #60A5FA;
-          animation-duration: 0.7s;
-          animation-direction: reverse;
+        .ring-2 {
+          inset: 11px;
+          animation: spin 0.65s linear infinite reverse;
         }
-        .sc-ring--amber.sc-ring--2 { border-top-color: #FCD34D; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .sc-icon {
-          width: 52px;
-          height: 52px;
+
+        /* Status icons */
+        .status-icon {
+          width: 64px;
+          height: 64px;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
+          animation: pop-in 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
         }
-        .sc-icon--green {
+        @keyframes pop-in {
+          from { transform: scale(0.6); opacity: 0; }
+          to   { transform: scale(1);   opacity: 1; }
+        }
+        .status-icon--green {
           background: rgba(16,185,129,0.1);
-          border: 1px solid rgba(16,185,129,0.2);
+          border: 1px solid rgba(16,185,129,0.25);
+          box-shadow: 0 0 30px rgba(16,185,129,0.12);
         }
-        .sc-icon--red {
+        .status-icon--red {
           background: rgba(239,68,68,0.1);
-          border: 1px solid rgba(239,68,68,0.2);
+          border: 1px solid rgba(239,68,68,0.25);
+          box-shadow: 0 0 30px rgba(239,68,68,0.1);
         }
-        .sc-title {
-          font-size: 20px;
+
+        .title {
+          font-family: 'Sora', system-ui, sans-serif;
+          font-size: 21px;
           font-weight: 700;
           color: #F1F5F9;
           letter-spacing: -0.025em;
           margin-bottom: 10px;
         }
-        .sc-desc {
+
+        .desc {
           font-size: 14px;
-          color: #64748B;
-          line-height: 1.6;
-          margin-bottom: 6px;
+          color: #64748b;
+          line-height: 1.65;
+          max-width: 300px;
+          margin-bottom: 8px;
         }
-        .sc-sub {
-          font-size: 12px;
-          color: #475569;
+
+        .attempt-label {
           font-family: 'JetBrains Mono', monospace;
-          margin-bottom: 20px;
+          font-size: 11.5px;
+          color: #475569;
+          margin-bottom: 22px;
         }
-        .sc-progress {
+
+        /* Progress bar */
+        .progress-wrap {
+          width: 100%;
           height: 2px;
           background: rgba(255,255,255,0.05);
           border-radius: 1px;
           overflow: hidden;
-          margin-top: 24px;
+          margin-top: 26px;
         }
-        .sc-progress-bar {
+        .progress-bar {
           height: 100%;
-          background: linear-gradient(90deg, #2563EB, #60A5FA);
-          animation: progress-slide 1.5s ease-in-out infinite;
+          width: 55%;
           border-radius: 1px;
+          animation: slide 1.6s ease-in-out infinite;
         }
-        @keyframes progress-slide {
-          0%   { transform: translateX(-100%); width: 60%; }
-          100% { transform: translateX(200%); width: 60%; }
+        @keyframes slide {
+          0%   { transform: translateX(-120%); }
+          100% { transform: translateX(260%); }
         }
-        .sc-error-actions {
+
+        /* Error actions */
+        .error-actions {
           display: flex;
           flex-direction: column;
           gap: 10px;
-          margin-top: 24px;
+          margin-top: 26px;
+          width: 100%;
         }
-        .sc-btn {
+
+        .btn-primary {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 12px 20px;
+          font-size: 14px;
+          font-weight: 600;
+          border-radius: 11px;
+          cursor: pointer;
+          border: none;
+          background: #2563EB;
+          color: #fff;
+          font-family: 'DM Sans', system-ui, sans-serif;
+          transition: background 0.15s, transform 0.15s;
+          box-shadow: 0 4px 16px rgba(37,99,235,0.3);
+        }
+        .btn-primary:hover {
+          background: #3B82F6;
+          transform: translateY(-1px);
+        }
+
+        .btn-ghost {
           display: flex;
           align-items: center;
           justify-content: center;
           padding: 11px 20px;
-          font-size: 13.5px;
+          font-size: 14px;
           font-weight: 600;
-          border-radius: 9px;
+          border-radius: 11px;
           cursor: pointer;
-          border: none;
-          transition: all 0.15s;
-          text-decoration: none;
-          font-family: inherit;
-        }
-        .sc-btn--primary {
-          background: #2563EB;
-          color: #fff;
-        }
-        .sc-btn--primary:hover { background: #3B82F6; }
-        .sc-btn--ghost {
           background: rgba(255,255,255,0.04);
           color: #94A3B8;
           border: 1px solid rgba(255,255,255,0.08);
+          text-decoration: none;
+          font-family: 'DM Sans', system-ui, sans-serif;
+          transition: background 0.15s, color 0.15s;
         }
-        .sc-btn--ghost:hover { background: rgba(255,255,255,0.08); color: #E2E8F0; }
-        .sc-support {
-          font-size: 11.5px;
+        .btn-ghost:hover {
+          background: rgba(255,255,255,0.08);
+          color: #F1F5F9;
+        }
+
+        .support-note {
+          font-size: 12px;
           color: #475569;
           line-height: 1.6;
-          margin-top: 4px;
+          margin-top: 6px;
         }
-        .sc-support a {
+        .support-note a {
           color: #60A5FA;
           text-decoration: none;
         }
-        .sc-support a:hover { text-decoration: underline; }
+        .support-note a:hover { text-decoration: underline; }
+
+        @media(max-width: 480px) {
+          .card { border-radius: 18px; }
+          .card-body { padding: 30px 22px 26px; }
+        }
       `}</style>
     </>
   );
