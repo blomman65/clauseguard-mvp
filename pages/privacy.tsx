@@ -30,8 +30,7 @@ export default function Privacy() {
           <div className="prose">
 
             <h2>1. Data Controller</h2>
-            <p><strong>Legal Entity:</strong> TrustTerms, Enskild Firma<br/>
-            <strong>Organization Number:</strong> 20080117-1372<br/>
+            <p><strong>Legal Entity:</strong>Enskild Firma<br/>            
             <strong>Contact Email:</strong> trustterms.help@outlook.com<br/>
             <strong>Response Time:</strong> Within 30 days for GDPR requests</p>
             <p>For official company records, see <a href="https://www.bolagsverket.se" target="_blank" rel="noopener noreferrer">Bolagsverket</a>.</p>

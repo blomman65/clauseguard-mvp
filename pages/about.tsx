@@ -75,9 +75,7 @@ export default function About() {
                 <tbody>
                   {[
                     ["Business Name", "TrustTerms"],
-                    ["Legal Entity", "Enskild Firma (Sole Proprietorship)"],
-                    ["Organization Number", "20080117-1372"],
-                    ["VAT Number", "SE080117137201"],
+                    ["Legal Entity", "Enskild Firma (Sole Proprietorship)"],                                        
                     ["Contact Email", "trustterms.help@outlook.com"],
                   ].map(([k, v], i) => (
                     <tr key={i}>
@@ -90,8 +88,7 @@ export default function About() {
                     </tr>
                   ))}
                 </tbody>
-              </table>
-              <p className="data-note">For official records, see <a href="https://www.bolagsverket.se" target="_blank" rel="noopener noreferrer">Bolagsverket</a></p>
+              </table>              
             </div>
           </section>
 

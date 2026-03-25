@@ -121,8 +121,7 @@ export default function Contact() {
                 <tbody>
                   {[
                     ["Business Name", "TrustTerms"],
-                    ["Legal Entity", "Enskild Firma (Sole Proprietorship)"],
-                    ["Organization Number", "20080117-1372"],
+                    ["Legal Entity", "Enskild Firma (Sole Proprietorship)"]                    ,
                     ["Contact Email", "trustterms.help@outlook.com"],
                   ].map(([k, v], i) => (
                     <tr key={i}>
